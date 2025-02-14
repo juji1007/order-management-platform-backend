@@ -3,6 +3,7 @@ package com.nineteen.omp.global.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.nineteen.omp.global.config.JpaAuditingConfig;
+import com.nineteen.omp.global.config.QueryDslConfig;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +19,7 @@ import org.springframework.context.annotation.Import;
 
 
 @DataJpaTest
-@Import({JpaAuditingConfig.class})
+@Import({JpaAuditingConfig.class, QueryDslConfig.class})
 @DisplayName("BaseEntity 클래스의")
 class BaseEntityTest {
 
