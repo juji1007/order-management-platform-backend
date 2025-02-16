@@ -28,8 +28,10 @@ public class UserController {
   }
 
   @PostMapping("/users/signup")
-  public String signup(@RequestBody @Valid SignupRequestDto requestDto,
-      BindingResult bindingResult) {
+  public String signup(
+      @RequestBody @Valid SignupRequestDto requestDto,
+      BindingResult bindingResult
+  ) {
 
     // Validation 예외처리
     List<FieldError> fieldErrors = bindingResult.getFieldErrors();
