@@ -24,4 +24,26 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id", updatable = false, nullable = false)
   private Long id;
+
+  @Column(nullable = false)
+  private String username;
+
+  @Column(nullable = false)
+  private String password;
+
+  @Column(nullable = false)
+  private String nickname;
+
+  @Column(nullable = false)
+  private String role;
+
+  @Column(nullable = false)
+  private String email;
+
+  @Column(nullable = false)
+  private Boolean is_public;
+
+  @Column(nullable = false)
+  private String delivery_address;
+
 }
