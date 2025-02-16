@@ -5,8 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 public record SignupRequestDto(
-    Long id,  // UUID
-
     @NotBlank
     @Pattern(
         regexp = "^[a-z0-9]{4,10}$",
