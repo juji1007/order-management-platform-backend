@@ -1,9 +1,13 @@
 package com.nineteen.omp.user.service;
 
+import com.nineteen.omp.global.dto.ResponseDto;
+import com.nineteen.omp.global.exception.CommonExceptionCode;
+import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +20,12 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public void signup(SignupRequestDto requestDto) {
+  public ResponseEntity<ResponseDto<?>> signup(SignupRequestDto requestDto) {
 
     // 회원 중복 확인
     boolean checkUsername = userRepository.existsByUsername(requestDto.username());
     if (checkUsername) {
-      throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
+      throw new CustomException(CommonExceptionCode.DUPLICATE_USERNAME);
     }
     // 사용자 등록
     User user = User.builder()
@@ -36,6 +40,7 @@ public class UserServiceImpl implements UserService {
 
     userRepository.save(user);
 
+    return ResponseEntity.ok().body(ResponseDto.success());
   }
 
 }
