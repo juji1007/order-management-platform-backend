@@ -4,6 +4,7 @@ import com.nineteen.omp.auth.domain.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public record SignupRequestDto(
     @NotBlank
@@ -21,8 +22,9 @@ public record SignupRequestDto(
     String password, // 비밀번호
 
     @NotBlank
+    @Size(max = 30)
     String nickname, // 닉네임
-
+    
     Role role, // 역할
 
     @NotBlank
@@ -32,6 +34,7 @@ public record SignupRequestDto(
     Boolean is_public, // 공개여부
 
     @NotBlank
+    @Size(max = 30)
     String delivery_address // 배달주소
 ) {
 
