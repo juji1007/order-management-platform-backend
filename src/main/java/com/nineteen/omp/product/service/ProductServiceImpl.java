@@ -3,6 +3,7 @@ package com.nineteen.omp.product.service;
 import com.nineteen.omp.global.exception.CommonExceptionCode;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.product.controller.dto.ProductRequestDto;
+import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.Product;
 import com.nineteen.omp.product.exception.ProductExceptionCode;
 import com.nineteen.omp.product.repository.ProductRepository;
@@ -53,6 +54,20 @@ public class ProductServiceImpl implements ProductService {
     } catch (Exception e) {
       throw new CustomException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @Override
+  public ProductResponseDto getProductById(UUID productId) {
+    Product product = productRepository.findById(productId)
+        .orElseThrow(() -> new CustomException(ProductExceptionCode.PRODUCT_NOT_FOUND));
+
+    return new ProductResponseDto(
+        product.getId(),
+        product.getName(),
+        product.getPrice(),
+        product.getImage(),
+        product.getDescription()
+    );
   }
 
 
