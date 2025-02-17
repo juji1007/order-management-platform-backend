@@ -22,7 +22,6 @@ public class AesEncryptor implements Encryptor {
   ) {
     this.secretKey =
         new SecretKeySpec(aesKey.getBytes(StandardCharsets.UTF_8), AES_ALGORITHM);
-    ;
   }
 
   @Override
