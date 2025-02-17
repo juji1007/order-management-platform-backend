@@ -3,7 +3,6 @@ package com.nineteen.omp.user.service;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +18,8 @@ public class UserService {
   public void signup(SignupRequestDto requestDto) {
 
     // 회원 중복 확인
-    Optional<User> checkUsername = userRepository.findByUsername(requestDto.username());
-    if (checkUsername.isPresent()) {
+    boolean checkUsername = userRepository.existsByUsername(requestDto.username());
+    if (checkUsername) {
       throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
     }
     // 사용자 등록
