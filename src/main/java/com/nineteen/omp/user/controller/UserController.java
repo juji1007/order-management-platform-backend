@@ -1,11 +1,13 @@
 package com.nineteen.omp.user.controller;
 
+import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.service.UserService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +24,7 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/users/signup")
-  public String signup(
+  public ResponseEntity<ResponseDto<?>> signup(
       @RequestBody @Valid SignupRequestDto requestDto,
       BindingResult bindingResult
   ) {
@@ -33,11 +35,14 @@ public class UserController {
       for (FieldError fieldError : bindingResult.getFieldErrors()) {
         log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
       }
-      return "signup failed";
+//      return"signup failed";
+      return null;
+//      return ResponseEntity.badRequest().body(ResponseDto.failure("Signup failed due to validation errors");
     }
 
     userService.signup(requestDto);
 
-    return "post signup success";
+    return ResponseEntity.ok().body(ResponseDto.success());
+
   }
 }
