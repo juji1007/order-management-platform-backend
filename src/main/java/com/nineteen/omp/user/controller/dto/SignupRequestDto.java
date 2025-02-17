@@ -1,5 +1,6 @@
 package com.nineteen.omp.user.controller.dto;
 
+import com.nineteen.omp.auth.domain.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,8 +23,7 @@ public record SignupRequestDto(
     @NotBlank
     String nickname, // 닉네임
 
-    @NotBlank
-    String role, // 역할
+    Role role, // 역할
 
     @NotBlank
     @Email
@@ -35,11 +35,9 @@ public record SignupRequestDto(
     String delivery_address // 배달주소
 ) {
 
-  // role 기본값 설정 ("USER")
   public SignupRequestDto {
-    if (role == null) {
-      role = "USER";
-    }
+    // role 기본값 설정 ("USER")
+    role = Role.USER;
 
     // is_public 기본값 설정(true)
     if (is_public == null) {
