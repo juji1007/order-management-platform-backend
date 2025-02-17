@@ -4,12 +4,12 @@ import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
   private final UserRepository userRepository;

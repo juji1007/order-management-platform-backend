@@ -4,7 +4,7 @@ import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.service.UserService;
 import jakarta.validation.Valid;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
   private final UserService userService;
