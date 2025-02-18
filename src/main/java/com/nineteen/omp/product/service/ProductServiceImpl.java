@@ -96,5 +96,18 @@ public class ProductServiceImpl implements ProductService {
         .build();
   }
 
+  @Override
+  public void deleteProduct(UUID productId) {
+    StoreProduct storeProduct = getProductById(productId);
+    productRepository.delete(storeProduct);
+  }
+
+  @Override
+  public ProductResponseDto softDeleteProduct(UUID productId) {
+    StoreProduct storeProduct = getProductById(productId);
+    storeProduct.softDelete();
+    productRepository.save(storeProduct);
+    return new ProductResponseDto(storeProduct);
+  }
 
 }

@@ -9,6 +9,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,5 +49,16 @@ public class ProductController {
     return ResponseEntity.ok().body(ResponseDto.success(updateProduct));
   }
 
+  @DeleteMapping("/{productId}")
+  public ResponseEntity<ResponseDto<?>> deleteProduct(@PathVariable UUID productId) {
+    productService.deleteProduct(productId);
+    return ResponseEntity.ok().body(ResponseDto.success());
+  }
 
+  // TODO : softDelete -> public 일 때 사용 가능.
+  @DeleteMapping("/soft/{productId}")
+  public ResponseEntity<ResponseDto<?>> softDeleteProduct(@PathVariable UUID productId) {
+    ProductResponseDto product = productService.softDeleteProduct(productId);
+    return ResponseEntity.ok().body(ResponseDto.success(product));
+  }
 }
