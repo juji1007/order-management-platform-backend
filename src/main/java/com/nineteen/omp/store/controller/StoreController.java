@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -91,17 +92,30 @@ public class StoreController {
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 
-  private StoreServiceRequestDto toStoreServiceRequestDto(StoreRequestDto storeRequestDto,
-      User user) {
-    return new StoreServiceRequestDto(
-        user,
-        storeRequestDto.categoryCode(),
-        storeRequestDto.name(),
-        storeRequestDto.address(),
-        storeRequestDto.phone(),
-        storeRequestDto.openHours(),
-        storeRequestDto.closeHours(),
-        storeRequestDto.closedDays()
-    );
+  @PatchMapping("/{storeId}/soft-delete")
+  public ResponseEntity<?> softDeleteStore(@PathVariable UUID storeId) {
+    storeService.softDeleteStore(storeId);
+    return ResponseEntity.ok(ResponseDto.success());
+  }
+
+  @DeleteMapping("/{storeId}")
+  public ResponseEntity<?> deleteStore(@PathVariable UUID storeId) {
+    storeService.hardDeleteStore(storeId);
+    return ResponseEntity.ok(ResponseDto.success());
   }
 }
+
+private StoreServiceRequestDto toStoreServiceRequestDto(StoreRequestDto storeRequestDto,
+    User user) {
+  return new StoreServiceRequestDto(
+      user,
+      storeRequestDto.categoryCode(),
+      storeRequestDto.name(),
+      storeRequestDto.address(),
+      storeRequestDto.phone(),
+      storeRequestDto.openHours(),
+      storeRequestDto.closeHours(),
+      storeRequestDto.closedDays()
+  );
+}
+

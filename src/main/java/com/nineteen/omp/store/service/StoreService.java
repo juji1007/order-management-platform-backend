@@ -112,6 +112,42 @@ public class StoreService {
     return toResponseDto(savedStore);
   }
 
+  //softDelete
+  @Transactional
+  public Boolean softDeleteStore(UUID storeId) {
+    //아이디 존재 확인
+    Store store = storeRepository.findById(storeId)
+        .filter(s -> s.getDeletedAt() == null)
+        .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+
+    //@PreRemove
+    storeRepository.deleteById(storeId);
+
+    //삭제 후 아이디 존재 확인
+    Store deletedStore = storeRepository.findById(storeId)
+        .filter(s -> s.getDeletedAt() != null)
+        .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_DELETE_FAIL));
+    return true;
+  }
+
+  //hardDelete
+  @Transactional
+  public Boolean hardDeleteStore(UUID storeId) {
+    //아이디 존재 확인
+    Store store = storeRepository.findById(storeId)
+        .filter(s -> s.getDeletedAt() != null) //soft삭제 후 수행
+        .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+
+    storeRepository.delete(store);
+
+    //아이디 삭제 후 존재 확인
+    boolean isDeleted = !storeRepository.existsById(storeId);
+    if (!isDeleted) {
+      throw new StoreException(StoreExceptionCode.STORE_DELETE_FAIL);
+    }
+    return isDeleted;
+  }
+
   //toResponse
   private StoreResponseDto toResponseDto(Store store) {
     return new StoreResponseDto(
