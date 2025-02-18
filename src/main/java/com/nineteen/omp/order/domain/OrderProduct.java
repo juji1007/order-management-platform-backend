@@ -1,8 +1,8 @@
 package com.nineteen.omp.order.domain;
 
 
+import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.store.domain.Store;
-import com.nineteen.omp.store.domain.StoreProduct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

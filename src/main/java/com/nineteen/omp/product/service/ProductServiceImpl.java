@@ -4,7 +4,7 @@ import com.nineteen.omp.global.exception.CommonExceptionCode;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.product.controller.dto.ProductRequestDto;
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
-import com.nineteen.omp.product.domain.Product;
+import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.product.exception.ProductExceptionCode;
 import com.nineteen.omp.product.repository.ProductRepository;
 import com.nineteen.omp.store.domain.Store;
@@ -24,20 +24,16 @@ public class ProductServiceImpl implements ProductService {
   private final StoreRepository storeRepository;
 
   @Override
-  public Product addProduct(ProductRequestDto requestDto) {
+  public StoreProduct addProduct(ProductRequestDto requestDto) {
     // TODO: 실제 store의 UUID 정보를 동적으로 조회하도록 변경 필요
     Store store = getStoreById(UUID.fromString("00000000-0000-0000-0000-000000000001"));
-    Product product = createProduct(requestDto, store);
-    return saveProduct(product);
+
+    StoreProduct storeProduct = createProduct(requestDto, store);
+    return saveProduct(storeProduct);
   }
 
-  private Store getStoreById(UUID storeId) {
-    return storeRepository.findById(storeId)
-        .orElseThrow(() -> new CustomException(ProductExceptionCode.STORE_NOT_FOUND));
-  }
-
-  private Product createProduct(ProductRequestDto requestDto, Store store) {
-    return Product.builder()
+  private StoreProduct createProduct(ProductRequestDto requestDto, Store store) {
+    return StoreProduct.builder()
         .store(store)
         .name(requestDto.name())
         .price(requestDto.price())
@@ -46,9 +42,9 @@ public class ProductServiceImpl implements ProductService {
         .build();
   }
 
-  private Product saveProduct(Product product) {
+  private StoreProduct saveProduct(StoreProduct storeProduct) {
     try {
-      return productRepository.save(product);
+      return productRepository.save(storeProduct);
     } catch (DataIntegrityViolationException e) {
       throw new CustomException(ProductExceptionCode.PRODUCT_SAVE_FAILED);
     } catch (Exception e) {
@@ -57,8 +53,30 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductResponseDto getProductById(UUID productId) {
-    Product product = productRepository.findById(productId)
+  public ProductResponseDto getProduct(UUID productId) {
+    StoreProduct storeProduct = getProductById(productId);
+    return new ProductResponseDto(storeProduct);
+  }
+
+  @Override
+  public ProductResponseDto updateProduct(ProductRequestDto requestDto, UUID productId) {
+
+    StoreProduct storeProduct = getProductById(productId);
+    UUID storeId = storeProduct.getStore().getId();
+    Store store = getStoreById(storeId);
+
+    // 필드값 수정
+    StoreProduct updatedStoreProduct = updateProductFromDto(requestDto, storeProduct, store);
+
+    // DB 저장
+    productRepository.save(updatedStoreProduct);
+
+    // 수정된 데이터를 ResponseDto로 반환
+    return new ProductResponseDto(updatedStoreProduct);
+  }
+
+  private StoreProduct getProductById(UUID productId) {
+    return productRepository.findById(productId)
         .orElseThrow(() -> new CustomException(ProductExceptionCode.PRODUCT_NOT_FOUND));
 
     return new ProductResponseDto(

@@ -19,12 +19,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "p_product")
+@Table(name = "p_store_product")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product extends BaseEntity {
+public class StoreProduct extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -44,5 +44,15 @@ public class Product extends BaseEntity {
 
   @Column(length = 500)
   private String description;
+
+  public StoreProductBuilder toBuilder() {
+    return StoreProduct.builder()
+        .id(this.id)
+        .store(this.store)
+        .name(this.name)
+        .price(this.price)
+        .image(this.image)
+        .description(this.description);
+  }
 
 }

@@ -26,8 +26,8 @@ public class ProductController {
 
   @PostMapping()
   public ResponseEntity<ResponseDto<?>> addProduct(@RequestBody ProductRequestDto requestDto) {
-    Product product = productService.addProduct(requestDto);
-    return ResponseEntity.ok().body(ResponseDto.success(product));
+    StoreProduct storeProduct = productService.addProduct(requestDto);
+    return ResponseEntity.ok().body(ResponseDto.success(storeProduct));
   }
 
   @GetMapping("/{productId}")
