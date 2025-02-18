@@ -1,13 +1,18 @@
 package com.nineteen.omp.store.service;
 
+import com.nineteen.omp.global.exception.CommonExceptionCode;
+import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.domain.StoreCategory;
 import com.nineteen.omp.store.exception.StoreException;
 import com.nineteen.omp.store.exception.StoreExceptionCode;
 import com.nineteen.omp.store.repository.StoreRepository;
+import com.nineteen.omp.store.repository.dto.StoreSearchDto;
 import com.nineteen.omp.store.service.dto.StoreResponseDto;
 import com.nineteen.omp.store.service.dto.StoreServiceRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +48,23 @@ public class StoreService {
 
   public boolean existsByNameAndAddress(String name, String address) {
     return storeRepository.existsByNameAndAddress(name, address);
+  }
+
+  //Search
+  public Page<StoreResponseDto> searchStores(String keyword, StoreSearchDto searchDto,
+      Pageable pageable) {
+    // Pageable 검증
+    if (pageable.getPageNumber() < 0) {
+      throw new CustomException(CommonExceptionCode.INVALID_PARAMETER);
+    }
+
+    if (searchDto.openHours() != null && searchDto.closedHours() != null) {
+      if (searchDto.openHours().compareTo(searchDto.closedHours()) > 0) {
+        // 오픈시간 > 닫는시간 처리 추후 localDatetime으로 정확히 날짜로 처리
+        throw new CustomException(CommonExceptionCode.INVALID_PARAMETER);
+      }
+    }
+    return storeRepository.searchStores(keyword, searchDto, pageable);
   }
 
   //toResponse
