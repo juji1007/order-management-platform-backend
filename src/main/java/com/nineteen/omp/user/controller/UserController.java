@@ -1,17 +1,14 @@
 package com.nineteen.omp.user.controller;
 
 import com.nineteen.omp.global.dto.ResponseDto;
-import com.nineteen.omp.user.controller.dto.GetUserInfoPageResponseDto;
 import com.nineteen.omp.user.controller.dto.GetUserInfoResponseDto;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.controller.dto.UpdateUserRequestDto;
 import com.nineteen.omp.user.service.UserService;
-import com.nineteen.omp.user.service.dto.GetUserInfoPageResponseCommand;
 import com.nineteen.omp.user.service.dto.UpdateUserRequestCommand;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
