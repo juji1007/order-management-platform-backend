@@ -3,6 +3,7 @@ package com.nineteen.omp.user.service;
 import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.global.exception.CommonExceptionCode;
 import com.nineteen.omp.global.exception.CustomException;
+import com.nineteen.omp.user.controller.dto.LoginRequestDto;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
@@ -43,4 +44,12 @@ public class UserServiceImpl implements UserService {
     return ResponseEntity.ok().body(ResponseDto.success());
   }
 
+  @Override
+  public ResponseEntity<ResponseDto<?>> login(LoginRequestDto requestDto) {
+
+    User user = userRepository.findByUsername(requestDto.username())
+        .orElseThrow(() -> new CustomException(CommonExceptionCode.USER_NOT_FOUND));
+
+    return ResponseEntity.ok().body(ResponseDto.success());
+  }
 }

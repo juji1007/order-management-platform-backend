@@ -1,6 +1,7 @@
 package com.nineteen.omp.user.controller;
 
 import com.nineteen.omp.global.dto.ResponseDto;
+import com.nineteen.omp.user.controller.dto.LoginRequestDto;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.service.UserService;
 import jakarta.validation.Valid;
@@ -29,5 +30,14 @@ public class UserController {
 
     return ResponseEntity.ok().body(ResponseDto.success());
 
+  }
+
+  @PostMapping("/users/login")
+  public ResponseEntity<ResponseDto<?>> login(
+      @RequestBody @Valid LoginRequestDto requestDto
+  ) {
+    userService.login(requestDto);
+
+    return ResponseEntity.ok().body(ResponseDto.success());
   }
 }
