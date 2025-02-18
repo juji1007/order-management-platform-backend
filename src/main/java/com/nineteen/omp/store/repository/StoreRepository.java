@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreRepository extends JpaRepository<Store, UUID>, StoreRepositoryCustom {
 
+  boolean existsByNameAndAddress(String storeName, String address);
 }
