@@ -1,5 +1,6 @@
 package com.nineteen.omp.user.controller;
 
+import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.service.UserService;
 import jakarta.validation.Valid;
