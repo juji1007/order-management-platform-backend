@@ -78,14 +78,22 @@ public class ProductServiceImpl implements ProductService {
   private StoreProduct getProductById(UUID productId) {
     return productRepository.findById(productId)
         .orElseThrow(() -> new CustomException(ProductExceptionCode.PRODUCT_NOT_FOUND));
+  }
 
-    return new ProductResponseDto(
-        product.getId(),
-        product.getName(),
-        product.getPrice(),
-        product.getImage(),
-        product.getDescription()
-    );
+  private Store getStoreById(UUID storeId) {
+    return storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(ProductExceptionCode.STORE_NOT_FOUND));
+  }
+
+  private StoreProduct updateProductFromDto(ProductRequestDto requestDto, StoreProduct storeProduct,
+      Store store) {
+    return storeProduct.toBuilder()
+        .store(store)
+        .name(requestDto.name())
+        .price(requestDto.price())
+        .image(requestDto.image())
+        .description(requestDto.description())
+        .build();
   }
 
 

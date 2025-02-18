@@ -12,5 +12,7 @@ public interface ProductService {
 
   ProductResponseDto getProduct(UUID productId);
 
-  ProductResponseDto getProductById(UUID productId);
+  ProductResponseDto updateProduct(ProductRequestDto requestDto, UUID productId);
+
+
 }
