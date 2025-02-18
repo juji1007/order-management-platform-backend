@@ -1,8 +1,6 @@
 package com.nineteen.omp.store.controller;
 
-import com.nineteen.omp.category.domain.StoreCategory;
-import com.nineteen.omp.global.exception.CommonExceptionCode;
-import com.nineteen.omp.global.exception.CustomException;
+import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.store.controller.dto.StoreRequestDto;
 import com.nineteen.omp.store.service.StoreService;
 import com.nineteen.omp.store.service.dto.StoreResponseDto;
@@ -23,38 +21,25 @@ public class StoreController {
 
   private final StoreService storeService;
   private final UserService userService;
-  private final CategoryService categoryService;
 
   @PostMapping
-  public ResponseEntity<StoreResponseDto> createStore(
+  public ResponseEntity<ResponseDto<StoreResponseDto>> createStore(
       @RequestBody StoreRequestDto storeRequestDto) {
-    try {
-      //user -> 스프링 시큐리티 이용
-      String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-          .toString();
-      User user = userService.findById(userId);
+    String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+        .toString();
+    User user = userService.findById(userId);
 
-      //category -> 카테고리 서비스 이용, 카테고리(db정보 이미 있음) 선택 후 create 가정
-      StoreCategory category = categoryService.findById(storeRequestDto.categoryId());
+    StoreServiceRequestDto storeServiceRequestDto = toStoreServiceRequestDto(storeRequestDto, user);
+    StoreResponseDto storeResponseDto = storeService.createStore(storeServiceRequestDto);
 
-      //StoreRequestDto -> StoreServiceRequestDto 변환(유저 아이디, 카테고리 아이디 추가)
-      StoreServiceRequestDto storeServiceRequestDto = toStoreServiceRequestDto(storeRequestDto,
-          user,
-          category);
-
-      StoreResponseDto storeResponseDto = storeService.createStore(storeServiceRequestDto);
-
-      return ResponseEntity.ok().body(storeResponseDto);
-    } catch (Exception e) {
-      throw new CustomException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-    }
+    return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 
   private StoreServiceRequestDto toStoreServiceRequestDto(StoreRequestDto storeRequestDto,
-      User user, StoreCategory category) {
+      User user) {
     return new StoreServiceRequestDto(
         user,
-        category,
+        storeRequestDto.category(),
         storeRequestDto.name(),
         storeRequestDto.address(),
         storeRequestDto.phone(),
