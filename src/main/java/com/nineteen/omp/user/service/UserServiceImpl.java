@@ -9,6 +9,7 @@ import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   @Transactional
@@ -50,6 +52,9 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findByUsername(requestDto.username())
         .orElseThrow(() -> new CustomException(CommonExceptionCode.USER_NOT_FOUND));
 
+    if (!passwordEncoder.matches(requestDto.password(), user.getPassword())) {
+      throw new CustomException(CommonExceptionCode.INVALID_PASSWORD);
+    }
     return ResponseEntity.ok().body(ResponseDto.success());
   }
 }
