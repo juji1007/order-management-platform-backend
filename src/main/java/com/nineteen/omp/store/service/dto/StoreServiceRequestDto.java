@@ -8,7 +8,7 @@ import java.time.LocalTime;
 public record StoreServiceRequestDto(
 
     User user,
-    StoreCategory category,
+    Integer categoryCode,
     String name,
     String address,
     String phone,

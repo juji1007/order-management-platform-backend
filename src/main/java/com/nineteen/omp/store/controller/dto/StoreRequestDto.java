@@ -5,7 +5,7 @@ import java.time.LocalTime;
 
 // controller -> service
 public record StoreRequestDto(
-    StoreCategory category,
+    Integer categoryCode,
     String name,
     String address,
     String phone,

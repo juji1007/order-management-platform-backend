@@ -25,7 +25,7 @@ public class StoreService {
       throw new StoreException(StoreExceptionCode.STORE_IS_DUPLICATED);
     }
     //enum에서 값 찾기
-    StoreCategory category = StoreCategory.selectName(requestDto.name());
+    StoreCategory category = StoreCategory.fromCode(requestDto.categoryCode());
 
     Store store = Store.builder()
         .user(requestDto.user())

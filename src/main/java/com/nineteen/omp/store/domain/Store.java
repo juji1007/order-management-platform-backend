@@ -2,6 +2,7 @@ package com.nineteen.omp.store.domain;
 
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -35,7 +36,7 @@ public class Store {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Enumerated(EnumType.STRING)
+  @Convert(converter = StoreCategoryConverter.class)
   @Column(name = "category", updatable = true, nullable = false)
   private StoreCategory storeCategory;
 

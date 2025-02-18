@@ -39,7 +39,7 @@ public class StoreController {
       User user) {
     return new StoreServiceRequestDto(
         user,
-        storeRequestDto.category(),
+        storeRequestDto.categoryCode(),
         storeRequestDto.name(),
         storeRequestDto.address(),
         storeRequestDto.phone(),
