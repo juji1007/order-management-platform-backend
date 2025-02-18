@@ -1,6 +1,7 @@
 package com.nineteen.omp.store.service;
 
 import com.nineteen.omp.store.domain.Store;
+import com.nineteen.omp.store.domain.StoreCategory;
 import com.nineteen.omp.store.exception.StoreException;
 import com.nineteen.omp.store.exception.StoreExceptionCode;
 import com.nineteen.omp.store.repository.StoreRepository;
@@ -23,10 +24,12 @@ public class StoreService {
     if (isStoreExsits) {
       throw new StoreException(StoreExceptionCode.STORE_IS_DUPLICATED);
     }
+    //enum에서 값 찾기
+    StoreCategory category = StoreCategory.selectName(requestDto.name());
 
     Store store = Store.builder()
         .user(requestDto.user())
-        .storeCategory(requestDto.category())
+        .storeCategory(category)
         .name(requestDto.name())
         .address(requestDto.address())
         .phone(requestDto.phone())

@@ -1,11 +1,11 @@
 package com.nineteen.omp.store.controller.dto;
 
+import com.nineteen.omp.store.domain.StoreCategory;
 import java.time.LocalTime;
-import java.util.UUID;
 
 // controller -> service
 public record StoreRequestDto(
-    UUID categoryId,
+    StoreCategory category,
     String name,
     String address,
     String phone,

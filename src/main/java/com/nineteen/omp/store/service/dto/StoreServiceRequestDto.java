@@ -1,6 +1,6 @@
 package com.nineteen.omp.store.service.dto;
 
-import com.nineteen.omp.category.domain.StoreCategory;
+import com.nineteen.omp.store.domain.StoreCategory;
 import com.nineteen.omp.user.domain.User;
 import java.time.LocalTime;
 

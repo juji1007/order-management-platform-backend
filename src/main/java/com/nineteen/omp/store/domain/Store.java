@@ -1,9 +1,10 @@
 package com.nineteen.omp.store.domain;
 
-import com.nineteen.omp.category.domain.StoreCategory;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,8 +35,8 @@ public class Store {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @OneToOne
-  @JoinColumn(name = "category_id", nullable = false)
+  @Enumerated(EnumType.STRING)
+  @Column(name = "category", updatable = true, nullable = false)
   private StoreCategory storeCategory;
 
   @Column(name = "name", updatable = true, nullable = false)
