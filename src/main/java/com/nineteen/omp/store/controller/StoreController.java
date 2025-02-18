@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,7 +64,8 @@ public class StoreController {
 
     Sort sort = isAsc ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
     Pageable pageable = PageRequest.of(page - 1, size, sort);
-    Page<StoreResponseDto> searchedStores = storeService.searchStores(keyword, storeSearchDto, pageable);
+    Page<StoreResponseDto> searchedStores = storeService.searchStores(keyword, storeSearchDto,
+        pageable);
 
     return ResponseEntity.ok(ResponseDto.success(searchedStores));
   }
@@ -71,6 +73,21 @@ public class StoreController {
   @GetMapping("/{storeId}")
   public ResponseEntity<ResponseDto<StoreResponseDto>> getStore(@PathVariable UUID storeId) {
     StoreResponseDto storeResponseDto = storeService.getStore(storeId);
+    return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
+  }
+
+  @PatchMapping("/{storeId}")
+  public ResponseEntity<ResponseDto<StoreResponseDto>> updateStore(
+      @PathVariable UUID storeId,
+      @RequestBody StoreRequestDto storeRequestDto
+  ) {
+    //user -> 스프링 시큐리티 이용
+    String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+        .toString();
+    User user = userService.findById(userId);
+
+    StoreServiceRequestDto storeServiceRequestDto = toStoreServiceRequestDto(storeRequestDto, user);
+    StoreResponseDto storeResponseDto = storeService.updateStore(storeId, storeServiceRequestDto);
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 

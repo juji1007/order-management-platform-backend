@@ -77,6 +77,41 @@ public class StoreService {
     return toResponseDto(store);
   }
 
+  //update
+  @Transactional
+  public StoreResponseDto updateStore(UUID storeId, StoreServiceRequestDto requestDto) {
+    //아이디 존재 확인, //localdatetime 예외처리 필요
+    Store store = storeRepository.findById(storeId)
+        .filter(s -> s.getDeletedAt() == null)
+        .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+
+    //enum에서 값 찾기
+    StoreCategory category = StoreCategory.fromCode(requestDto.categoryCode());
+
+    //setter랑 같은 것 같음?
+    if (requestDto.categoryCode() != null) {
+      store.changeStoreCategory(StoreCategory.fromCode(requestDto.categoryCode()));
+    }
+    if (requestDto.name() != null) {
+      store.changeStoreName(requestDto.name());
+    }
+    if (requestDto.address() != null) {
+      store.changeStoreAddress(requestDto.address());
+    }
+    if (requestDto.openHours() != null) {
+      store.changeStoreOpenHours(requestDto.openHours());
+    }
+    if (requestDto.closeHours() != null) {
+      store.changeStoreCloseHours(requestDto.closeHours());
+    }
+    if (requestDto.closedDays() != null) {
+      store.changeStoreClosedDays(requestDto.closedDays());
+    }
+
+    Store savedStore = storeRepository.save(store);
+    return toResponseDto(savedStore);
+  }
+
   //toResponse
   private StoreResponseDto toResponseDto(Store store) {
     return new StoreResponseDto(

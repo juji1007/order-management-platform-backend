@@ -1,6 +1,8 @@
 package com.nineteen.omp.store.domain;
 
 import com.nineteen.omp.global.entity.BaseEntity;
+import com.nineteen.omp.store.exception.StoreException;
+import com.nineteen.omp.store.exception.StoreExceptionCode;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -53,4 +55,36 @@ public class Store extends BaseEntity {
   @Column(name = "closed_days", updatable = true, nullable = true)
   private String closedDays; // -> localDate 고려 리스트도 고려
 
+  public void changeStoreCategory(StoreCategory storeCategory) {
+    if (storeCategory == null) {
+      throw new StoreException(StoreExceptionCode.STORE_CATEGORY_IS_NULL);
+    }
+    this.storeCategory = storeCategory;
+  }
+
+  public void changeStoreName(String name) {
+    if (name == null) {
+      throw new StoreException(StoreExceptionCode.STORE_NAME_IS_NULL);
+    }
+    this.name = name;
+  }
+
+  public void changeStoreAddress(String address) {
+    if (address == null) {
+      throw new StoreException(StoreExceptionCode.STORE_ADDRESS_IS_NULL);
+    }
+    this.address = address;
+  }
+
+  public void changeStoreOpenHours(LocalTime openHours) {
+    this.openHours = openHours;
+  }
+
+  public void changeStoreCloseHours(LocalTime closeHours) {
+    this.closeHours = closeHours;
+  }
+
+  public void changeStoreClosedDays(String closedDays) {
+    this.closedDays = closedDays;
+  }
 }
