@@ -10,6 +10,7 @@ import com.nineteen.omp.store.repository.StoreRepository;
 import com.nineteen.omp.store.repository.dto.StoreSearchDto;
 import com.nineteen.omp.store.service.dto.StoreResponseDto;
 import com.nineteen.omp.store.service.dto.StoreServiceRequestDto;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +66,15 @@ public class StoreService {
       }
     }
     return storeRepository.searchStores(keyword, searchDto, pageable);
+  }
+
+  //Read
+  @Transactional(readOnly = true)
+  public StoreResponseDto getStore(UUID storeId) {
+    Store store = storeRepository.findById(storeId)
+        .filter(s -> s.getDeletedAt() == null)
+        .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+    return toResponseDto(store);
   }
 
   //toResponse

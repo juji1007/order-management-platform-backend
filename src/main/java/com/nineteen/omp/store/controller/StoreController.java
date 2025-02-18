@@ -9,6 +9,7 @@ import com.nineteen.omp.store.service.StoreService;
 import com.nineteen.omp.store.service.dto.StoreResponseDto;
 import com.nineteen.omp.store.service.dto.StoreServiceRequestDto;
 import com.nineteen.omp.user.domain.User;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,6 +66,12 @@ public class StoreController {
     Page<StoreResponseDto> searchedStores = storeService.searchStores(keyword, storeSearchDto, pageable);
 
     return ResponseEntity.ok(ResponseDto.success(searchedStores));
+  }
+
+  @GetMapping("/{storeId}")
+  public ResponseEntity<ResponseDto<StoreResponseDto>> getStore(@PathVariable UUID storeId) {
+    StoreResponseDto storeResponseDto = storeService.getStore(storeId);
+    return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 
   private StoreServiceRequestDto toStoreServiceRequestDto(StoreRequestDto storeRequestDto,
