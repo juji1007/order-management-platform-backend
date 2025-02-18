@@ -8,6 +8,7 @@ import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   @Transactional
   public ResponseEntity<ResponseDto<?>> signup(SignupRequestDto requestDto) {
+
+    String encodedPassword = passwordEncoder.encode(requestDto.password());
 
     // 회원 중복 확인
     boolean checkUsername = userRepository.existsByUsername(requestDto.username());
@@ -30,9 +34,9 @@ public class UserServiceImpl implements UserService {
     // 사용자 등록
     User user = User.builder()
         .username(requestDto.username())
-        .password(requestDto.password())
+        .password(encodedPassword)
         .nickname(requestDto.nickname())
-        .role(requestDto.role())  // 교체 필요
+        .role(requestDto.role())
         .email(requestDto.email())
         .is_public(requestDto.is_public())
         .delivery_address(requestDto.delivery_address())
