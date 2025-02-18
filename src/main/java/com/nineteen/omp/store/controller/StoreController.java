@@ -103,19 +103,20 @@ public class StoreController {
     storeService.hardDeleteStore(storeId);
     return ResponseEntity.ok(ResponseDto.success());
   }
+
+  private StoreServiceRequestDto toStoreServiceRequestDto(StoreRequestDto storeRequestDto,
+      User user) {
+    return new StoreServiceRequestDto(
+        user,
+        storeRequestDto.categoryCode(),
+        storeRequestDto.name(),
+        storeRequestDto.address(),
+        storeRequestDto.phone(),
+        storeRequestDto.openHours(),
+        storeRequestDto.closeHours(),
+        storeRequestDto.closedDays()
+    );
+  }
 }
 
-private StoreServiceRequestDto toStoreServiceRequestDto(StoreRequestDto storeRequestDto,
-    User user) {
-  return new StoreServiceRequestDto(
-      user,
-      storeRequestDto.categoryCode(),
-      storeRequestDto.name(),
-      storeRequestDto.address(),
-      storeRequestDto.phone(),
-      storeRequestDto.openHours(),
-      storeRequestDto.closeHours(),
-      storeRequestDto.closedDays()
-  );
-}
 
