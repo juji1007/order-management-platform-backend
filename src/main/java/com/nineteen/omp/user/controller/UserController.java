@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +31,13 @@ public class UserController {
 
     return ResponseEntity.ok().body(ResponseDto.success());
 
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ResponseDto<?>> handleValidationException(
+      MethodArgumentNotValidException e) {
+    String errorMessage = e.getBindingResult().getFieldError().getDefaultMessage();
+    return ResponseEntity.badRequest()
+        .body(ResponseDto.exception(errorMessage, "INVALID_PARAMETER"));
   }
 }
