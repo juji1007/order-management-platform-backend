@@ -1,5 +1,6 @@
 package com.nineteen.omp.store.domain;
 
+import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Store {
+public class Store extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
