@@ -62,4 +62,7 @@ public class Payment {
   @Enumerated(value = EnumType.STRING)
   private PaymentMethod method;
 
+  public void cancel() {
+    this.status = PaymentStatus.CANCELED;
+  }
 }
