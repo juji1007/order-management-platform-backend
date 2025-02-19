@@ -1,6 +1,7 @@
 package com.nineteen.omp.coupon.domain;
 
 
+import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCoupon {
+public class UserCoupon extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,4 +36,9 @@ public class UserCoupon {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "coupon_id")
   private Coupon coupon;
+
+  public int useCoupon(int totalAmount) {
+    super.softDelete();
+    return totalAmount - coupon.getDiscountAmount();
+  }
 }

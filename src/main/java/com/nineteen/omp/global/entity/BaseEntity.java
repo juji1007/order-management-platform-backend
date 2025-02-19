@@ -36,7 +36,7 @@ public abstract class BaseEntity {
 
 
   @PreRemove
-  private void softDelete() {
+  protected void softDelete() {
     if (isDeleted != null && !isDeleted) {
       if (deletedAt == null) {
         deletedAt = LocalDateTime.now();
