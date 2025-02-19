@@ -10,8 +10,11 @@ import com.nineteen.omp.payment.domain.PaymentMethod;
 import com.nineteen.omp.payment.domain.PgProvider;
 import com.nineteen.omp.payment.service.PaymentService;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +48,14 @@ public class PaymentController {
         .build();
     paymentService.createPayment(requestCommand);
 
+    return ResponseEntity.ok(ResponseDto.success());
+  }
+
+  @PatchMapping("/{paymentId}")
+  public ResponseEntity<ResponseDto<?>> cancelPayment(
+      @PathVariable("paymentId") UUID paymentId
+  ) {
+    paymentService.cancelPayment(paymentId);
     return ResponseEntity.ok(ResponseDto.success());
   }
 }
