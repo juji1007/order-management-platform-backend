@@ -1,13 +1,11 @@
 package com.nineteen.omp.user.service;
 
-import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.global.exception.CommonExceptionCode;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public ResponseEntity<ResponseDto<?>> signup(SignupRequestDto requestDto) {
+  public void signup(SignupRequestDto requestDto) {
 
     String encodedPassword = passwordEncoder.encode(requestDto.password());
 
@@ -44,7 +42,6 @@ public class UserServiceImpl implements UserService {
 
     userRepository.save(user);
 
-    return ResponseEntity.ok().body(ResponseDto.success());
   }
 
 }
