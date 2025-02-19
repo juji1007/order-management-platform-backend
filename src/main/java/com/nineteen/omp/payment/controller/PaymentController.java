@@ -6,6 +6,7 @@ import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.order.domain.Order;
 import com.nineteen.omp.order.service.OrderService;
 import com.nineteen.omp.payment.controller.dto.CreatePaymentRequestDto;
+import com.nineteen.omp.payment.controller.dto.GetPaymentResponseDto;
 import com.nineteen.omp.payment.domain.PaymentMethod;
 import com.nineteen.omp.payment.domain.PgProvider;
 import com.nineteen.omp.payment.service.PaymentService;
@@ -13,11 +14,13 @@ import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -40,7 +43,7 @@ public class PaymentController {
     UserCoupon userCoupon = userCouponService.getUserCoupon(request.userCouponId());
 
     // 결제 생성
-    CreatePaymentRequestCommand requestCommand = CreatePaymentRequestCommand.builder()
+    var requestCommand = CreatePaymentRequestCommand.builder()
         .order(order)
         .userCoupon(userCoupon)
         .pgProvider(PgProvider.valueOf(request.pgProvider()))
@@ -57,5 +60,14 @@ public class PaymentController {
   ) {
     paymentService.cancelPayment(paymentId);
     return ResponseEntity.ok(ResponseDto.success());
+  }
+
+  @GetMapping
+  public ResponseEntity<ResponseDto<?>> getPaymentByOrderId(
+      @RequestParam("orderId") UUID orderId
+  ) {
+    var responseCommand = paymentService.getPaymentByOrderId(orderId);
+    var response = new GetPaymentResponseDto(responseCommand);
+    return ResponseEntity.ok(ResponseDto.success(response));
   }
 }
