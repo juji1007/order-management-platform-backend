@@ -3,6 +3,7 @@ package com.nineteen.omp.order.domain;
 
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.user.domain.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -36,4 +37,7 @@ public class Order {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
+
+  @Column(name = "order_total_amount")
+  private Integer totalAmount;
 }
