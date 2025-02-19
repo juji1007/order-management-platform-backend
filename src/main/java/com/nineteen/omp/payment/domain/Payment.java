@@ -68,7 +68,7 @@ public class Payment extends BaseEntity {
   }
 
   public Integer getDiscountAmount() {
-    return userCoupon.getDiscountAmount();
+    return userCoupon == null ? 0 : userCoupon.getDiscountAmount();
   }
 
   public UUID getOrderId() {
