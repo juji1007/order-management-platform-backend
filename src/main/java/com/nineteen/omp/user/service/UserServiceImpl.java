@@ -1,9 +1,9 @@
 package com.nineteen.omp.user.service;
 
-import com.nineteen.omp.global.exception.CommonExceptionCode;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
+import com.nineteen.omp.user.domain.UserExceptionCode;
 import com.nineteen.omp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     // 회원 중복 확인
     boolean checkUsername = userRepository.existsByUsername(requestDto.username());
     if (checkUsername) {
-      throw new CustomException(CommonExceptionCode.DUPLICATE_USERNAME);
+      throw new CustomException(UserExceptionCode.DUPLICATE_USERNAME);
     }
     // 사용자 등록
     User user = User.builder()
