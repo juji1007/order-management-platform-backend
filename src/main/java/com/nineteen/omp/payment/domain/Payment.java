@@ -66,4 +66,12 @@ public class Payment extends BaseEntity {
   public void cancel() {
     this.status = PaymentStatus.CANCELED;
   }
+
+  public Integer getDiscountAmount() {
+    return userCoupon.getDiscountAmount();
+  }
+
+  public UUID getOrderId() {
+    return order.getId();
+  }
 }
