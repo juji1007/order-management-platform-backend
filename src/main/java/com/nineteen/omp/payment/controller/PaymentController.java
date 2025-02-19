@@ -3,16 +3,23 @@ package com.nineteen.omp.payment.controller;
 import com.nineteen.omp.coupon.domain.UserCoupon;
 import com.nineteen.omp.coupon.service.UserCouponService;
 import com.nineteen.omp.global.dto.ResponseDto;
+import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.order.domain.Order;
 import com.nineteen.omp.order.service.OrderService;
 import com.nineteen.omp.payment.controller.dto.CreatePaymentRequestDto;
+import com.nineteen.omp.payment.controller.dto.GetPaymentListResponseDto;
 import com.nineteen.omp.payment.controller.dto.GetPaymentResponseDto;
 import com.nineteen.omp.payment.domain.PaymentMethod;
 import com.nineteen.omp.payment.domain.PgProvider;
 import com.nineteen.omp.payment.service.PaymentService;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
+import com.nineteen.omp.payment.service.dto.GetPaymentListResponseCommand;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -69,5 +76,37 @@ public class PaymentController {
     var responseCommand = paymentService.getPaymentByOrderId(orderId);
     var response = new GetPaymentResponseDto(responseCommand);
     return ResponseEntity.ok(ResponseDto.success(response));
+  }
+
+  @GetMapping
+  public ResponseEntity<ResponseDto<?>> getPaymentListByUserId(
+      @RequestParam(name = "userId") Long userId,
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable
+  ) {
+    // Master가 아니면 본인 결제 내역만 조회 가능
+    PageableUtils.validatePageable(pageable);
+    var responseCommand = paymentService.getPaymentListByUserId(userId, pageable);
+    var response = convertCommandToDto(pageable, responseCommand);
+    return ResponseEntity.ok(ResponseDto.success(response));
+  }
+
+  private static GetPaymentListResponseDto convertCommandToDto(
+      Pageable pageable,
+      GetPaymentListResponseCommand responseCommand
+  ) {
+    var responseDtoList = responseCommand.getPaymentResponseCommandPage().stream()
+        .map(GetPaymentResponseDto::new)
+        .toList();
+    var responseDtoPage = new PageImpl<>(
+        responseDtoList,
+        pageable,
+        responseCommand.getPaymentResponseCommandPage().getTotalElements()
+    );
+    return new GetPaymentListResponseDto(responseDtoPage);
   }
 }
