@@ -8,9 +8,14 @@ import com.nineteen.omp.payment.domain.PaymentStatus;
 import com.nineteen.omp.payment.exception.PaymentExceptionCode;
 import com.nineteen.omp.payment.repository.PaymentRepository;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
+import com.nineteen.omp.payment.service.dto.GetPaymentListResponseCommand;
 import com.nineteen.omp.payment.service.dto.GetPaymentResponseCommand;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +70,17 @@ public class PaymentServiceImpl implements PaymentService {
       totalAmount = userCoupon.useCoupon(totalAmount);
     }
     return totalAmount;
+  }
+
+  @Override
+  public GetPaymentListResponseCommand getPaymentListByUserId(Long userId, Pageable pageable) {
+    Page<Payment> payments = paymentRepository.findByOrder_User_Id(userId, pageable);
+    List<GetPaymentResponseCommand> contents = payments.stream()
+        .map(GetPaymentResponseCommand::new)
+        .toList();
+    PageImpl<GetPaymentResponseCommand> responseCommands =
+        new PageImpl<>(contents, pageable, payments.getTotalElements());
+    return new GetPaymentListResponseCommand(responseCommands);
   }
 
 }
