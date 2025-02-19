@@ -17,8 +17,8 @@ public class UserCouponServiceImpl implements UserCouponService {
   private final UserCouponRepository userCouponRepository;
 
   @Override
-  public UserCoupon getUserCoupon(String userCouponId) {
-    return userCouponRepository.findById(UUID.fromString(userCouponId))
+  public UserCoupon getUserCoupon(UUID userCouponId) {
+    return userCouponRepository.findById(userCouponId)
         .orElseThrow(() -> new CustomException(UserCouponExceptionCode.USER_COUPON_NOT_FOUND));
   }
 }

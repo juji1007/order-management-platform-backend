@@ -1,8 +1,10 @@
 package com.nineteen.omp.payment.controller.dto;
 
+import java.util.UUID;
+
 public record CreatePaymentRequestDto(
-    String orderId,
-    String userCouponId,
+    UUID orderId,
+    UUID userCouponId,
     String pgProvider,
     String paymentMethod
 ) {

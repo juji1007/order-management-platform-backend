@@ -17,8 +17,8 @@ public class OrderServiceImpl implements OrderService {
   private final OrderRepository orderRepository;
 
   @Override
-  public Order getOrder(String orderId) {
-    return orderRepository.findById(UUID.fromString(orderId))
+  public Order getOrder(UUID orderId) {
+    return orderRepository.findById(orderId)
         .orElseThrow(() -> new CustomException(OrderExceptionCode.ORDER_NOT_FOUND));
   }
 }
