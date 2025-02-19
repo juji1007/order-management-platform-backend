@@ -2,6 +2,7 @@ package com.nineteen.omp.payment.domain;
 
 
 import com.nineteen.omp.coupon.domain.UserCoupon;
+import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.order.domain.Order;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +30,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE p_payment SET is_deleted = true WHERE payment_id = ?")
-public class Payment {
+public class Payment extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
