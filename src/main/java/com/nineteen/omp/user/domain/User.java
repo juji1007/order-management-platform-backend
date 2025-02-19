@@ -28,10 +28,25 @@ public class User {
   @Column(name = "user_id", updatable = false, nullable = false)
   private Long id;
 
+  @Column(nullable = false, unique = true, length = 30)
   private String username;
+
+  @Column(nullable = false)
   private String password;
 
+  @Column(nullable = false, length = 30)
+  private String nickname;
+
   @Enumerated(value = EnumType.STRING)
+  @Column(nullable = false, length = 30)
   private Role role;
 
+  @Column(nullable = false, unique = true, length = 30)
+  private String email;
+
+  @Column(nullable = false)
+  private Boolean is_public;
+
+  @Column(nullable = false, length = 30)
+  private String delivery_address;
 }
