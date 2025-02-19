@@ -15,4 +15,6 @@ public interface PaymentService {
   GetPaymentResponseCommand getPaymentByOrderId(UUID orderId);
 
   GetPaymentListResponseCommand getPaymentListByUserId(Long userId, Pageable pageable);
+
+  GetPaymentListResponseCommand getPaymentList(Pageable pageable);
 }

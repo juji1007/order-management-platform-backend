@@ -83,4 +83,15 @@ public class PaymentServiceImpl implements PaymentService {
     return new GetPaymentListResponseCommand(responseCommands);
   }
 
+  @Override
+  public GetPaymentListResponseCommand getPaymentList(Pageable pageable) {
+    Page<Payment> payments = paymentRepository.findAll(pageable);
+    List<GetPaymentResponseCommand> contents = payments.stream()
+        .map(GetPaymentResponseCommand::new)
+        .toList();
+    PageImpl<GetPaymentResponseCommand> responseCommands =
+        new PageImpl<>(contents, pageable, payments.getTotalElements());
+    return new GetPaymentListResponseCommand(responseCommands);
+  }
+
 }
