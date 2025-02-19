@@ -100,4 +100,61 @@ class PaymentServiceImplTest {
     }
   }
 
+  @Nested
+  @DisplayName("지정 주문의 결제 조회 테스트")
+  class GetPaymentByOrderId {
+
+    @Test
+    @DisplayName("지정 주문의 결제 조회 성공")
+    void getPaymentByOrderId() {
+      // given
+      final Order order = mock(Order.class);
+      final UserCoupon userCoupon = mock(UserCoupon.class);
+      final Payment payment = Payment.builder()
+          .id(UUID.randomUUID())
+          .order(order)
+          .userCoupon(userCoupon)
+          .status(PaymentStatus.PENDING)
+          .method(PaymentMethod.CREDIT_CARD)
+          .pgProvider(PgProvider.MOCK_PAY)
+          .totalAmount(1000)
+          .build();
+      final UUID orderId = UUID.randomUUID();
+      final int discountAmount = 100;
+
+      when(order.getId()).thenReturn(orderId);
+      when(userCoupon.getDiscountAmount()).thenReturn(discountAmount);
+
+      when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(payment));
+
+      // when
+      var result = paymentService.getPaymentByOrderId(orderId);
+
+      // then
+      assertThat(result.paymentId()).isEqualTo(payment.getId());
+      assertThat(result.orderId()).isEqualTo(orderId);
+      assertThat(result.status()).isEqualTo(payment.getStatus());
+      assertThat(result.paymentMethod()).isEqualTo(payment.getMethod());
+      assertThat(result.pgProvider()).isEqualTo(payment.getPgProvider());
+      assertThat(result.paymentAmount()).isEqualTo(payment.getTotalAmount());
+      assertThat(result.discountAmount()).isEqualTo(payment.getDiscountAmount());
+      assertThat(result.paymentDate()).isNull();
+
+    }
+
+    @Test
+    @DisplayName("지정 주문의 결제 조회 실패 - 결제 정보 없음")
+    void getPaymentByOrderId_NotFoundPayment() {
+      // given
+      final UUID orderId = UUID.randomUUID();
+
+      when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.empty());
+
+      // when & then
+      assertThrows(CustomException.class, () -> {
+        paymentService.getPaymentByOrderId(orderId);
+      });
+    }
+  }
+
 }
