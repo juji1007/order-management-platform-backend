@@ -42,3 +42,4 @@ public class User {
   private Boolean is_public;
 
   private String delivery_address;
+}
