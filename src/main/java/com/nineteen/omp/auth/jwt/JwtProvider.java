@@ -27,6 +27,7 @@ public class JwtProvider {
   private final Long refreshTokenValidity;
   private final Long accessTokenValidity;
   private final SecretKey secretKey;
+  private final String PREFIX;
 
   private final Encryptor encryptor;
 
@@ -34,35 +35,49 @@ public class JwtProvider {
       @Value("${jwt.refresh-token-validity}") Long refreshTokenValidity,
       @Value("${jwt.access-token-validity}") Long accessTokenValidity,
       @Value("${jwt.secret}") String secret,
+      @Value("${jwt.prefix}") String prefix,
       @Qualifier("AES") Encryptor encryptor
   ) {
     this.refreshTokenValidity = refreshTokenValidity;
     this.accessTokenValidity = accessTokenValidity;
     this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
         SIG.HS256.key().build().getAlgorithm());
+    PREFIX = prefix;
     this.encryptor = encryptor;
   }
 
   public String generateAccessToken(UserDetails userDetails) throws Exception {
     log.info("Generate access token");
-    return generateJwt((UserDetailsImpl) userDetails, accessTokenValidity, ACCESS_TOKEN);
+    UserDetailsImpl details = (UserDetailsImpl) userDetails;
+    return generateJwt(
+        details.getUserId(), details.getRole(), accessTokenValidity, ACCESS_TOKEN);
   }
 
   public String generateRefreshToken(UserDetails userDetails) throws Exception {
     log.info("Generate refresh token");
-    return generateJwt((UserDetailsImpl) userDetails, refreshTokenValidity, REFRESH_TOKEN);
+    UserDetailsImpl details = (UserDetailsImpl) userDetails;
+    return generateJwt(
+        details.getUserId(), details.getRole(), refreshTokenValidity, REFRESH_TOKEN);
+  }
+
+  public String generateAccessToken(String refreshToken) throws Exception {
+    log.info("Generate access token with refresh token");
+    Long userId = this.extractUserId(refreshToken);
+    Role role = this.extractRole(refreshToken);
+    return generateJwt(userId, role, accessTokenValidity, ACCESS_TOKEN);
   }
 
   private String generateJwt(
-      UserDetailsImpl userDetails,
+      Long userId,
+      Role role,
       Long tokenValidity,
       String tokenType
   ) throws Exception {
-    return Jwts.builder()
+    return PREFIX + Jwts.builder()
         .subject(tokenType)
         .claim(JwtClaims.USER_ID.getKey(),
-            encryptor.encrypt(String.valueOf(userDetails.getUserId())))
-        .claim(JwtClaims.ROLE.getKey(), userDetails.getRole())
+            encryptor.encrypt(String.valueOf(userId)))
+        .claim(JwtClaims.ROLE.getKey(), role)
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + tokenValidity))
         .signWith(secretKey)
@@ -91,8 +106,9 @@ public class JwtProvider {
   }
 
   private Claims parseClaims(String token) {
+    String mainToken = token.substring(PREFIX.length());
     return Jwts.parser().verifyWith(secretKey).build()
-        .parseSignedClaims(token)
+        .parseSignedClaims(mainToken)
         .getPayload();
   }
 
@@ -103,5 +119,4 @@ public class JwtProvider {
   public Boolean isRefreshToken(String token) {
     return REFRESH_TOKEN.equals(extractTokenType(token));
   }
-
 }
