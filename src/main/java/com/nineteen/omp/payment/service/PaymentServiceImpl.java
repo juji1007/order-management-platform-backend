@@ -8,6 +8,7 @@ import com.nineteen.omp.payment.domain.PaymentStatus;
 import com.nineteen.omp.payment.exception.PaymentExceptionCode;
 import com.nineteen.omp.payment.repository.PaymentRepository;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
+import com.nineteen.omp.payment.service.dto.GetPaymentResponseCommand;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,13 @@ public class PaymentServiceImpl implements PaymentService {
     Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
     payment.cancel();
+  }
+
+  @Override
+  public GetPaymentResponseCommand getPaymentByOrderId(UUID orderId) {
+    Payment payment = paymentRepository.findByOrderId(orderId)
+        .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
+    return new GetPaymentResponseCommand(payment);
   }
 
   private int calculateTotalAmount(Order order, UserCoupon userCoupon) {
