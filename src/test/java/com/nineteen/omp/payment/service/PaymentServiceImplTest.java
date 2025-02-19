@@ -125,7 +125,7 @@ class PaymentServiceImplTest {
       when(order.getId()).thenReturn(orderId);
       when(userCoupon.getDiscountAmount()).thenReturn(discountAmount);
 
-      when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(payment));
+      when(paymentRepository.findByOrder_Id(orderId)).thenReturn(Optional.of(payment));
 
       // when
       var result = paymentService.getPaymentByOrderId(orderId);
@@ -148,7 +148,7 @@ class PaymentServiceImplTest {
       // given
       final UUID orderId = UUID.randomUUID();
 
-      when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.empty());
+      when(paymentRepository.findByOrder_Id(orderId)).thenReturn(Optional.empty());
 
       // when & then
       assertThrows(CustomException.class, () -> {
