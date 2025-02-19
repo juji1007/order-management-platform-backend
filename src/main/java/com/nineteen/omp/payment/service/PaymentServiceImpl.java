@@ -53,7 +53,7 @@ public class PaymentServiceImpl implements PaymentService {
 
   @Override
   public GetPaymentResponseCommand getPaymentByOrderId(UUID orderId) {
-    Payment payment = paymentRepository.findByOrderId(orderId)
+    Payment payment = paymentRepository.findByOrder_Id(orderId)
         .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
     return new GetPaymentResponseCommand(payment);
   }
