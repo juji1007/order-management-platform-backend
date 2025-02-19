@@ -29,7 +29,7 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLRestriction("is_deleted = false")
-@SQLDelete(sql = "UPDATE p_payment SET is_deleted = true WHERE payment_id = ?")
+@SQLDelete(sql = "UPDATE p_payment SET is_deleted = true WHERE id = ?")
 public class Payment extends BaseEntity {
 
   @Id
