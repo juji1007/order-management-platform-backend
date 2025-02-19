@@ -41,4 +41,8 @@ public class UserCoupon extends BaseEntity {
     super.softDelete();
     return totalAmount - coupon.getDiscountAmount();
   }
+
+  public Integer getDiscountAmount() {
+    return coupon.getDiscountAmount();
+  }
 }
