@@ -95,6 +95,22 @@ public class PaymentController {
     return ResponseEntity.ok(ResponseDto.success(response));
   }
 
+  @GetMapping("/all")
+  public ResponseEntity<ResponseDto<?>> getPaymentListByUserId(
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable
+  ) {
+    // Master만 전체 결제 내역 조회 가능
+    PageableUtils.validatePageable(pageable);
+    var responseCommand = paymentService.getPaymentList(pageable);
+    var response = convertCommandToDto(pageable, responseCommand);
+    return ResponseEntity.ok(ResponseDto.success(response));
+  }
+
   private static GetPaymentListResponseDto convertCommandToDto(
       Pageable pageable,
       GetPaymentListResponseCommand responseCommand
