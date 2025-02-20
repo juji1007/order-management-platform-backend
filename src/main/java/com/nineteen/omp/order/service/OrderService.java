@@ -6,4 +6,6 @@ public interface OrderService {
 
   void createOrder(OrderRequestDto orderRequestDto);
 
+  List<OrderResponseDto> getAllOrders();
+
 }

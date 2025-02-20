@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class OrderServiceImpl {
+public class OrderServiceImpl implements OrderService {
 
 
   private final StoreRepository storeRepository;
@@ -46,4 +46,16 @@ public class OrderServiceImpl {
     orderRepository.save(order);
   }
 
+  @Override
+  public List<OrderResponseDto> getAllOrders() {
+    List<Order> orders = orderRepository.findAll();
+
+    return orders.stream()
+        .map(order -> {
+          List<OrderProduct> orderProducts = orderProductRepository.findByOrder(order);
+          return new OrderResponseDto(order, orderProducts);
+        })
+        .collect(Collectors.toList());
+
+  }
 }

@@ -27,4 +27,10 @@ public class OrderController {
     return ResponseEntity.ok().body(ResponseDto.success("Order created successfully"));
   }
 
+  @GetMapping
+  public ResponseEntity<ResponseDto<?>> getAllOrders() {
+    List<OrderResponseDto> orders = orderService.getAllOrders();
+    return ResponseEntity.ok().body(ResponseDto.success(orders));
+  }
+
 }
