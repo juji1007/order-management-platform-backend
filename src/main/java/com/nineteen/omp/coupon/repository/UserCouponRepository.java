@@ -1,6 +1,5 @@
 package com.nineteen.omp.coupon.repository;
 
-import com.nineteen.omp.coupon.controller.dto.UserCouponResponseDto;
 import com.nineteen.omp.coupon.domain.UserCoupon;
 import java.util.UUID;
 import org.springframework.data.domain.Page;

@@ -3,7 +3,6 @@ package com.nineteen.omp.coupon.service;
 import com.nineteen.omp.coupon.controller.dto.UserCouponRequestDto;
 import com.nineteen.omp.coupon.controller.dto.UserCouponResponseDto;
 import com.nineteen.omp.coupon.service.dto.UserCouponCommand;
-import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +15,8 @@ public interface UserCouponService {
 
   UserCouponResponseDto getUserCoupon(UUID userCouponId);
 
-  UserCouponResponseDto updateUserCoupon(UUID userCouponId, @Valid UserCouponRequestDto userCouponRequestDto);
+  UserCouponResponseDto updateUserCoupon(UUID userCouponId,
+      UserCouponRequestDto userCouponRequestDto);
 
   void deleteUserCoupon(UUID userCouponId);
 }
