@@ -2,8 +2,8 @@ package com.nineteen.omp.store.repository;
 
 import static com.nineteen.omp.store.domain.QArea.area;
 
+import com.nineteen.omp.store.controller.dto.AreaResponseDto;
 import com.nineteen.omp.store.domain.Area;
-import com.nineteen.omp.store.service.dto.AreaResponseDto;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -78,6 +78,12 @@ public class AreaRepositoryCustomImpl implements AreaRepositoryCustom {
             break;
           case "dong":
             orders.add(new OrderSpecifier<>(direction, area.dong));
+            break;
+          case "createdAt":
+            orders.add(new OrderSpecifier<>(direction, area.createdAt));
+            break;
+          case "updatedAt":
+            orders.add(new OrderSpecifier<>(direction, area.updatedAt));
             break;
           default:
             break;
