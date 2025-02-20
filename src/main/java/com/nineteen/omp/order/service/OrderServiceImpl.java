@@ -58,4 +58,15 @@ public class OrderServiceImpl implements OrderService {
         .collect(Collectors.toList());
 
   }
+
+  // TODO : 예외 처리
+  @Override
+  public OrderResponseDto getOrder(UUID orderId) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
+
+    List<OrderProduct> orderProducts = orderProductRepository.findByOrder(order);
+    return new OrderResponseDto(order, orderProducts);
+  }
+
 }

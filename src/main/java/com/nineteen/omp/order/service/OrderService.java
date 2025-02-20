@@ -8,4 +8,5 @@ public interface OrderService {
 
   List<OrderResponseDto> getAllOrders();
 
+  OrderResponseDto getOrder(UUID orderId);
 }
