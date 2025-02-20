@@ -8,6 +8,7 @@ import com.nineteen.omp.auth.domain.Role;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -75,6 +78,51 @@ class UserServiceImplTest {
           CustomException.class,
           () -> userService.getUserInfo(userId)
       );
+    }
+  }
+
+  @Nested
+  @DisplayName("전체 사용자 조회 테스트")
+  class GetUsersAll {
+
+    @Test
+    @DisplayName("전체 사용자 조회 성공")
+    void success() {
+      // given
+      var pageable = Pageable.unpaged();
+      var user = User.builder()
+          .id(1L)
+          .username("test")
+          .password("test")
+          .nickname("test")
+          .role(Role.USER)
+          .email("email")
+          .is_public(true)
+          .delivery_address("address")
+          .build();
+      var userPage = new PageImpl<>(List.of(user), pageable, 1);
+
+      when(userRepository.findAll(pageable)).thenReturn(userPage);
+
+      // when
+      var response = userService.getUsers(pageable);
+
+      // then
+      assertThat(response.getUserPageResponseCommandPage()).hasSize(userPage.getSize());
+    }
+
+    @Test
+    @DisplayName("사용자가 없을 때")
+    void noUserException() {
+      // given
+      var pageable = Pageable.unpaged();
+      when(userRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of()));
+
+      // when
+      var response = userService.getUsers(pageable);
+
+      // then
+      assertThat(response.getUserPageResponseCommandPage()).hasSize(0);
     }
   }
 }
