@@ -5,8 +5,12 @@ import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.domain.UserExceptionCode;
 import com.nineteen.omp.user.repository.UserRepository;
+import com.nineteen.omp.user.service.dto.GetUserInfoPageResponseCommand;
 import com.nineteen.omp.user.service.dto.GetUserInfoResponseCommand;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +53,17 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(UserExceptionCode.USER_NOT_FOUND));
     return new GetUserInfoResponseCommand(user);
+  }
+
+  @Override
+  public GetUserInfoPageResponseCommand getUsers(Pageable pageable) {
+    Page<User> userPage = userRepository.findAll(pageable);
+    var contents = userPage.stream()
+        .map(GetUserInfoResponseCommand::new)
+        .toList();
+    var responseCommandPage = new PageImpl<>(contents,
+        pageable, userPage.getTotalElements());
+    return new GetUserInfoPageResponseCommand(responseCommandPage);
   }
 
 }
