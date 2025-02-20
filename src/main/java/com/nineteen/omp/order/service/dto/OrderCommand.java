@@ -1,7 +1,7 @@
 package com.nineteen.omp.order.service.dto;
 
 import com.nineteen.omp.order.controller.dto.OrderRequestDto;
-import com.nineteen.omp.order.controller.dto.OrderRequestDto.OrderProductDto;
+import com.nineteen.omp.order.controller.dto.OrderRequestDto.OrderProductRequestDto;
 import com.nineteen.omp.order.domain.emuns.OrderStatus;
 import com.nineteen.omp.order.domain.emuns.OrderType;
 import java.util.List;
@@ -11,7 +11,7 @@ public record OrderCommand(
     UUID storeId,
     Long userId,
     int totalPrice,
-    List<OrderProductDto> orderProducts,
+    List<OrderProductRequestDto> orderProducts,
     String deliveryAddress,
     String specialRequest,
     String paymentMethod,

@@ -10,7 +10,7 @@ public record OrderRequestDto(
     UUID storeId,
     Long userId,
     int totalPrice,
-    List<OrderProductDto> orderProducts,
+    List<OrderProductRequestDto> orderProducts,
     String deliveryAddress,
     String specialRequest,
     String paymentMethod,
@@ -19,7 +19,7 @@ public record OrderRequestDto(
     UUID couponId
 ) {
 
-  public record OrderProductDto(UUID storeProductId, int quantity, int pricePerItem) {
+  public record OrderProductRequestDto(UUID storeProductId, int quantity, int pricePerItem) {
 
   }
 
