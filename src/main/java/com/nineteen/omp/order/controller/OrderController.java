@@ -24,7 +24,8 @@ public class OrderController {
   @PostMapping
   public ResponseEntity<ResponseDto<?>> createOrder(@RequestBody OrderRequestDto orderRequestDto) {
     orderService.createOrder(orderRequestDto);
-    return ResponseEntity.ok().body(ResponseDto.success("Order created successfully"));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ResponseDto.success());
   }
 
   @GetMapping
