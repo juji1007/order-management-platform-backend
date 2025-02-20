@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
-  private static final String LOGIN_URI_PATTERN = "^\\/login(?:\\/.*)?$";
+  private static List<String> PASS_URI_PATTERN = List.of(
+      "/api/v1/users/login",
+      "/api/v1/users/signup"
+  );
 
   private final JwtProvider jwtProvider;
   private final JwtHeaderHandler jwtHeaderHandler;
@@ -110,6 +114,6 @@ public class JwtFilter extends OncePerRequestFilter {
   }
 
   private boolean isLoginRequest(String uri) {
-    return uri.matches(LOGIN_URI_PATTERN);
+    return PASS_URI_PATTERN.contains(uri);
   }
 }

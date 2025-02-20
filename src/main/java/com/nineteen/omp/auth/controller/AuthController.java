@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +19,7 @@ public class AuthController {
 
   private final AuthService authService;
 
-  @RequestMapping("/logout")
+  @PostMapping("/logout")
   public ResponseEntity<ResponseDto<?>> logout(
       HttpServletRequest request,
       HttpServletResponse response
@@ -28,7 +29,7 @@ public class AuthController {
     return ResponseEntity.ok(ResponseDto.success());
   }
 
-  @RequestMapping("/reissue")
+  @PostMapping("/reissue")
   public ResponseEntity<ResponseDto<?>> reissue(
       HttpServletRequest request,
       HttpServletResponse response

@@ -55,7 +55,7 @@ public class UserController {
   public ResponseEntity<ResponseDto<?>> getUsers(
       @PageableDefault(
           size = 10,
-          page = 1,
+          page = 0,
           sort = {"createdAt", "updatedAt"},
           direction = Direction.ASC
       ) Pageable pageable
@@ -77,7 +77,7 @@ public class UserController {
     return ResponseEntity.ok(ResponseDto.success());
   }
 
-  @PatchMapping("/users/{userId}")
+  @PatchMapping("/users/{userId}/withdraw ")
   public ResponseEntity<ResponseDto<?>> deleteUser(
       @PathVariable(name = "userId") Long userId
   ) {
@@ -93,7 +93,7 @@ public class UserController {
       ) String nickname,
       @PageableDefault(
           size = 10,
-          page = 1,
+          page = 0,
           sort = {"createdAt", "updatedAt"},
           direction = Direction.ASC
       ) Pageable pageable
