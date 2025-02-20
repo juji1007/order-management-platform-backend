@@ -37,8 +37,7 @@ public class ProductController {
   public ResponseEntity<ResponseDto<?>> addProduct(@RequestBody ProductRequestDto requestDto) {
     ProductCommand productCommand = ProductCommand.fromProductRequestDto(requestDto);
     ProductResponseDto productResponseDto = productService.addProduct(productCommand);
-    return ResponseEntity.ok().body(
-        (ResponseDto<?>) ResponseDto.success(productResponseDto));
+    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.success(productResponseDto));
   }
 
   @GetMapping("/{productId}")
