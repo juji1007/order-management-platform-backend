@@ -212,4 +212,54 @@ class UserServiceImplTest {
       );
     }
   }
+
+  @Nested
+  @DisplayName("사용자 검색 테스트")
+  class SearchUser {
+
+    @Test
+    @DisplayName("사용자 검색 성공")
+    void success() {
+      // given
+      String searchKeyword = "test";
+      var pageable = Pageable.unpaged();
+      var user = User.builder()
+          .id(1L)
+          .username("test")
+          .password("test")
+          .nickname("test")
+          .role(Role.USER)
+          .email("email")
+          .is_public(true)
+          .delivery_address("address")
+          .build();
+      var userPage = new PageImpl<>(List.of(user), pageable, 1);
+
+      when(userRepository.findAllByNicknameContainsIgnoreCase(searchKeyword, pageable))
+          .thenReturn(userPage);
+
+      // when
+      var response = userService.searchUser(searchKeyword, pageable);
+
+      // then
+      assertThat(response.getUserPageResponseCommandPage())
+          .hasSize(userPage.getSize());
+    }
+
+    @Test
+    @DisplayName("사용자가 없을 때")
+    void noUserException() {
+      // given
+      String searchKeyword = "test";
+      var pageable = Pageable.unpaged();
+      when(userRepository.findAllByNicknameContainsIgnoreCase(searchKeyword, pageable))
+          .thenReturn(new PageImpl<>(List.of()));
+
+      // when
+      var response = userService.searchUser(searchKeyword, pageable);
+
+      // then
+      assertThat(response.getUserPageResponseCommandPage()).hasSize(0);
+    }
+  }
 }
