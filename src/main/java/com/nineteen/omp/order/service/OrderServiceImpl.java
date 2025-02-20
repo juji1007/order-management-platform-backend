@@ -69,4 +69,15 @@ public class OrderServiceImpl implements OrderService {
     return new OrderResponseDto(order, orderProducts);
   }
 
+  @Override
+  public void cancelOrder(UUID orderId) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
+
+    Order cancelledOrder = order.cancelOrder();
+
+    orderRepository.save(cancelledOrder);
+  }
+
+
 }

@@ -38,4 +38,11 @@ public class OrderController {
     OrderResponseDto order = orderService.getOrder(orderId);
     return ResponseEntity.ok().body(ResponseDto.success(order));
   }
+
+  @PatchMapping("/{orderId}")
+  public ResponseEntity<ResponseDto<?>> cancelOrder(@PathVariable UUID orderId) {
+    orderService.cancelOrder(orderId);
+    return ResponseEntity.ok().body(ResponseDto.success());
+  }
+
 }
