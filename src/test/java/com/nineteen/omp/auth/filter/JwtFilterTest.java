@@ -53,7 +53,7 @@ class JwtFilterTest {
   @DisplayName("로그인 요청이 들어왔을 때 인증 절차를 건너뛴다.")
   public void loginPathTest() throws Exception {
     // given
-    request.setRequestURI("/login");
+    request.setRequestURI("/api/v1/users/login");
 
     // when
     jwtFilter.doFilterInternal(request, response, filterChain);
