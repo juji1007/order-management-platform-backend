@@ -14,6 +14,7 @@ import com.nineteen.omp.payment.domain.PgProvider;
 import com.nineteen.omp.payment.service.PaymentService;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
 import com.nineteen.omp.payment.service.dto.GetPaymentListResponseCommand;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
@@ -41,7 +42,7 @@ public class PaymentController {
 
   @PostMapping
   public ResponseEntity<ResponseDto<?>> createPayment(
-      @RequestBody CreatePaymentRequestDto request
+      @RequestBody @Valid CreatePaymentRequestDto request
   ) {
 
     // 주문 조회
@@ -80,7 +81,11 @@ public class PaymentController {
 
   @GetMapping
   public ResponseEntity<ResponseDto<?>> getPaymentListByUserId(
-      @RequestParam(name = "userId") Long userId,
+      @RequestParam(
+          name = "userId",
+          required = false,
+          defaultValue = ""
+      ) Long userId,
       @PageableDefault(
           size = 10,
           page = 1,
@@ -88,7 +93,10 @@ public class PaymentController {
           direction = Direction.ASC
       ) Pageable pageable
   ) {
-    // Master가 아니면 본인 결제 내역만 조회 가능
+    /*
+     * Master 가 아니면 본인 결제 내역만 조회 가능
+     * Master 라면 UserId를 파라미터로 받아 해당 유저의 결제 내역 조회
+     */
     PageableUtils.validatePageable(pageable);
     var responseCommand = paymentService.getPaymentListByUserId(userId, pageable);
     var response = convertCommandToDto(pageable, responseCommand);
