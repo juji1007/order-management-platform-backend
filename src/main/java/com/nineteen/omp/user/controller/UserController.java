@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -60,7 +61,7 @@ public class UserController {
       ) Pageable pageable
   ) {
     // Master 만 조회 가능
-//    PageableUtils.validatePageable(pageable);
+//    pageable = PageableUtils.validatePageable(pageable);
     var responseCommand = userService.getUsers(pageable);
     var responseDto = convertCommandToDto(pageable, responseCommand);
     return ResponseEntity.ok(ResponseDto.success(responseDto));
@@ -82,6 +83,26 @@ public class UserController {
   ) {
     userService.deleteUser(userId);
     return ResponseEntity.ok(ResponseDto.success());
+  }
+
+  @GetMapping("/users")
+  public ResponseEntity<ResponseDto<?>> searchUser(
+      @RequestParam(
+          name = "nickname",
+          defaultValue = ""
+      ) String nickname,
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable
+  ) {
+    // Master 만 조회 가능
+//    pageable = PageableUtils.validatePageable(pageable);
+    var responseCommand = userService.searchUser(nickname, pageable);
+    var responseDto = convertCommandToDto(pageable, responseCommand);
+    return ResponseEntity.ok(ResponseDto.success(responseDto));
   }
 
   private static GetUserInfoPageResponseDto convertCommandToDto(
