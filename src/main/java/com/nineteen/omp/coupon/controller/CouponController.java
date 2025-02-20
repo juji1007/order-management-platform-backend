@@ -5,6 +5,7 @@ import com.nineteen.omp.coupon.controller.dto.CouponResponseDto;
 import com.nineteen.omp.coupon.service.CouponService;
 import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.global.utils.PageableUtils;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class CouponController {
   //관리자
   @PostMapping
   public ResponseEntity<ResponseDto<CouponResponseDto>> createCoupon(
-      @RequestBody CouponRequestDto couponRequestDto) {
+      @Valid @RequestBody CouponRequestDto couponRequestDto) {
 
     CouponResponseDto couponResponseDto = couponService.createCoupon(couponRequestDto);
 
@@ -53,10 +54,10 @@ public class CouponController {
           sort = {"createdAt", "updatedAt"},
           direction = Direction.ASC
       ) Pageable pageable) {
-    PageableUtils.validatePageable(pageable);
+    Pageable validatedPageable = PageableUtils.validatePageable(pageable);
 
-    Page<CouponResponseDto> searchedCoupons = couponService.searchCoupons(keyword, pageable);
-    System.out.println("검색결과 : " + searchedCoupons);
+    Page<CouponResponseDto> searchedCoupons = couponService.searchCoupons(keyword,
+        validatedPageable);
     return ResponseEntity.ok(ResponseDto.success(searchedCoupons));
   }
 

@@ -6,7 +6,7 @@ import java.util.UUID;
 public record CouponResponseDto(
     UUID id,
     String name,
-    Integer discountPrice,
+    int discountPrice,
     LocalDateTime expiration
 ) {
 
