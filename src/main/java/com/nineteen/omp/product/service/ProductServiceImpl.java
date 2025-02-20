@@ -59,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductResponseDto updateProduct(ProductRequestDto requestDto, UUID productId) {
+  public ProductResponseDto updateProduct(ProductCommand command, UUID productId) {
 
     StoreProduct storeProduct = getProductById(productId);
     UUID storeId = storeProduct.getStore().getId();
