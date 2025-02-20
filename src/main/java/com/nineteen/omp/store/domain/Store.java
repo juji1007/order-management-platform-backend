@@ -5,8 +5,9 @@ import com.nineteen.omp.store.exception.StoreException;
 import com.nineteen.omp.store.exception.StoreExceptionCode;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +20,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "p_store")
@@ -26,6 +29,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLRestriction("is_deleted = false")
+@SQLDelete(sql = "UPDATE p_store SET is_deleted = true WHERE store_id = ?")
 public class Store extends BaseEntity {
 
   @Id
@@ -37,7 +42,7 @@ public class Store extends BaseEntity {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Convert(converter = StoreCategoryConverter.class)
+  @Enumerated(EnumType.STRING)
   @Column(name = "category", updatable = true, nullable = false)
   private StoreCategory storeCategory;
 
