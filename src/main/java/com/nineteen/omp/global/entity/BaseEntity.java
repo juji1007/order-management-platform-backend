@@ -25,13 +25,13 @@ public abstract class BaseEntity {
   private LocalDateTime createdAt;
 
   @LastModifiedDate
-  @Column(name = "updatedAt", nullable = false)
+  @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
 
-  @Column(name = "deletedAt")
+  @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
 
-  @Column(name = "isDeleted")
+  @Column(name = "is_deleted")
   private Boolean isDeleted = false;
 
 
