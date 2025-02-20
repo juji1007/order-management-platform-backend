@@ -66,16 +66,24 @@ public class ProductServiceImpl implements ProductService {
     Store store = getStoreById(storeId);
 
     // 필드값 수정
-    StoreProduct updatedStoreProduct = updateProductFromDto(requestDto, storeProduct, store);
-
-    // DB 저장
+    StoreProduct updatedStoreProduct = updateProductFromCommand(command, storeProduct, store);
     productRepository.save(updatedStoreProduct);
-
-    // 수정된 데이터를 ResponseDto로 반환
     return new ProductResponseDto(updatedStoreProduct);
   }
 
-  private StoreProduct getProductById(UUID productId) {
+  private StoreProduct updateProductFromCommand(ProductCommand command, StoreProduct storeProduct,
+      Store store) {
+    return storeProduct.toBuilder()
+        .store(store)
+        .name(command.name())
+        .price(command.price())
+        .image(command.image())
+        .description(command.description())
+        .build();
+  }
+
+  @Override
+  public StoreProduct getProductById(UUID productId) {
     return productRepository.findById(productId)
         .orElseThrow(() -> new CustomException(ProductExceptionCode.PRODUCT_NOT_FOUND));
   }

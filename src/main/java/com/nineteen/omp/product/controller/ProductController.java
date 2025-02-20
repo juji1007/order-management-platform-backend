@@ -40,10 +40,14 @@ public class ProductController {
     return ResponseEntity.ok().body(ResponseDto.success(productResponseDto));
   }
 
-  // TODO : softDelete -> public 일 때 사용 가능.
-  @DeleteMapping("/soft/{productId}")
-  public ResponseEntity<ResponseDto<?>> softDeleteProduct(@PathVariable UUID productId) {
-    ProductResponseDto product = productService.softDeleteProduct(productId);
-    return ResponseEntity.ok().body(ResponseDto.success(product));
+  // TODO : @AuthenticationPrinciapal 로 UserDetails 에서 productId를 가져와야 함.
+  @PatchMapping("/{productId}")
+  public ResponseEntity<ResponseDto<?>> updateProduct(
+      @RequestBody ProductRequestDto requestDto,
+      @PathVariable UUID productId
+  ) {
+    ProductCommand command = ProductCommand.fromProductRequestDto(requestDto);
+    ProductResponseDto updateProduct = productService.updateProduct(command, productId);
+    return ResponseEntity.ok().body(ResponseDto.success(updateProduct));
   }
 }
