@@ -82,7 +82,6 @@ public class ProductServiceImpl implements ProductService {
         .build();
   }
 
-  @Override
   public StoreProduct getProductById(UUID productId) {
     return productRepository.findById(productId)
         .orElseThrow(() -> new CustomException(ProductExceptionCode.PRODUCT_NOT_FOUND));

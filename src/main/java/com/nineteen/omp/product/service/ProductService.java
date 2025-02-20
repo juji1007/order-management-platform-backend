@@ -14,8 +14,6 @@ public interface ProductService {
 
   ProductResponseDto updateProduct(ProductCommand command, UUID productId);
 
-  StoreProduct getProductById(UUID productId);
-
   void deleteProduct(UUID productId);
 
 /*  Page<ProductResponseDto> searchProducts(String keyword, String category, int i, int size,
