@@ -84,4 +84,18 @@ public class UserServiceImpl implements UserService {
     userRepository.deleteById(userId);
   }
 
+  @Override
+  public GetUserInfoPageResponseCommand searchUser(String nickname, Pageable pageable) {
+    Page<User> userPage = userRepository.findAllByNicknameContainsIgnoreCase(nickname, pageable);
+    var contents = userPage.stream()
+        .map(GetUserInfoResponseCommand::new)
+        .toList();
+    var pageResponseCommand = new PageImpl<>(
+        contents,
+        pageable,
+        userPage.getTotalElements()
+    );
+    return new GetUserInfoPageResponseCommand(pageResponseCommand);
+  }
+
 }
