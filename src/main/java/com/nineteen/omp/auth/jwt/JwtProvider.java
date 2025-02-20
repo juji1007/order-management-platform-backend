@@ -49,7 +49,7 @@ public class JwtProvider {
   public String generateAccessToken(UserDetails userDetails) throws Exception {
     log.info("Generate access token");
     UserDetailsImpl details = (UserDetailsImpl) userDetails;
-    return generateJwt(
+    return PREFIX + generateJwt(
         details.getUserId(), details.getRole(), accessTokenValidity, ACCESS_TOKEN);
   }
 
@@ -64,7 +64,7 @@ public class JwtProvider {
     log.info("Generate access token with refresh token");
     Long userId = this.extractUserId(refreshToken);
     Role role = this.extractRole(refreshToken);
-    return generateJwt(userId, role, accessTokenValidity, ACCESS_TOKEN);
+    return PREFIX + generateJwt(userId, role, accessTokenValidity, ACCESS_TOKEN);
   }
 
   private String generateJwt(
@@ -73,7 +73,7 @@ public class JwtProvider {
       Long tokenValidity,
       String tokenType
   ) throws Exception {
-    return PREFIX + Jwts.builder()
+    return Jwts.builder()
         .subject(tokenType)
         .claim(JwtClaims.USER_ID.getKey(),
             encryptor.encrypt(String.valueOf(userId)))
@@ -106,7 +106,10 @@ public class JwtProvider {
   }
 
   private Claims parseClaims(String token) {
-    String mainToken = token.substring(PREFIX.length());
+    String mainToken = token;
+    if (token.startsWith(PREFIX)) {
+      mainToken = token.substring(PREFIX.length());
+    }
     return Jwts.parser().verifyWith(secretKey).build()
         .parseSignedClaims(mainToken)
         .getPayload();
