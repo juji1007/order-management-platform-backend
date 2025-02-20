@@ -1,17 +1,17 @@
 package com.nineteen.omp.store.controller;
 
 import com.nineteen.omp.global.dto.ResponseDto;
-import com.nineteen.omp.global.exception.CommonExceptionCode;
-import com.nineteen.omp.global.exception.CustomException;
+import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.store.controller.dto.AreaRequestDto;
+import com.nineteen.omp.store.controller.dto.AreaResponseDto;
 import com.nineteen.omp.store.service.AreaService;
-import com.nineteen.omp.store.service.dto.AreaResponseDto;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +32,7 @@ public class AreaController {
 
   @PostMapping //admin만 가능하게 -> security에서 처리
   public ResponseEntity<ResponseDto<AreaResponseDto>> createArea(
-      @RequestBody AreaRequestDto areaRequestDto) {
+      @Valid @RequestBody AreaRequestDto areaRequestDto) {
 
     AreaResponseDto areaResponseDto = areaService.createArea(areaRequestDto);
 
@@ -42,19 +42,20 @@ public class AreaController {
   //키워드 -> 시,동,구 하나라도 있으면 검색
   @GetMapping
   public ResponseEntity<ResponseDto<Page<AreaResponseDto>>> searchArea(
-      @RequestParam(required = false) String keyword,
-      @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "10") int size,
-      @RequestParam(defaultValue = "name") String sortBy,
-      @RequestParam(defaultValue = "true") boolean isAsc
-  ) {
-    if (page < 1 || size < 1) {
-      throw new CustomException(CommonExceptionCode.INVALID_PARAMETER);
-    }
+      @RequestParam(
+          name = "keyword",
+          defaultValue = "",
+          required = false
+      ) String keyword,
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable) {
+    Pageable validatedPageable = PageableUtils.validatePageable(pageable);
 
-    Sort sort = isAsc ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-    Pageable pageable = PageRequest.of(page - 1, size, sort);
-    Page<AreaResponseDto> searchedAreas = areaService.searchAreas(keyword, pageable);
+    Page<AreaResponseDto> searchedAreas = areaService.searchAreas(keyword, validatedPageable);
 
     return ResponseEntity.ok(ResponseDto.success(searchedAreas));
   }
@@ -70,7 +71,7 @@ public class AreaController {
   @PatchMapping("{areaId}")
   public ResponseEntity<ResponseDto<AreaResponseDto>> updateArea(
       @PathVariable UUID areaId,
-      @RequestBody AreaRequestDto areaRequestDto) {
+      @Valid @RequestBody AreaRequestDto areaRequestDto) {
     AreaResponseDto areaResponseDto = areaService.updateArea(areaId, areaRequestDto);
     return ResponseEntity.ok(ResponseDto.success(areaResponseDto));
   }
