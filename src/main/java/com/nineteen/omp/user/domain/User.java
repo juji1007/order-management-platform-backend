@@ -24,4 +24,6 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id", updatable = false, nullable = false)
   private Long id;
+
+  private String username;  //TODO : 임시 작성
 }
