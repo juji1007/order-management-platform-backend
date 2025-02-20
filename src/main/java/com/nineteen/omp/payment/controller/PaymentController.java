@@ -14,6 +14,7 @@ import com.nineteen.omp.payment.domain.PgProvider;
 import com.nineteen.omp.payment.service.PaymentService;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
 import com.nineteen.omp.payment.service.dto.GetPaymentListResponseCommand;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
@@ -41,7 +42,7 @@ public class PaymentController {
 
   @PostMapping
   public ResponseEntity<ResponseDto<?>> createPayment(
-      @RequestBody CreatePaymentRequestDto request
+      @RequestBody @Valid CreatePaymentRequestDto request
   ) {
 
     // 주문 조회
