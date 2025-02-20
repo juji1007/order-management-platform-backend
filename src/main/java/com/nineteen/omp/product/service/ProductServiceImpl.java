@@ -48,10 +48,8 @@ public class ProductServiceImpl implements ProductService {
   private StoreProduct saveProduct(StoreProduct storeProduct) {
     try {
       return productRepository.save(storeProduct);
-    } catch (DataIntegrityViolationException e) {
-      throw new ProductException(ProductExceptionCode.PRODUCT_SAVE_FAILED);
     } catch (Exception e) {
-      throw new CustomException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
+      throw new ProductException(ProductExceptionCode.PRODUCT_SAVE_FAILED);
     }
   }
 
