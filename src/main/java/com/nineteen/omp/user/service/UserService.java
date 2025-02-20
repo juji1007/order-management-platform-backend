@@ -15,4 +15,6 @@ public interface UserService {
   GetUserInfoPageResponseCommand getUsers(Pageable pageable);
 
   void updateUser(Long userId, UpdateUserRequestCommand requestCommand);
+
+  void deleteUser(Long userId);
 }

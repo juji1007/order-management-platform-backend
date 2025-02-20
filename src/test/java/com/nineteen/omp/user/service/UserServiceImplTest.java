@@ -3,6 +3,7 @@ package com.nineteen.omp.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nineteen.omp.auth.domain.Role;
@@ -175,6 +176,39 @@ class UserServiceImplTest {
       assertThrows(
           CustomException.class,
           () -> userService.updateUser(userId, mock(UpdateUserRequestCommand.class))
+      );
+    }
+  }
+
+  @Nested
+  @DisplayName("사용자 정보 삭제 테스트")
+  class DeleteUser {
+
+    @Test
+    @DisplayName("사용자 정보 삭제 성공")
+    void success() {
+      // given
+      Long userId = 1L;
+      when(userRepository.existsById(userId)).thenReturn(true);
+
+      // when
+      userService.deleteUser(userId);
+
+      // then
+      verify(userRepository).deleteById(userId);
+    }
+
+    @Test
+    @DisplayName("잘못된 사용자 정보")
+    void userNotFoundException() {
+      // given
+      Long userId = 1L;
+      when(userRepository.existsById(userId)).thenReturn(false);
+
+      // when, then
+      assertThrows(
+          CustomException.class,
+          () -> userService.deleteUser(userId)
       );
     }
   }
