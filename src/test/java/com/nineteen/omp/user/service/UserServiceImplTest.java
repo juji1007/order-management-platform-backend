@@ -2,12 +2,14 @@ package com.nineteen.omp.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.nineteen.omp.auth.domain.Role;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.repository.UserRepository;
+import com.nineteen.omp.user.service.dto.UpdateUserRequestCommand;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
@@ -123,6 +125,57 @@ class UserServiceImplTest {
 
       // then
       assertThat(response.getUserPageResponseCommandPage()).hasSize(0);
+    }
+  }
+
+  @Nested
+  @DisplayName("사용자 정보 수정 테스트")
+  class UpdateUser {
+
+    @Test
+    @DisplayName("사용자 정보 수정 성공")
+    void success() {
+      // given
+      Long userId = 1L;
+      User user = User.builder()
+          .id(userId)
+          .username("test")
+          .password("test")
+          .nickname("test")
+          .role(Role.USER)
+          .email("email")
+          .is_public(true)
+          .delivery_address("address")
+          .build();
+
+      when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+      // when
+      var requestCommand = new UpdateUserRequestCommand("newNickname", "newEmail", false,
+          "newAddress");
+      userService.updateUser(userId, requestCommand);
+
+      // then
+      Assertions.assertAll(
+          () -> assertThat(user.getNickname()).isEqualTo(requestCommand.nickname()),
+          () -> assertThat(user.getEmail()).isEqualTo(requestCommand.email()),
+          () -> assertThat(user.getIs_public()).isEqualTo(requestCommand.is_public()),
+          () -> assertThat(user.getDelivery_address()).isEqualTo(requestCommand.delivery_address())
+      );
+    }
+
+    @Test
+    @DisplayName("사용자 정보 수정 실패")
+    void userNotFoundException() {
+      // given
+      Long userId = 1L;
+      when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+      // when, then
+      assertThrows(
+          CustomException.class,
+          () -> userService.updateUser(userId, mock(UpdateUserRequestCommand.class))
+      );
     }
   }
 }

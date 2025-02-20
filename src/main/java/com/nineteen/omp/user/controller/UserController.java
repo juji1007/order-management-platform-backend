@@ -4,8 +4,10 @@ import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.user.controller.dto.GetUserInfoPageResponseDto;
 import com.nineteen.omp.user.controller.dto.GetUserInfoResponseDto;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
+import com.nineteen.omp.user.controller.dto.UpdateUserRequestDto;
 import com.nineteen.omp.user.service.UserService;
 import com.nineteen.omp.user.service.dto.GetUserInfoPageResponseCommand;
+import com.nineteen.omp.user.service.dto.UpdateUserRequestCommand;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +64,16 @@ public class UserController {
     var responseCommand = userService.getUsers(pageable);
     var responseDto = convertCommandToDto(pageable, responseCommand);
     return ResponseEntity.ok(ResponseDto.success(responseDto));
+  }
+
+  @PatchMapping("/users/{userId}")
+  public ResponseEntity<ResponseDto<?>> updateUser(
+      @PathVariable(name = "userId") Long userId,
+      @RequestBody @Valid UpdateUserRequestDto requestDto
+  ) {
+    UpdateUserRequestCommand requestCommand = new UpdateUserRequestCommand(requestDto);
+    userService.updateUser(userId, requestCommand);
+    return ResponseEntity.ok(ResponseDto.success());
   }
 
   private static GetUserInfoPageResponseDto convertCommandToDto(

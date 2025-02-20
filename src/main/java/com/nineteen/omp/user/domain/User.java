@@ -2,6 +2,7 @@ package com.nineteen.omp.user.domain;
 
 
 import com.nineteen.omp.auth.domain.Role;
+import com.nineteen.omp.user.service.dto.UpdateUserRequestCommand;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,4 +50,19 @@ public class User {
 
   @Column(nullable = false, length = 30)
   private String delivery_address;
+
+  public void update(UpdateUserRequestCommand requestCommand) {
+    if (requestCommand.nickname() != null) {
+      this.nickname = requestCommand.nickname();
+    }
+    if (requestCommand.email() != null) {
+      this.email = requestCommand.email();
+    }
+    if (requestCommand.is_public() != null) {
+      this.is_public = requestCommand.is_public();
+    }
+    if (requestCommand.delivery_address() != null) {
+      this.delivery_address = requestCommand.delivery_address();
+    }
+  }
 }

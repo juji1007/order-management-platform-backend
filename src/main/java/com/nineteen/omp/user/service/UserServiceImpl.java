@@ -7,6 +7,7 @@ import com.nineteen.omp.user.domain.UserExceptionCode;
 import com.nineteen.omp.user.repository.UserRepository;
 import com.nineteen.omp.user.service.dto.GetUserInfoPageResponseCommand;
 import com.nineteen.omp.user.service.dto.GetUserInfoResponseCommand;
+import com.nineteen.omp.user.service.dto.UpdateUserRequestCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -64,6 +65,13 @@ public class UserServiceImpl implements UserService {
     var responseCommandPage = new PageImpl<>(contents,
         pageable, userPage.getTotalElements());
     return new GetUserInfoPageResponseCommand(responseCommandPage);
+  }
+
+  @Override
+  public void updateUser(Long userId, UpdateUserRequestCommand requestCommand) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(UserExceptionCode.USER_NOT_FOUND));
+    user.update(requestCommand);
   }
 
 }
