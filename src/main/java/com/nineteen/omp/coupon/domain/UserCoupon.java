@@ -1,7 +1,7 @@
 package com.nineteen.omp.coupon.domain;
 
-
 import com.nineteen.omp.user.domain.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,13 +26,17 @@ public class UserCoupon {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "user_coupon_id", updatable = false, nullable = false)
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "coupon_id")
+  @JoinColumn(name = "coupon_id", nullable = false)
   private Coupon coupon;
+
+  @Column(name = "status", nullable = false)
+  private boolean status;
 }
