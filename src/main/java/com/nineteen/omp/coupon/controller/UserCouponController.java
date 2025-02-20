@@ -1,8 +1,10 @@
 package com.nineteen.omp.coupon.controller;
 
+import com.nineteen.omp.coupon.controller.dto.CouponResponseDto;
 import com.nineteen.omp.coupon.controller.dto.UserCouponRequestDto;
 import com.nineteen.omp.coupon.controller.dto.UserCouponResponseDto;
 import com.nineteen.omp.coupon.domain.Coupon;
+import com.nineteen.omp.coupon.service.CouponService;
 import com.nineteen.omp.coupon.service.UserCouponService;
 import com.nineteen.omp.coupon.service.dto.UserCouponCommand;
 import com.nineteen.omp.global.dto.ResponseDto;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -39,7 +40,14 @@ public class UserCouponController {
 
     Long userId = 123L;
 
-    Coupon coupon = couponService.getCoupon(userCouponRequestDto.couponId());
+    CouponResponseDto couponResponseDto = couponService.getCoupon(userCouponRequestDto.couponId());
+
+    Coupon coupon = new Coupon(
+        couponResponseDto.id(),
+        couponResponseDto.name(),
+        couponResponseDto.discountPrice(),
+        couponResponseDto.expiration()
+    );
 
     UserCouponResponseDto userCouponResponseDto = userCouponService.createUserCoupon(
         new UserCouponCommand(userCouponRequestDto, userId, coupon));
@@ -56,9 +64,10 @@ public class UserCouponController {
           sort = {"createdAt", "updatedAt"},
           direction = Direction.ASC
       ) Pageable pageable) {
-    PageableUtils.validatePageable(pageable);
-
-    Page<UserCouponResponseDto> searchedCoupons = userCouponService.searchUserCoupon(pageable);
+    Pageable validatedPageable = PageableUtils.validatePageable(pageable);
+    System.out.println("페이지 정보 !!!!!! " + validatedPageable);
+    Page<UserCouponResponseDto> searchedCoupons = userCouponService.searchUserCoupon(
+        validatedPageable);
 
     return ResponseEntity.ok(ResponseDto.success(searchedCoupons));
   }

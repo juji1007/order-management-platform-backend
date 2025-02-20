@@ -16,7 +16,7 @@ public interface UserCouponService {
 
   UserCouponResponseDto getUserCoupon(UUID userCouponId);
 
-  UserCouponResponseDto updateUserCoupon(UUID userCouponId, @Valid UserCouponRequestDto userCouponRequestDto);
+  UserCouponResponseDto updateUserCoupon(UUID userCouponId, UserCouponRequestDto userCouponRequestDto);
 
   void deleteUserCoupon(UUID userCouponId);
 }

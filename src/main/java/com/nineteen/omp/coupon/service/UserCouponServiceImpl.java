@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserCouponServiceImpl implements UserCouponService {
@@ -46,7 +48,11 @@ public class UserCouponServiceImpl implements UserCouponService {
   @Override
   @Transactional(readOnly = true)
   public Page<UserCouponResponseDto> searchUserCoupon(Pageable pageable) {
+    System.out.println("페이지 정보 : " + pageable.getPageNumber());
     Page<UserCoupon> userCouponPage = userCouponRepository.findAll(pageable);
+    System.out.println("userCouponPage = " + userCouponPage);
+    System.out.println("Total elements: " + userCouponPage.getTotalElements()); // 추가된 로그
+    System.out.println("UserCoupons: " + userCouponPage.getContent()); // 추가된 로그
     List<UserCouponResponseDto> content = userCouponPage.stream()
         .map(userCoupon -> new UserCouponResponseDto(
             userCoupon.getId(),
