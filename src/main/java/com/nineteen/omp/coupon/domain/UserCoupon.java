@@ -29,9 +29,11 @@ public class UserCoupon {
   @Column(name = "user_coupon_id", updatable = false, nullable = false)
   private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "user_id", nullable = false)
+//  private User user;
+  @Column(name = "user_id", nullable = false)
+  private Long userId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "coupon_id", nullable = false)
@@ -39,4 +41,8 @@ public class UserCoupon {
 
   @Column(name = "status", nullable = false)
   private boolean status;
+
+  public void changeStatus(boolean status) {
+    this.status = status;
+  }
 }
