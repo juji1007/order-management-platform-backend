@@ -2,11 +2,11 @@ package com.nineteen.omp.product.service;
 
 import com.nineteen.omp.global.exception.CommonExceptionCode;
 import com.nineteen.omp.global.exception.CustomException;
-import com.nineteen.omp.product.controller.dto.ProductRequestDto;
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.product.exception.ProductExceptionCode;
 import com.nineteen.omp.product.repository.ProductRepository;
+import com.nineteen.omp.product.service.dto.ProductCommand;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.repository.StoreRepository;
 import java.util.UUID;
