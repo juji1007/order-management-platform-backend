@@ -28,7 +28,6 @@ public class CouponRepositoryCustomImpl implements CouponRepositoryCustom {
   public Page<CouponResponseDto> searchCoupons(String keyword, Pageable pageable) {
     List<OrderSpecifier<?>> orders = getAllOrderSpecifier(pageable);
 
-    System.out.println("페이지 ; " + pageable.toString());
     QueryResults<Coupon> results = queryFactory
         .selectFrom(coupon)
         .where(keywordContains(keyword))
@@ -36,15 +35,6 @@ public class CouponRepositoryCustomImpl implements CouponRepositoryCustom {
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .fetchResults();
-    System.out.println("쿼리: " + queryFactory
-        .selectFrom(coupon)
-        .where(keywordContains(keyword))
-        .orderBy(orders.toArray(new OrderSpecifier[0]))
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .toString());
-
-    System.out.println("쿼리 : " + results.getResults());
 
     List<CouponResponseDto> content = results.getResults().stream()
         .map(coupon -> new CouponResponseDto(
@@ -55,24 +45,15 @@ public class CouponRepositoryCustomImpl implements CouponRepositoryCustom {
         ))
         .collect(Collectors.toList());
     long total = results.getTotal();
-    System.out.println("검색 내용 :" + content);
     return new PageImpl<>(content, pageable, total);
   }
 
   private BooleanExpression keywordContains(String keyword) {
-    System.out.println("키워드!!!!! ; " + keyword);
     if (keyword == null || keyword.isEmpty()) {
-      System.out.println("키워드 없어!!!");
       return null;
     }
-    System.out.println("키워드 있어!!!!");
     return coupon.name.containsIgnoreCase(keyword);
   }
-
-//  private BooleanExpression nameContains(String keyword) {
-//    System.out.println("키워드!!!!! ; " + keyword);
-//    return keyword != null ? coupon.name.containsIgnoreCase(keyword) : null;
-//  }
 
   private List<OrderSpecifier<?>> getAllOrderSpecifier(Pageable pageable) {
     List<OrderSpecifier<?>> orders = new ArrayList<>();
