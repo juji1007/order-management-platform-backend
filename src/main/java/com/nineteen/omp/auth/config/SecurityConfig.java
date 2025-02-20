@@ -1,6 +1,10 @@
 package com.nineteen.omp.auth.config;
 
 import com.nineteen.omp.auth.filter.JwtAuthenticationFilter;
+import com.nineteen.omp.auth.filter.JwtFilter;
+import com.nineteen.omp.auth.jwt.JwtHeaderHandler;
+import com.nineteen.omp.auth.jwt.JwtProvider;
+import com.nineteen.omp.user.repository.UserRepository;
 import com.nineteen.omp.user.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +29,11 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
-      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+      AuthenticationConfiguration authenticationConfiguration,
+      JwtProvider jwtProvider,
+      JwtHeaderHandler jwtHeaderHandler,
+      UserRepository userRepository
+  ) throws Exception {
 
     AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
     http
@@ -38,8 +46,9 @@ public class SecurityConfig {
             .anyRequest().authenticated()
 
         )
-        .addFilter(new JwtAuthenticationFilter(authenticationManager));
-
+        .addFilter(new JwtAuthenticationFilter(authenticationManager)) // 로그인 필터 추가
+        .addFilterAfter(new JwtFilter(jwtProvider, jwtHeaderHandler, userRepository),
+            JwtAuthenticationFilter.class); // JWT 인증 필터 추가
     return http.build();
   }
 
