@@ -108,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
   public void deleteProduct(UUID productId) {
     StoreProduct storeProduct = getProductById(productId);
     productRepository.delete(storeProduct);
-  }
+  } 
 
   @Override
   public ProductResponseDto softDeleteProduct(UUID productId) {

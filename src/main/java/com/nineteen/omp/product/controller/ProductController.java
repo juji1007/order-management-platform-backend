@@ -50,4 +50,10 @@ public class ProductController {
     ProductResponseDto updateProduct = productService.updateProduct(command, productId);
     return ResponseEntity.ok().body(ResponseDto.success(updateProduct));
   }
+
+  @DeleteMapping("/{productId}")
+  public ResponseEntity<ResponseDto<?>> deleteProduct(@PathVariable UUID productId) {
+    productService.deleteProduct(productId);
+    return ResponseEntity.ok().body(ResponseDto.success());
+  }
 }
