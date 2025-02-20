@@ -48,6 +48,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     jwtHeaderHandler.addAccessToken(response, tokens.accessToken());
     jwtHeaderHandler.addRefreshToken(response, tokens.refreshToken());
 
+    log.info("AccessToken: {}", tokens.accessToken());
+    log.info("RefreshToken: {}", tokens.refreshToken());
+
     // 응답
     response.setStatus(HttpServletResponse.SC_OK);
     log.info("인증 성공 처리 완료 - userId: {}", userDetails.getUserId());
