@@ -14,7 +14,6 @@ public record ProductResponseDto(
     String deletedAt
 ) {
 
-  // Product 객체를 받아서 ProductResponseDto 생성
   public ProductResponseDto(StoreProduct product) {
     this(
         product.getId(),
