@@ -1,8 +1,8 @@
 package com.nineteen.omp.product.service;
 
-import com.nineteen.omp.product.controller.dto.ProductRequestDto;
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.StoreProduct;
+import com.nineteen.omp.product.service.dto.ProductCommand;
 import java.util.UUID;
 
 
@@ -12,11 +12,12 @@ public interface ProductService {
 
   ProductResponseDto getProduct(UUID productId);
 
-  ProductResponseDto updateProduct(ProductRequestDto requestDto, UUID productId);
+  ProductResponseDto updateProduct(ProductCommand command, UUID productId);
 
   StoreProduct getProductById(UUID productId);
 
   void deleteProduct(UUID productId);
 
-  ProductResponseDto softDeleteProduct(UUID productId);
+/*  Page<ProductResponseDto> searchProducts(String keyword, String category, int i, int size,
+      String sortBy, boolean isAsc);*/
 }

@@ -34,15 +34,10 @@ public class ProductController {
         (ResponseDto<?>) ResponseDto.success(productResponseDto));
   }
 
-
-    ProductResponseDto updateProduct = productService.updateProduct(requestDto, productId);
-    return ResponseEntity.ok().body(ResponseDto.success(updateProduct));
-  }
-
-  @DeleteMapping("/{productId}")
-  public ResponseEntity<ResponseDto<?>> deleteProduct(@PathVariable UUID productId) {
-    productService.deleteProduct(productId);
-    return ResponseEntity.ok().body(ResponseDto.success());
+  @GetMapping("/{productId}")
+  public ResponseEntity<ResponseDto<ProductResponseDto>> getProduct(@PathVariable UUID productId) {
+    ProductResponseDto productResponseDto = productService.getProduct(productId);
+    return ResponseEntity.ok().body(ResponseDto.success(productResponseDto));
   }
 
   // TODO : softDelete -> public 일 때 사용 가능.
