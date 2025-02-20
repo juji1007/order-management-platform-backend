@@ -65,7 +65,6 @@ public class ProductServiceImpl implements ProductService {
     UUID storeId = storeProduct.getStore().getId();
     Store store = getStoreById(storeId);
 
-    // 필드값 수정
     StoreProduct updatedStoreProduct = updateProductFromCommand(command, storeProduct, store);
     productRepository.save(updatedStoreProduct);
     return new ProductResponseDto(updatedStoreProduct);
@@ -92,29 +91,11 @@ public class ProductServiceImpl implements ProductService {
         .orElseThrow(() -> new CustomException(ProductExceptionCode.STORE_NOT_FOUND));
   }
 
-  private StoreProduct updateProductFromDto(ProductRequestDto requestDto, StoreProduct storeProduct,
-      Store store) {
-    return storeProduct.toBuilder()
-        .store(store)
-        .name(requestDto.name())
-        .price(requestDto.price())
-        .image(requestDto.image())
-        .description(requestDto.description())
-        .build();
-  }
 
   @Override
   public void deleteProduct(UUID productId) {
     StoreProduct storeProduct = getProductById(productId);
     productRepository.delete(storeProduct);
-  } 
-
-  @Override
-  public ProductResponseDto softDeleteProduct(UUID productId) {
-    StoreProduct storeProduct = getProductById(productId);
-    storeProduct.softDelete();
-    productRepository.save(storeProduct);
-    return new ProductResponseDto(storeProduct);
   }
 
 }
