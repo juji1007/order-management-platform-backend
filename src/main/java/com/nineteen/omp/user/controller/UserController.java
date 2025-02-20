@@ -76,6 +76,14 @@ public class UserController {
     return ResponseEntity.ok(ResponseDto.success());
   }
 
+  @PatchMapping("/users/{userId}")
+  public ResponseEntity<ResponseDto<?>> deleteUser(
+      @PathVariable(name = "userId") Long userId
+  ) {
+    userService.deleteUser(userId);
+    return ResponseEntity.ok(ResponseDto.success());
+  }
+
   private static GetUserInfoPageResponseDto convertCommandToDto(
       Pageable pageable,
       GetUserInfoPageResponseCommand responseCommand

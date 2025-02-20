@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -102,7 +104,49 @@ class BaseEntityTest {
     }
   }
 
-  @Entity
+  @Nested
+  @DisplayName("Describe: Entity는")
+  class EntityDescribe {
+
+    @Nested
+    @DisplayName("Context: 삭제하면")
+    class IsDeletedContext {
+
+      @Test
+      @DisplayName("It: isDeleted가 true로 변경된다.")
+      void update_isDeleted_when_entity_deleted() {
+        //given
+        TestEntity testEntity = new TestEntity();
+        em.persist(testEntity);
+
+        //when
+        em.remove(testEntity);
+
+        //then
+        assertThat(testEntity.getIsDeleted()).isTrue();
+      }
+
+      @Test
+      @DisplayName("It: 조회되지 않는다.")
+      void not_found_when_entity_deleted() {
+        //given
+        TestEntity testEntity = new TestEntity();
+        em.persist(testEntity);
+
+        //when
+        em.remove(testEntity);
+        em.flush();
+
+        //then
+        TestEntity deleted = em.find(TestEntity.class, testEntity.getId());
+        assertThat(deleted).isNull();
+      }
+    }
+  }
+
+  @Entity(name = "test_entity")
+  @SQLRestriction("is_deleted = false")
+  @SQLDelete(sql = "UPDATE test_entity SET is_deleted = true WHERE id = ?")
   private static class TestEntity extends BaseEntity {
 
     @Id

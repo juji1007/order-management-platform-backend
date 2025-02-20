@@ -2,6 +2,7 @@ package com.nineteen.omp.user.domain;
 
 
 import com.nineteen.omp.auth.domain.Role;
+import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.user.service.dto.UpdateUserRequestCommand;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "p_user")
@@ -22,7 +25,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+@SQLRestriction("is_deleted = false")
+@SQLDelete(sql = "UPDATE p_user SET is_deleted = true WHERE id = ?")
+public class User extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

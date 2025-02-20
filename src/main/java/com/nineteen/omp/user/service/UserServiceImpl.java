@@ -68,10 +68,20 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public void updateUser(Long userId, UpdateUserRequestCommand requestCommand) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(UserExceptionCode.USER_NOT_FOUND));
     user.update(requestCommand);
+  }
+
+  @Override
+  @Transactional
+  public void deleteUser(Long userId) {
+    if (!userRepository.existsById(userId)) {
+      throw new CustomException(UserExceptionCode.USER_NOT_FOUND);
+    }
+    userRepository.deleteById(userId);
   }
 
 }
