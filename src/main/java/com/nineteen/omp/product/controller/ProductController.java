@@ -28,22 +28,12 @@ public class ProductController {
 
   @PostMapping()
   public ResponseEntity<ResponseDto<?>> addProduct(@RequestBody ProductRequestDto requestDto) {
-    StoreProduct storeProduct = productService.addProduct(requestDto);
-    return ResponseEntity.ok().body(ResponseDto.success(storeProduct));
+    ProductCommand productCommand = ProductCommand.fromProductRequestDto(requestDto);
+    ProductResponseDto productResponseDto = productService.addProduct(productCommand);
+    return ResponseEntity.ok().body(
+        (ResponseDto<?>) ResponseDto.success(productResponseDto));
   }
 
-  @GetMapping("/{productId}")
-  public ResponseEntity<ResponseDto<ProductResponseDto>> getProduct(@PathVariable UUID productId) {
-    ProductResponseDto productResponseDto = productService.getProduct(productId);
-    return ResponseEntity.ok().body(ResponseDto.success(productResponseDto));
-  }
-
-  // TODO : @AuthenticationPrinciapal 로 UserDetails 에서 productId를 가져와야 함.
-  @PatchMapping("/{productId}")
-  public ResponseEntity<ResponseDto<?>> updateProduct(
-      @RequestBody ProductRequestDto requestDto,
-      @PathVariable UUID productId
-  ) {
 
     ProductResponseDto updateProduct = productService.updateProduct(requestDto, productId);
     return ResponseEntity.ok().body(ResponseDto.success(updateProduct));

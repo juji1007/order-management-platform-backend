@@ -5,22 +5,25 @@ import com.nineteen.omp.product.domain.StoreProduct;
 import java.util.UUID;
 
 public record ProductResponseDto(
-
     UUID productId,
     String name,
     int price,
     String image,
-    String description
+    String description,
+    Boolean isDeleted,
+    String deletedAt
 ) {
 
   // Product 객체를 받아서 ProductResponseDto 생성
-  public ProductResponseDto(StoreProduct storeProduct) {
+  public ProductResponseDto(StoreProduct product) {
     this(
-        storeProduct.getId(),
-        storeProduct.getName(),
-        storeProduct.getPrice(),
-        storeProduct.getImage(),
-        storeProduct.getDescription()
+        product.getId(),
+        product.getName(),
+        product.getPrice(),
+        product.getImage(),
+        product.getDescription(),
+        product.getIsDeleted(),
+        product.getDeletedAt() != null ? product.getDeletedAt().toString() : null
     );
   }
 }

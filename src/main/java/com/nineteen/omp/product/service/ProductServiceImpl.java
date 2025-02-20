@@ -24,21 +24,21 @@ public class ProductServiceImpl implements ProductService {
   private final StoreRepository storeRepository;
 
   @Override
-  public StoreProduct addProduct(ProductRequestDto requestDto) {
-    // TODO: 실제 store의 UUID 정보를 동적으로 조회하도록 변경 필요
-    Store store = getStoreById(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+  public ProductResponseDto addProduct(ProductCommand command) {
+    Store store = getStoreById(command.storeId());
+    StoreProduct storeProduct = createProduct(command, store);
 
-    StoreProduct storeProduct = createProduct(requestDto, store);
-    return saveProduct(storeProduct);
+    storeProduct = saveProduct(storeProduct);
+    return new ProductResponseDto(storeProduct);
   }
 
-  private StoreProduct createProduct(ProductRequestDto requestDto, Store store) {
+  private StoreProduct createProduct(ProductCommand command, Store store) {
     return StoreProduct.builder()
         .store(store)
-        .name(requestDto.name())
-        .price(requestDto.price())
-        .image(requestDto.image())
-        .description(requestDto.description())
+        .name(command.name())
+        .price(command.price())
+        .image(command.image())
+        .description(command.description())
         .build();
   }
 
