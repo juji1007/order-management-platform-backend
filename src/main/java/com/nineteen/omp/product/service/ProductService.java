@@ -1,6 +1,7 @@
 package com.nineteen.omp.product.service;
 
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
+import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.product.service.dto.ProductCommand;
 import java.util.UUID;
 
