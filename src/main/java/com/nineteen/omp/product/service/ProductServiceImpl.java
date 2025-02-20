@@ -4,6 +4,7 @@ import com.nineteen.omp.global.exception.CommonExceptionCode;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.StoreProduct;
+import com.nineteen.omp.product.exception.ProductException;
 import com.nineteen.omp.product.exception.ProductExceptionCode;
 import com.nineteen.omp.product.repository.ProductRepository;
 import com.nineteen.omp.product.service.dto.ProductCommand;
@@ -46,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     try {
       return productRepository.save(storeProduct);
     } catch (DataIntegrityViolationException e) {
-      throw new CustomException(ProductExceptionCode.PRODUCT_SAVE_FAILED);
+      throw new ProductException(ProductExceptionCode.PRODUCT_SAVE_FAILED);
     } catch (Exception e) {
       throw new CustomException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
     }
@@ -83,12 +84,12 @@ public class ProductServiceImpl implements ProductService {
 
   public StoreProduct getProductById(UUID productId) {
     return productRepository.findById(productId)
-        .orElseThrow(() -> new CustomException(ProductExceptionCode.PRODUCT_NOT_FOUND));
+        .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
   }
 
   private Store getStoreById(UUID storeId) {
     return storeRepository.findById(storeId)
-        .orElseThrow(() -> new CustomException(ProductExceptionCode.STORE_NOT_FOUND));
+        .orElseThrow(() -> new ProductException(ProductExceptionCode.STORE_NOT_FOUND));
   }
 
 
