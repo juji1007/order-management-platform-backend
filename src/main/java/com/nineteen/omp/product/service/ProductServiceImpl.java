@@ -6,6 +6,7 @@ import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.product.exception.ProductException;
 import com.nineteen.omp.product.exception.ProductExceptionCode;
+import com.nineteen.omp.product.repository.ProductQueryRepository;
 import com.nineteen.omp.product.repository.ProductRepository;
 import com.nineteen.omp.product.service.dto.ProductCommand;
 import com.nineteen.omp.store.domain.Store;
@@ -13,7 +14,8 @@ import com.nineteen.omp.store.repository.StoreRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -97,6 +99,12 @@ public class ProductServiceImpl implements ProductService {
   public void deleteProduct(UUID productId) {
     StoreProduct storeProduct = getProductById(productId);
     productRepository.delete(storeProduct);
+  }
+
+  @Override
+  public Page<ProductResponseDto> searchProducts(String keyword, String category,
+      Pageable pageable) {
+    return productQueryRepository.searchProducts(keyword, category, pageable);
   }
 
 }
