@@ -38,7 +38,7 @@ public class Coupon extends BaseEntity {
   private String name;
 
   @Column(name = "discount_price", nullable = false)
-  private Integer discountPrice;
+  private int discountPrice;
 
   @Column(name = "expiration", nullable = false)
   private LocalDateTime expiration;
