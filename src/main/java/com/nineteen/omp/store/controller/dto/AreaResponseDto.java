@@ -1,4 +1,4 @@
-package com.nineteen.omp.store.service.dto;
+package com.nineteen.omp.store.controller.dto;
 
 import java.util.UUID;
 
