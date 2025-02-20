@@ -5,6 +5,7 @@ import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
 import com.nineteen.omp.user.domain.UserExceptionCode;
 import com.nineteen.omp.user.repository.UserRepository;
+import com.nineteen.omp.user.service.dto.GetUserInfoResponseCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,13 @@ public class UserServiceImpl implements UserService {
         .build();
 
     userRepository.save(user);
+  }
 
+  @Override
+  public GetUserInfoResponseCommand getUserInfo(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(UserExceptionCode.USER_NOT_FOUND));
+    return new GetUserInfoResponseCommand(user);
   }
 
 }
