@@ -2,6 +2,7 @@ package com.nineteen.omp.auth.config;
 
 import com.nineteen.omp.auth.filter.JwtAuthenticationFilter;
 import com.nineteen.omp.auth.filter.JwtFilter;
+import com.nineteen.omp.auth.handler.CustomAuthenticationSuccessHandler;
 import com.nineteen.omp.auth.jwt.JwtHeaderHandler;
 import com.nineteen.omp.auth.jwt.JwtProvider;
 import com.nineteen.omp.user.repository.UserRepository;
@@ -27,15 +28,20 @@ public class SecurityConfig {
 
   private final UserDetailsServiceImpl userDetailsService;
 
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
       AuthenticationConfiguration authenticationConfiguration,
       JwtProvider jwtProvider,
       JwtHeaderHandler jwtHeaderHandler,
-      UserRepository userRepository
+      UserRepository userRepository,
+      CustomAuthenticationSuccessHandler successHandler
   ) throws Exception {
 
     AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
+    JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
+        authenticationManager, successHandler);
+
     http
         .csrf(csrf -> csrf.disable())
         .sessionManagement(
@@ -46,7 +52,7 @@ public class SecurityConfig {
             .anyRequest().authenticated()
 
         )
-        .addFilter(new JwtAuthenticationFilter(authenticationManager)) // 로그인 필터 추가
+        .addFilter(jwtAuthenticationFilter) // 로그인 필터 추가
         .addFilterAfter(new JwtFilter(jwtProvider, jwtHeaderHandler, userRepository),
             JwtAuthenticationFilter.class); // JWT 인증 필터 추가
     return http.build();

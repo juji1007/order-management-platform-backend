@@ -1,6 +1,7 @@
 package com.nineteen.omp.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nineteen.omp.auth.handler.CustomAuthenticationSuccessHandler;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.user.controller.dto.LoginRequestDto;
 import com.nineteen.omp.user.domain.UserExceptionCode;
@@ -18,9 +19,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;
+  private final CustomAuthenticationSuccessHandler successHandler;
 
-  public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+  public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
+      CustomAuthenticationSuccessHandler successHandler) {
     this.authenticationManager = authenticationManager;
+    this.successHandler = successHandler;
     setFilterProcessesUrl("/api/v1/users/login");
   }
 
@@ -49,11 +53,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain, Authentication authResult) throws IOException, ServletException {
-    response.setContentType("application/json");
-    response.getWriter().write("{\"message\": \"login success!\"}");
+    successHandler.onAuthenticationSuccess(request, response, authResult);
   }
 
-  // 로그인 실패 시 호출
+  // 로그인 실패 시 호출(작동 안함)
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request,
       HttpServletResponse response, AuthenticationException failed)
