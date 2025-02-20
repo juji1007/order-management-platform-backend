@@ -5,9 +5,10 @@ import java.time.LocalDateTime;
 
 public record CouponData(
     String name,
-    Integer discountPrice,
+    int discountPrice,
     LocalDateTime expiration
 ) {
+
   public Coupon toEntity() {
     return Coupon.builder()
         .name(name)
