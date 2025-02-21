@@ -31,8 +31,6 @@ public record SignupRequestDto(
     @Email
     String email, // 이메일
 
-    Boolean is_public, // 공개여부
-
     @NotBlank
     @Size(max = 30)
     String delivery_address // 배달주소
@@ -41,11 +39,6 @@ public record SignupRequestDto(
   public SignupRequestDto {
     // role 기본값 설정 ("USER")
     role = Role.USER;
-
-    // is_public 기본값 설정(true)
-    if (is_public == null) {
-      is_public = true;  // 기본값 true
-    }
   }
 }
 

@@ -8,7 +8,6 @@ public record GetUserInfoResponseCommand(
     String nickname,
     String email,
     Role role,
-    boolean isPublic,
     String deliveryAddress
 ) {
 
@@ -20,7 +19,6 @@ public record GetUserInfoResponseCommand(
         user.getNickname(),
         user.getEmail(),
         user.getRole(),
-        user.getIs_public(),
         user.getDelivery_address()
     );
   }
