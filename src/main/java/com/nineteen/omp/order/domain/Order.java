@@ -78,8 +78,10 @@ public class Order extends BaseEntity {
   }
 
   public Order cancelOrder() {
-    return this.toBuilder()
-        .orderStatus(OrderStatus.CANCELLED)
-        .build();
+    if (this.orderStatus == OrderStatus.CANCELLED) {
+      throw new IllegalStateException("Order is already cancelled");
+    }
+    this.orderStatus = OrderStatus.CANCELLED;
+    return this;
   }
 }
