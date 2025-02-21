@@ -4,6 +4,8 @@ package com.nineteen.omp.order.domain;
 import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.order.domain.emuns.OrderStatus;
 import com.nineteen.omp.order.domain.emuns.OrderType;
+import com.nineteen.omp.order.exception.OrderException;
+import com.nineteen.omp.order.exception.OrderExceptionCode;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Entity;
@@ -15,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +31,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @Table(name = "p_order")
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLRestriction("is_deleted = false")
@@ -55,6 +58,8 @@ public class Order extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private OrderType orderType;
 
+  @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+  private List<OrderProduct> orderProducts;
 
   @Builder
   public Order(Store store, User user, int totalPrice, OrderStatus orderStatus,
@@ -66,11 +71,11 @@ public class Order extends BaseEntity {
     this.orderType = orderType;
   }
 
-
-  public void calculateTotalPrice(List<OrderProduct> orderProducts) {
-    this.totalPrice = orderProducts.stream()
-        .mapToInt(
-            orderProduct -> orderProduct.getQuantity() * orderProduct.getStoreProduct().getPrice())
-        .sum();
+  public Order cancelOrder() {
+    if (this.orderStatus == OrderStatus.CANCELLED) {
+      throw new OrderException(OrderExceptionCode.ORDER_ALREADY_CANCELLED);
+    }
+    this.orderStatus = OrderStatus.CANCELLED;
+    return this;
   }
 }
