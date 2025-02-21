@@ -1,4 +1,4 @@
-package com.nineteen.omp.user.domain;
+package com.nineteen.omp.user.exception;
 
 import com.nineteen.omp.global.exception.ExceptionCode;
 import lombok.Getter;
