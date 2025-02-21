@@ -6,12 +6,12 @@ import lombok.Getter;
 
 @Getter
 public enum StoreCategory {
-  KOREAN(0,"한식"),
-  CHINESE(1,"중식"),
-  JAPANESE(2,"일식"),
-  WESTERN(3,"양식"),
-  LATE_NIGHT(4,"야식"),
-  SNACK(5,"분식");
+  KOREAN(0, "한식"),
+  CHINESE(1, "중식"),
+  JAPANESE(2, "일식"),
+  WESTERN(3, "양식"),
+  LATE_NIGHT(4, "야식"),
+  SNACK(5, "분식");
 
   private final int categoryCode;
   private final String categoryName;
@@ -24,6 +24,15 @@ public enum StoreCategory {
   public static StoreCategory fromCode(int code) {
     for (StoreCategory category : values()) {
       if (category.categoryCode == code) {
+        return category;
+      }
+    }
+    throw new StoreException(StoreExceptionCode.STORE_CATEGORY_NOT_FOUND);
+  }
+
+  public static StoreCategory fromName(String name) {
+    for (StoreCategory category : values()) {
+      if (category.categoryName.equals(name)) {
         return category;
       }
     }
