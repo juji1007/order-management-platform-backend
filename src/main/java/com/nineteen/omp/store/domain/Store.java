@@ -35,4 +35,6 @@ public class Store {
   @OneToOne
   @JoinColumn(name = "category_id")
   private StoreCategory storeCategory;
+
+  private String storename; // TEMP: 임시로 추가된 필드
 }
