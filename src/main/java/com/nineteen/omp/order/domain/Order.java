@@ -4,6 +4,8 @@ package com.nineteen.omp.order.domain;
 import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.order.domain.emuns.OrderStatus;
 import com.nineteen.omp.order.domain.emuns.OrderType;
+import com.nineteen.omp.order.exception.OrderException;
+import com.nineteen.omp.order.exception.OrderExceptionCode;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Entity;
@@ -79,7 +81,7 @@ public class Order extends BaseEntity {
 
   public Order cancelOrder() {
     if (this.orderStatus == OrderStatus.CANCELLED) {
-      throw new IllegalStateException("Order is already cancelled");
+      throw new OrderException(OrderExceptionCode.ORDER_ALREADY_CANCELLED);
     }
     this.orderStatus = OrderStatus.CANCELLED;
     return this;
