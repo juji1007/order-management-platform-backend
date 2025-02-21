@@ -1,6 +1,5 @@
 package com.nineteen.omp.user.service;
 
-import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.service.dto.GetUserInfoPageResponseCommand;
 import com.nineteen.omp.user.service.dto.GetUserInfoResponseCommand;

@@ -34,12 +34,11 @@ public class UserController {
   private final UserService userService;
 
   @PostMapping("/users/signup")
-  public void signup(
+  public ResponseEntity<ResponseDto<?>> signup(
       @RequestBody @Valid SignupRequestDto requestDto
   ) {
-
     userService.signup(requestDto);
-
+    return ResponseEntity.ok(ResponseDto.success());
   }
 
   @GetMapping("/users/{userId}")

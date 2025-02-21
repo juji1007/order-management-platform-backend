@@ -24,7 +24,7 @@ public record SignupRequestDto(
     @NotBlank
     @Size(max = 30)
     String nickname, // 닉네임
-    
+
     Role role, // 역할
 
     @NotBlank
