@@ -3,13 +3,18 @@ package com.nineteen.omp.order.service;
 import com.nineteen.omp.order.controller.dto.OrderRequestDto;
 import com.nineteen.omp.order.domain.Order;
 import com.nineteen.omp.order.repository.OrderProductRepository;
+import com.nineteen.omp.order.repository.OrderQueryRepository;
 import com.nineteen.omp.order.repository.OrderRepository;
 import com.nineteen.omp.order.service.dto.OrderCommand;
-import com.nineteen.omp.product.repository.ProductRepository;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.repository.StoreRepository;
 import com.nineteen.omp.user.domain.User;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
   private final ProductRepository productRepository;
   private final OrderRepository orderRepository;
   private final OrderProductRepository orderProductRepository;
+  private final OrderQueryRepository orderQueryRepository;
 
   public void createOrder(OrderRequestDto orderRequestDto) {
     OrderCommand orderCommand = OrderCommand.fromOrderRequestDto(orderRequestDto);
@@ -79,5 +85,9 @@ public class OrderServiceImpl implements OrderService {
     orderRepository.save(cancelledOrder);
   }
 
+  @Override
+  public Page<OrderResponseDto> getOrderByKeyword(String keyword, Pageable pageable) {
+    return orderQueryRepository.searchOrdersByKeyword(keyword, pageable);
+  }
 
 }
