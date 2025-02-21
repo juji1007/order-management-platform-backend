@@ -3,7 +3,6 @@ package com.nineteen.omp.order.service;
 import com.nineteen.omp.order.controller.dto.OrderRequestDto;
 import com.nineteen.omp.order.controller.dto.OrderResponseDto;
 import com.nineteen.omp.order.domain.Order;
-import com.nineteen.omp.order.domain.OrderProduct;
 import com.nineteen.omp.order.exception.OrderException;
 import com.nineteen.omp.order.exception.OrderExceptionCode;
 import com.nineteen.omp.order.repository.OrderProductRepository;
@@ -34,7 +33,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public void createOrder(OrderRequestDto orderRequestDto) {
     OrderCommand orderCommand = OrderCommand.fromOrderRequestDto(orderRequestDto);
-    // TODO : 예외처리 적용
+    // TODO : 병합 후 storeException 예외 적용
     Store store = storeRepository.findById(orderCommand.storeId())
         .orElseThrow(() -> new RuntimeException("Store not found"));
 
@@ -58,39 +57,32 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public List<OrderResponseDto> getAllOrders() {
     List<Order> orders = orderRepository.findAll();
-
     return orders.stream()
-        .map(order -> {
-          List<OrderProduct> orderProducts = orderProductRepository.findByOrder(order);
-          return new OrderResponseDto(order, orderProducts);
-        })
+        .map(order -> new OrderResponseDto(order, orderProductRepository.findByOrder(order)))
         .collect(Collectors.toList());
-
   }
 
-  // TODO : 예외 처리
   @Override
   public OrderResponseDto getOrder(UUID orderId) {
-    Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
-
-    List<OrderProduct> orderProducts = orderProductRepository.findByOrder(order);
-    return new OrderResponseDto(order, orderProducts);
+    Order order = findById(orderId);
+    return new OrderResponseDto(order, orderProductRepository.findByOrder(order));
   }
 
   @Override
   public void cancelOrder(UUID orderId) {
-    Order order = orderRepository.findById(orderId)
-        .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
-
+    Order order = findById(orderId);
     Order cancelledOrder = order.cancelOrder();
-
     orderRepository.save(cancelledOrder);
   }
 
   @Override
   public Page<OrderResponseDto> getOrderByKeyword(String keyword, Pageable pageable) {
     return orderQueryRepository.searchOrdersByKeyword(keyword, pageable);
+  }
+
+  private Order findById(UUID orderId) {
+    return orderRepository.findById(orderId)
+        .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
   }
 
 }
