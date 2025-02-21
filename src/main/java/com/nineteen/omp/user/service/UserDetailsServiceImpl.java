@@ -3,7 +3,7 @@ package com.nineteen.omp.user.service;
 import com.nineteen.omp.auth.dto.UserDetailsImpl;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.user.domain.User;
-import com.nineteen.omp.user.domain.UserExceptionCode;
+import com.nineteen.omp.user.exception.UserExceptionCode;
 import com.nineteen.omp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

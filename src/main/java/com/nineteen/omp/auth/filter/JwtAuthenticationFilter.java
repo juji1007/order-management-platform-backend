@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nineteen.omp.auth.handler.CustomAuthenticationSuccessHandler;
 import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.user.controller.dto.LoginRequestDto;
-import com.nineteen.omp.user.domain.UserExceptionCode;
+import com.nineteen.omp.user.exception.UserExceptionCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
