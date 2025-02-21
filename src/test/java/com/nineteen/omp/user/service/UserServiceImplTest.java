@@ -49,7 +49,6 @@ class UserServiceImplTest {
           .nickname("test")
           .role(Role.USER)
           .email("email")
-          .is_public(true)
           .delivery_address("address")
           .build();
 
@@ -64,7 +63,6 @@ class UserServiceImplTest {
           () -> assertThat(response.nickname()).isEqualTo(user.getNickname()),
           () -> assertThat(response.email()).isEqualTo(user.getEmail()),
           () -> assertThat(response.role()).isEqualTo(user.getRole()),
-          () -> assertThat(response.isPublic()).isEqualTo(user.getIs_public()),
           () -> assertThat(response.deliveryAddress()).isEqualTo(user.getDelivery_address())
       );
     }
@@ -100,7 +98,6 @@ class UserServiceImplTest {
           .nickname("test")
           .role(Role.USER)
           .email("email")
-          .is_public(true)
           .delivery_address("address")
           .build();
       var userPage = new PageImpl<>(List.of(user), pageable, 1);
@@ -145,14 +142,13 @@ class UserServiceImplTest {
           .nickname("test")
           .role(Role.USER)
           .email("email")
-          .is_public(true)
           .delivery_address("address")
           .build();
 
       when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
       // when
-      var requestCommand = new UpdateUserRequestCommand("newNickname", "newEmail", false,
+      var requestCommand = new UpdateUserRequestCommand("newNickname", "newEmail",
           "newAddress");
       userService.updateUser(userId, requestCommand);
 
@@ -160,7 +156,6 @@ class UserServiceImplTest {
       Assertions.assertAll(
           () -> assertThat(user.getNickname()).isEqualTo(requestCommand.nickname()),
           () -> assertThat(user.getEmail()).isEqualTo(requestCommand.email()),
-          () -> assertThat(user.getIs_public()).isEqualTo(requestCommand.is_public()),
           () -> assertThat(user.getDelivery_address()).isEqualTo(requestCommand.delivery_address())
       );
     }
@@ -230,7 +225,6 @@ class UserServiceImplTest {
           .nickname("test")
           .role(Role.USER)
           .email("email")
-          .is_public(true)
           .delivery_address("address")
           .build();
       var userPage = new PageImpl<>(List.of(user), pageable, 1);

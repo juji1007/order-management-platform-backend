@@ -42,7 +42,6 @@ public class UserServiceImpl implements UserService {
         .nickname(requestDto.nickname())
         .role(requestDto.role())
         .email(requestDto.email())
-        .is_public(requestDto.is_public())
         .delivery_address(requestDto.delivery_address())
         .build();
 

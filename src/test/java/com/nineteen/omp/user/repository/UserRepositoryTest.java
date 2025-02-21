@@ -33,7 +33,6 @@ class UserRepositoryTest {
         .nickname("tEst")
         .role(Role.USER)
         .email("test")
-        .is_public(true)
         .delivery_address("test")
         .build();
     User user2 = User.builder()
@@ -42,7 +41,6 @@ class UserRepositoryTest {
         .nickname("Test2")
         .role(Role.USER)
         .email("test2")
-        .is_public(true)
         .delivery_address("test2")
         .build();
     User user3 = User.builder()
@@ -51,7 +49,6 @@ class UserRepositoryTest {
         .nickname("3test")
         .role(Role.USER)
         .email("test3")
-        .is_public(true)
         .delivery_address("test3")
         .build();
 

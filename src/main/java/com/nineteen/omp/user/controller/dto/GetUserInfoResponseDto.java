@@ -8,7 +8,6 @@ public record GetUserInfoResponseDto(
     String nickname,
     String email,
     Role role,
-    boolean isPublic,
     String deliveryAddress
 ) {
 
@@ -20,7 +19,6 @@ public record GetUserInfoResponseDto(
         command.nickname(),
         command.email(),
         command.role(),
-        command.isPublic(),
         command.deliveryAddress()
     );
   }

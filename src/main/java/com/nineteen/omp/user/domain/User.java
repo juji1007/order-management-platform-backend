@@ -50,9 +50,6 @@ public class User extends BaseEntity {
   @Column(nullable = false, unique = true, length = 30)
   private String email;
 
-  @Column(nullable = false)
-  private Boolean is_public;
-
   @Column(nullable = false, length = 30)
   private String delivery_address;
 
@@ -62,9 +59,6 @@ public class User extends BaseEntity {
     }
     if (requestCommand.email() != null) {
       this.email = requestCommand.email();
-    }
-    if (requestCommand.is_public() != null) {
-      this.is_public = requestCommand.is_public();
     }
     if (requestCommand.delivery_address() != null) {
       this.delivery_address = requestCommand.delivery_address();
