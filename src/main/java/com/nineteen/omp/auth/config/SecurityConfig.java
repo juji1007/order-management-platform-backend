@@ -28,7 +28,6 @@ public class SecurityConfig {
 
   private final UserDetailsServiceImpl userDetailsService;
 
-
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
       AuthenticationConfiguration authenticationConfiguration,
@@ -49,8 +48,10 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/", "/api/v1/users/login", "/api/v1/users/signup")
             .permitAll()
+            .requestMatchers("/api/v1/masters/**").hasRole("MASTER")
+            .requestMatchers("/api/v1/owners/**").hasAnyRole("OWNER", "MASTER")
+            .requestMatchers("/api/v1/users/**").hasAnyRole("USER", "OWNER", "MASTER")
             .anyRequest().authenticated()
-
         )
         .addFilter(jwtAuthenticationFilter) // 로그인 필터 추가
         .addFilterAfter(new JwtFilter(jwtProvider, jwtHeaderHandler, userRepository),
