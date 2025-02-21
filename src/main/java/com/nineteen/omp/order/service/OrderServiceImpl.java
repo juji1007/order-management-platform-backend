@@ -1,7 +1,11 @@
 package com.nineteen.omp.order.service;
 
 import com.nineteen.omp.order.controller.dto.OrderRequestDto;
+import com.nineteen.omp.order.controller.dto.OrderResponseDto;
 import com.nineteen.omp.order.domain.Order;
+import com.nineteen.omp.order.domain.OrderProduct;
+import com.nineteen.omp.order.exception.OrderException;
+import com.nineteen.omp.order.exception.OrderExceptionCode;
 import com.nineteen.omp.order.repository.OrderProductRepository;
 import com.nineteen.omp.order.repository.OrderQueryRepository;
 import com.nineteen.omp.order.repository.OrderRepository;
@@ -23,11 +27,11 @@ public class OrderServiceImpl implements OrderService {
 
 
   private final StoreRepository storeRepository;
-  private final ProductRepository productRepository;
   private final OrderRepository orderRepository;
   private final OrderProductRepository orderProductRepository;
   private final OrderQueryRepository orderQueryRepository;
 
+  @Override
   public void createOrder(OrderRequestDto orderRequestDto) {
     OrderCommand orderCommand = OrderCommand.fromOrderRequestDto(orderRequestDto);
     // TODO : 예외처리 적용
@@ -36,10 +40,9 @@ public class OrderServiceImpl implements OrderService {
 
     // TODO: userId를 하드코딩된 값(1L) 대신 userRepository에서 조회해야 함.
     User user = User.builder()
-        .id(1L)  // 랜덤 Long 값 설정
-        .username("exampleUser")                      // 필드에 값 설정
+        .id(1L)
+        .username("exampleUser")
         .build();
-    // User user = userRepository.findById(orderCommand.userId()).orElseThrow(() -> new RuntimeException("User not found"));
 
     Order order = Order.builder()
         .store(store)
