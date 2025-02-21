@@ -1,10 +1,9 @@
 package com.nineteen.omp.user.service;
 
 import com.nineteen.omp.global.exception.CustomException;
-import com.nineteen.omp.user.controller.dto.LoginRequestDto;
 import com.nineteen.omp.user.controller.dto.SignupRequestDto;
 import com.nineteen.omp.user.domain.User;
-import com.nineteen.omp.user.domain.UserExceptionCode;
+import com.nineteen.omp.user.exception.UserExceptionCode;
 import com.nineteen.omp.user.repository.UserRepository;
 import com.nineteen.omp.user.service.dto.GetUserInfoPageResponseCommand;
 import com.nineteen.omp.user.service.dto.GetUserInfoResponseCommand;
@@ -13,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,12 +98,4 @@ public class UserServiceImpl implements UserService {
     return new GetUserInfoPageResponseCommand(pageResponseCommand);
   }
 
-  @Override
-  public ResponseEntity<ResponseDto<?>> login(LoginRequestDto requestDto) {
-
-    User user = userRepository.findByUsername(requestDto.username())
-        .orElseThrow(() -> new CustomException(CommonExceptionCode.USER_NOT_FOUND));
-
-    return ResponseEntity.ok().body(ResponseDto.success());
-  }
 }
