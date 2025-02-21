@@ -10,8 +10,7 @@ public record ProductResponseDto(
     int price,
     String image,
     String description,
-    Boolean isDeleted,
-    String deletedAt
+    Boolean isDeleted
 ) {
 
   public ProductResponseDto(StoreProduct product) {
@@ -21,8 +20,7 @@ public record ProductResponseDto(
         product.getPrice(),
         product.getImage(),
         product.getDescription(),
-        product.getIsDeleted(),
-        product.getDeletedAt() != null ? product.getDeletedAt().toString() : null
+        product.getIsDeleted()
     );
   }
 }
