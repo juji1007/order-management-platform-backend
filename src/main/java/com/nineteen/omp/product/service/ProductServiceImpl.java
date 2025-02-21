@@ -4,7 +4,6 @@ import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.product.exception.ProductException;
 import com.nineteen.omp.product.exception.ProductExceptionCode;
-import com.nineteen.omp.product.repository.ProductQueryRepository;
 import com.nineteen.omp.product.repository.ProductRepository;
 import com.nineteen.omp.product.service.dto.ProductCommand;
 import com.nineteen.omp.store.domain.Store;
@@ -23,7 +22,6 @@ public class ProductServiceImpl implements ProductService {
 
   private final ProductRepository productRepository;
   private final StoreRepository storeRepository;
-  private final ProductQueryRepository productQueryRepository;
 
   @Override
   public ProductResponseDto addProduct(ProductCommand command) {
@@ -102,7 +100,7 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public Page<ProductResponseDto> searchProducts(String keyword, String category,
       Pageable pageable) {
-    return productQueryRepository.searchProducts(keyword, category, pageable);
+    return productRepository.searchProducts(keyword, category, pageable);
   }
 
 }
