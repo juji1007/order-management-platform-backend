@@ -71,14 +71,6 @@ public class Order extends BaseEntity {
     this.orderType = orderType;
   }
 
-
-  public void calculateTotalPrice(List<OrderProduct> orderProducts) {
-    this.totalPrice = orderProducts.stream()
-        .mapToInt(
-            orderProduct -> orderProduct.getQuantity() * orderProduct.getStoreProduct().getPrice())
-        .sum();
-  }
-
   public Order cancelOrder() {
     if (this.orderStatus == OrderStatus.CANCELLED) {
       throw new OrderException(OrderExceptionCode.ORDER_ALREADY_CANCELLED);
