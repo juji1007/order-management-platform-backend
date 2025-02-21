@@ -3,7 +3,6 @@ package com.nineteen.omp.store.domain;
 import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.store.exception.StoreException;
 import com.nineteen.omp.store.exception.StoreExceptionCode;
-import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,8 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -38,9 +35,11 @@ public class Store extends BaseEntity {
   @Column(name = "store_id", updatable = false, nullable = false)
   private UUID id;
 
-  @OneToOne
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+  //  @OneToOne
+//  @JoinColumn(name = "user_id", nullable = false)
+//  private User user;
+  @Column(name = "user_id", nullable = false)
+  private Long userId;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "category", updatable = true, nullable = false)
@@ -58,13 +57,14 @@ public class Store extends BaseEntity {
   @Column(name = "close_hours", updatable = true, nullable = true)
   private LocalTime closeHours;
   @Column(name = "closed_days", updatable = true, nullable = true)
-  private String closedDays; // -> localDate 고려 리스트도 고려
+  private String closedDays;
 
-  public void changeStoreCategory(StoreCategory storeCategory) {
-    if (storeCategory == null) {
+  public void changeStoreCategory(String storeCategoryName) {
+    if (storeCategoryName == null) {
       throw new StoreException(StoreExceptionCode.STORE_CATEGORY_IS_NULL);
     }
-    this.storeCategory = storeCategory;
+    StoreCategory validatedStoreCategory = StoreCategory.fromName(storeCategoryName);
+    this.storeCategory = validatedStoreCategory;
   }
 
   public void changeStoreName(String name) {
