@@ -1,5 +1,7 @@
 package com.nineteen.omp.coupon.service;
 
+import static com.nineteen.omp.coupon.controller.dto.CouponResponseDto.toResponse;
+
 import com.nineteen.omp.coupon.controller.dto.CouponRequestDto;
 import com.nineteen.omp.coupon.controller.dto.CouponResponseDto;
 import com.nineteen.omp.coupon.domain.Coupon;
@@ -75,12 +77,5 @@ public class CouponServiceImpl implements CouponService {
         .orElseThrow(() -> new CouponException(CouponExceptionCode.COUPON_NOT_FOUND));
   }
 
-  private CouponResponseDto toResponse(Coupon coupon) {
-    return new CouponResponseDto(
-        coupon.getId(),
-        coupon.getName(),
-        coupon.getDiscountPrice(),
-        coupon.getExpiration()
-    );
-  }
+
 }
