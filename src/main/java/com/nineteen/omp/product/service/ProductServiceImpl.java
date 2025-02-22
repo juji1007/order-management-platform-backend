@@ -70,23 +70,14 @@ public class ProductServiceImpl implements ProductService {
     StoreProduct storeProduct = findProductById(productId)
         .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
 
-    UUID storeId = storeProduct.getStore().getId();
-    Store store = findStoreById(storeId);
-
-    StoreProduct updatedStoreProduct = updateProductFromCommand(command, storeProduct, store);
-    productRepository.save(updatedStoreProduct);
-    return new ProductResponseDto(updatedStoreProduct);
-  }
-
-  private StoreProduct updateProductFromCommand(ProductCommand command, StoreProduct storeProduct,
-      Store store) {
-    return storeProduct.toBuilder()
-        .store(store)
+    StoreProduct updatedStoreProduct = storeProduct.toBuilder()
         .name(command.name())
         .price(command.price())
         .image(command.image())
         .description(command.description())
         .build();
+
+    return new ProductResponseDto(updatedStoreProduct);
   }
 
   public Optional<StoreProduct> findProductById(UUID productId) {
