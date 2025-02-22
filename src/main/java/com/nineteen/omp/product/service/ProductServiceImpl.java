@@ -15,9 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
@@ -25,6 +27,7 @@ public class ProductServiceImpl implements ProductService {
   private final StoreRepository storeRepository;
 
   @Override
+  @Transactional
   public ProductResponseDto addProduct(ProductCommand command) {
 
     Store store = findStoreById(command.storeId());
@@ -61,6 +64,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
+  @Transactional
   public ProductResponseDto updateProduct(ProductCommand command, UUID productId) {
 
     StoreProduct storeProduct = findProductById(productId)
@@ -96,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
 
 
   @Override
+  @Transactional
   public void deleteProduct(UUID productId) {
     StoreProduct storeProduct = findProductById(productId)
         .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
