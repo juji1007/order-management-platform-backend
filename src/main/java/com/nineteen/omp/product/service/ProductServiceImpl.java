@@ -8,6 +8,7 @@ import com.nineteen.omp.product.repository.ProductRepository;
 import com.nineteen.omp.product.service.dto.ProductCommand;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.repository.StoreRepository;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,14 +54,18 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public ProductResponseDto getProduct(UUID productId) {
-    StoreProduct storeProduct = findProductById(productId);
+    StoreProduct storeProduct = findProductById(productId)
+        .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
+
     return new ProductResponseDto(storeProduct);
   }
 
   @Override
   public ProductResponseDto updateProduct(ProductCommand command, UUID productId) {
 
-    StoreProduct storeProduct = findProductById(productId);
+    StoreProduct storeProduct = findProductById(productId)
+        .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
+
     UUID storeId = storeProduct.getStore().getId();
     Store store = findStoreById(storeId);
 
@@ -80,9 +85,8 @@ public class ProductServiceImpl implements ProductService {
         .build();
   }
 
-  public StoreProduct findProductById(UUID productId) {
-    return productRepository.findById(productId)
-        .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
+  public Optional<StoreProduct> findProductById(UUID productId) {
+    return productRepository.findById(productId);
   }
 
   private Store findStoreById(UUID storeId) {
@@ -93,7 +97,8 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public void deleteProduct(UUID productId) {
-    StoreProduct storeProduct = findProductById(productId);
+    StoreProduct storeProduct = findProductById(productId)
+        .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
     productRepository.delete(storeProduct);
   }
 
