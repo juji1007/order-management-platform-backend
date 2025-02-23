@@ -6,6 +6,7 @@ import com.nineteen.omp.product.controller.dto.ProductRequestDto;
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.service.ProductService;
 import com.nineteen.omp.product.service.dto.ProductCommand;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,8 @@ public class ProductController {
   private final ProductService productService;
 
   @PostMapping()
-  public ResponseEntity<ResponseDto<?>> addProduct(@RequestBody ProductRequestDto requestDto) {
+  public ResponseEntity<ResponseDto<?>> addProduct(
+      @RequestBody @Valid ProductRequestDto requestDto) {
     ProductCommand productCommand = ProductCommand.fromProductRequestDto(requestDto);
     ProductResponseDto productResponseDto = productService.addProduct(productCommand);
     return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.success(productResponseDto));
@@ -64,7 +66,7 @@ public class ProductController {
   // TODO : @AuthenticationPrinciapal 로 UserDetails 에서 productId를 가져와야 함.
   @PatchMapping("/{productId}")
   public ResponseEntity<ResponseDto<?>> updateProduct(
-      @RequestBody ProductRequestDto requestDto,
+      @RequestBody @Valid ProductRequestDto requestDto,
       @PathVariable UUID productId
   ) {
     ProductCommand command = ProductCommand.fromProductRequestDto(requestDto);
