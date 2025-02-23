@@ -11,12 +11,13 @@ public class PageableUtils {
 
   private static final int FIRST_PAGE = 1;
 
-  public static void validatePageable(Pageable pageable) {
+  public static Pageable validatePageable(Pageable pageable) {
     validatePageNumber(pageable.getPageNumber());
     validatePageSize(pageable.getPageSize());
     validateSortBy(pageable.getSort());
 
-    pageable.previousOrFirst();
+
+    return pageable.previousOrFirst();
   }
 
   private static void validatePageNumber(int pageNumber) {
