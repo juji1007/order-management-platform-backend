@@ -41,7 +41,6 @@ public class StoreController {
 
     UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
     Long userId = userDetailsImpl.getUserId();
-    System.out.println("유저 아이디 : " + userId);
 
     StoreResponseDto storeResponseDto = storeService.createStore(
         new StoreCommand(userId, storeRequestDto));
@@ -49,7 +48,6 @@ public class StoreController {
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 
-  //검색 -> @ModelAttribute말고 전부 RequestParam 처리?, storeSearchDto(요청dto)예외처리 안함(null 일 때 전체검색)
   //검색 -> 이름, 카테고리, 주소 -> 정렬조건은 다만들기
   @GetMapping
   public ResponseEntity<ResponseDto<Page<StoreResponseDto>>> searchStore(
