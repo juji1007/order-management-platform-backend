@@ -1,5 +1,7 @@
 package com.nineteen.omp.store.service;
 
+import static com.nineteen.omp.store.controller.dto.StoreResponseDto.toResponseDto;
+
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.domain.StoreCategory;
@@ -8,6 +10,9 @@ import com.nineteen.omp.store.exception.StoreExceptionCode;
 import com.nineteen.omp.store.repository.StoreRepository;
 import com.nineteen.omp.store.repository.dto.StoreData;
 import com.nineteen.omp.store.service.dto.StoreCommand;
+import com.nineteen.omp.user.domain.User;
+import com.nineteen.omp.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,10 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreServiceImpl implements StoreService {
 
   private final StoreRepository storeRepository;
+  private final UserRepository userRepository;
 
   //Create, 가게 중복 체크
   @Transactional
   public StoreResponseDto createStore(StoreCommand storeCommand) {
+
+    User user = userRepository.findById(storeCommand.userId())
+        .orElseThrow(() -> new EntityNotFoundException("해당 ID의 사용자를 찾을 수 없습니다."));
+
     boolean isStoreExsits = storeRepository.existsByNameAndAddress(
         storeCommand.storeRequestDto().name(),
         storeCommand.storeRequestDto().address());
@@ -35,7 +45,7 @@ public class StoreServiceImpl implements StoreService {
     StoreCategory storeCategory = StoreCategory.fromName(
         storeCommand.storeRequestDto().storeCategoryName());
 
-    StoreData storeData = new StoreData(storeCommand, storeCategory);
+    StoreData storeData = new StoreData(storeCommand, storeCategory, user);
 
     Store savedStore = storeRepository.save(storeData.toEntity());
     return toResponseDto(savedStore);
@@ -99,21 +109,6 @@ public class StoreServiceImpl implements StoreService {
   private Store findByIdOrElseThrow(UUID storeId) {
     return storeRepository.findById(storeId)
         .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
-  }
-
-  //toResponse
-  private StoreResponseDto toResponseDto(Store store) {
-    return new StoreResponseDto(
-        store.getId(),
-        store.getUserId(),
-        store.getStoreCategory().getCategoryName(),
-        store.getName(),
-        store.getAddress(),
-        store.getPhone(),
-        store.getOpenHours(),
-        store.getCloseHours(),
-        store.getClosedDays()
-    );
   }
 
 }

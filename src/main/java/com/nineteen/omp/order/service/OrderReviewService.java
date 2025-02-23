@@ -1,8 +1,8 @@
 package com.nineteen.omp.order.service;
 
+import com.nineteen.omp.order.controller.dto.OrderReviewRequestDto;
 import com.nineteen.omp.order.controller.dto.OrderReviewResponseDto;
 import com.nineteen.omp.order.controller.dto.UpdateOrderReviewRequestDto;
-import com.nineteen.omp.order.service.dto.OrderReviewCommand;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderReviewService {
 
-  OrderReviewResponseDto createOrderReview(OrderReviewCommand orderReviewCommand);
+  OrderReviewResponseDto createOrderReview(OrderReviewRequestDto orderReviewRequestDto);
 
   Page<OrderReviewResponseDto> getOrderReviews(UUID orderId, Pageable validatedPageable);
 

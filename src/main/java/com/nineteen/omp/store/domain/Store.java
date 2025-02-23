@@ -3,6 +3,7 @@ package com.nineteen.omp.store.domain;
 import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.store.exception.StoreException;
 import com.nineteen.omp.store.exception.StoreExceptionCode;
+import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -35,11 +38,9 @@ public class Store extends BaseEntity {
   @Column(name = "store_id", updatable = false, nullable = false)
   private UUID id;
 
-  //  @OneToOne
-//  @JoinColumn(name = "user_id", nullable = false)
-//  private User user;
-  @Column(name = "user_id", nullable = false)
-  private Long userId;
+  @OneToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "category", updatable = true, nullable = false)

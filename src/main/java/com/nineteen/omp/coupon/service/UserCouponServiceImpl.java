@@ -14,6 +14,9 @@ import com.nineteen.omp.coupon.repository.CouponRepository;
 import com.nineteen.omp.coupon.repository.UserCouponRepository;
 import com.nineteen.omp.coupon.repository.dto.UserCouponData;
 import com.nineteen.omp.coupon.service.dto.UserCouponCommand;
+import com.nineteen.omp.user.domain.User;
+import com.nineteen.omp.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,10 +36,14 @@ public class UserCouponServiceImpl implements UserCouponService {
 
   private final UserCouponRepository userCouponRepository;
   private final CouponRepository couponRepository;
+  private final UserRepository userRepository;
 
   @Override
   @Transactional
   public UserCouponResponseDto createUserCoupon(UserCouponCommand userCouponCommand) {
+    User user = userRepository.findById(userCouponCommand.userId())
+        .orElseThrow(() -> new EntityNotFoundException("해당 ID를 갖는 사용자를 찾을 수 없습니다."));
+
     Coupon coupon = couponRepository.findById(userCouponCommand.userCouponRequestDto().couponId())
         .orElseThrow(() -> new CouponException(CouponExceptionCode.COUPON_NOT_FOUND));
 
@@ -47,7 +54,7 @@ public class UserCouponServiceImpl implements UserCouponService {
     }
 
     UserCouponData userCouponData = new UserCouponData(
-        userCouponCommand.userId(),
+        user,
         coupon,
         userCouponCommand.userCouponRequestDto().status());
 

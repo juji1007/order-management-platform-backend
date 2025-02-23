@@ -46,17 +46,7 @@ public class StoreRepositoryCustomImpl implements StoreRepositoryCustom {
         .fetchResults();
 
     List<StoreResponseDto> content = results.getResults().stream()
-        .map(store -> new StoreResponseDto(
-            store.getId(),
-            store.getUserId(),
-            store.getStoreCategory().getCategoryName(),
-            store.getName(),
-            store.getAddress(),
-            store.getPhone(),
-            store.getOpenHours(),
-            store.getCloseHours(),
-            store.getClosedDays()
-        ))
+        .map(StoreResponseDto::toResponseDto)
         .collect(Collectors.toList());
     long total = results.getTotal();
     return new PageImpl<>(content, pageable, total);
