@@ -9,8 +9,7 @@ public record ProductResponseDto(
     String name,
     int price,
     String image,
-    String description,
-    Boolean isDeleted
+    String description
 ) {
 
   public ProductResponseDto(StoreProduct product) {
@@ -19,8 +18,7 @@ public record ProductResponseDto(
         product.getName(),
         product.getPrice(),
         product.getImage(),
-        product.getDescription(),
-        product.getIsDeleted()
+        product.getDescription()
     );
   }
 }
