@@ -2,6 +2,7 @@ package com.nineteen.omp.store.service;
 
 import static com.nineteen.omp.store.controller.dto.StoreResponseDto.toResponseDto;
 
+import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.domain.StoreCategory;
@@ -11,8 +12,8 @@ import com.nineteen.omp.store.repository.StoreRepository;
 import com.nineteen.omp.store.repository.dto.StoreData;
 import com.nineteen.omp.store.service.dto.StoreCommand;
 import com.nineteen.omp.user.domain.User;
+import com.nineteen.omp.user.exception.UserExceptionCode;
 import com.nineteen.omp.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,7 +34,7 @@ public class StoreServiceImpl implements StoreService {
   public StoreResponseDto createStore(StoreCommand storeCommand) {
 
     User user = userRepository.findById(storeCommand.userId())
-        .orElseThrow(() -> new EntityNotFoundException("해당 ID의 사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new CustomException(UserExceptionCode.USER_NOT_FOUND));
 
     boolean isStoreExsits = storeRepository.existsByNameAndAddress(
         storeCommand.storeRequestDto().name(),
