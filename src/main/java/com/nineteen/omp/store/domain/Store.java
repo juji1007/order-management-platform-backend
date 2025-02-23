@@ -1,21 +1,24 @@
 package com.nineteen.omp.store.domain;
 
-
-import com.nineteen.omp.user.domain.User;
+import com.nineteen.omp.global.entity.BaseEntity;
+import com.nineteen.omp.store.exception.StoreException;
+import com.nineteen.omp.store.exception.StoreExceptionCode;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "p_store")
@@ -23,27 +26,70 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Store {
+@SQLRestriction("is_deleted = false")
+@SQLDelete(sql = "UPDATE p_store SET is_deleted = true WHERE store_id = ?")
+public class Store extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "store_id", updatable = false, nullable = false)
   private UUID id;
 
-  @OneToOne
-  @JoinColumn(name = "user_id")
-  private User user;
+  //  @OneToOne
+//  @JoinColumn(name = "user_id", nullable = false)
+//  private User user;
+  @Column(name = "user_id", nullable = false)
+  private Long userId;
 
   @Enumerated(EnumType.STRING)
-  public Category category;
+  @Column(name = "category", updatable = true, nullable = false)
+  private StoreCategory storeCategory;
 
-  // TODO : 실행을 위한 임시 컬럼
-  public enum Category {
-    KOREAN_FOOD,  // 한식
-    KIMCHI,        // 김치
-    BBQ,           // 바비큐
-    SOJU_BAR,      // 소주바
-    NOODLES,       // 면류
-    DESSERT,       // 디저트
-    // 추가적인 카테고리들을 여기에 정의
+  @Column(name = "name", updatable = true, nullable = false)
+  private String name;
+  @Column(name = "address", updatable = true, nullable = false)
+  private String address;
+  @Column(name = "phone", updatable = true, nullable = false)
+  private String phone;
+
+  @Column(name = "open_hours", updatable = true, nullable = true)
+  private LocalTime openHours;
+  @Column(name = "close_hours", updatable = true, nullable = true)
+  private LocalTime closeHours;
+  @Column(name = "closed_days", updatable = true, nullable = true)
+  private String closedDays;
+
+  public void changeStoreCategory(String storeCategoryName) {
+    if (storeCategoryName == null) {
+      throw new StoreException(StoreExceptionCode.STORE_CATEGORY_IS_NULL);
+    }
+    StoreCategory validatedStoreCategory = StoreCategory.fromName(storeCategoryName);
+    this.storeCategory = validatedStoreCategory;
+  }
+
+  public void changeStoreName(String name) {
+    if (name == null) {
+      throw new StoreException(StoreExceptionCode.STORE_NAME_IS_NULL);
+    }
+    this.name = name;
+  }
+
+  public void changeStoreAddress(String address) {
+    if (address == null) {
+      throw new StoreException(StoreExceptionCode.STORE_ADDRESS_IS_NULL);
+    }
+    this.address = address;
+  }
+
+  public void changeStoreOpenHours(LocalTime openHours) {
+    this.openHours = openHours;
+  }
+
+  public void changeStoreCloseHours(LocalTime closeHours) {
+    this.closeHours = closeHours;
+  }
+
+  public void changeStoreClosedDays(String closedDays) {
+    this.closedDays = closedDays;
   }
 }
