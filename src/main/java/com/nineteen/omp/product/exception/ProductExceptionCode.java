@@ -15,7 +15,6 @@ public enum ProductExceptionCode implements ExceptionCode {
   INVALID_CATEGORY(HttpStatus.NOT_FOUND, "유효하지 않은 카테고리입니다."),
   PRODUCT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 상품입니다.`");
 
-
   private final HttpStatus httpStatus;
   private final String message;
 }

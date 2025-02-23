@@ -48,6 +48,7 @@ public class ProductController {
     return ResponseEntity.ok().body(ResponseDto.success(productResponseDto));
   }
 
+
   @GetMapping()
   public ResponseEntity<ResponseDto<?>> getAllProducts(
       @PageableDefault(

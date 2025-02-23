@@ -20,5 +20,4 @@ public interface ProductService {
   Page<ProductResponseDto> searchProducts(String keyword, String category, Pageable pageable);
 
   void deleteProduct(UUID productId);
-
 }

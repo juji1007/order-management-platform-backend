@@ -1,5 +1,6 @@
 package com.nineteen.omp.product.service;
 
+
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.product.exception.ProductException;
@@ -59,7 +60,6 @@ public class ProductServiceImpl implements ProductService {
   public ProductResponseDto getProduct(UUID productId) {
     StoreProduct storeProduct = findProductById(productId)
         .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
-
     return new ProductResponseDto(storeProduct);
   }
 

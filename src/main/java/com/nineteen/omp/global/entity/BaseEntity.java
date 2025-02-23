@@ -34,7 +34,6 @@ public abstract class BaseEntity {
   @Column(name = "is_deleted")
   private Boolean isDeleted = false;
 
-
   @PreRemove
   private void softDelete() {
     if (isDeleted != null && !isDeleted) {
