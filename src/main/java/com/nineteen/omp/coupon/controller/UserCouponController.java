@@ -1,10 +1,7 @@
 package com.nineteen.omp.coupon.controller;
 
-import com.nineteen.omp.coupon.controller.dto.CouponResponseDto;
 import com.nineteen.omp.coupon.controller.dto.UserCouponRequestDto;
 import com.nineteen.omp.coupon.controller.dto.UserCouponResponseDto;
-import com.nineteen.omp.coupon.domain.Coupon;
-import com.nineteen.omp.coupon.service.CouponService;
 import com.nineteen.omp.coupon.service.UserCouponService;
 import com.nineteen.omp.coupon.service.dto.UserCouponCommand;
 import com.nineteen.omp.global.dto.ResponseDto;
@@ -32,25 +29,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserCouponController {
 
   private final UserCouponService userCouponService;
-  private final CouponService couponService;
 
   @PostMapping
   public ResponseEntity<ResponseDto<UserCouponResponseDto>> createUserCoupon(
       @Valid @RequestBody UserCouponRequestDto userCouponRequestDto) {
 
+    //관리자가 사용자에게 쿠폰 발급이므로 사용자 아이디 검색 필요
     Long userId = 123L;
 
-    CouponResponseDto couponResponseDto = couponService.getCoupon(userCouponRequestDto.couponId());
-
-    Coupon coupon = new Coupon(
-        couponResponseDto.id(),
-        couponResponseDto.name(),
-        couponResponseDto.discountPrice(),
-        couponResponseDto.expiration()
-    );
-
     UserCouponResponseDto userCouponResponseDto = userCouponService.createUserCoupon(
-        new UserCouponCommand(userCouponRequestDto, userId, coupon));
+        new UserCouponCommand(userCouponRequestDto, userId));
 
     return ResponseEntity.ok(ResponseDto.success(userCouponResponseDto));
   }

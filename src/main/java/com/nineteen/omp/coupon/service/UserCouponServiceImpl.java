@@ -1,10 +1,16 @@
 package com.nineteen.omp.coupon.service;
 
+import static com.nineteen.omp.coupon.controller.dto.UserCouponResponseDto.toResponseDto;
+
 import com.nineteen.omp.coupon.controller.dto.UserCouponRequestDto;
 import com.nineteen.omp.coupon.controller.dto.UserCouponResponseDto;
+import com.nineteen.omp.coupon.domain.Coupon;
 import com.nineteen.omp.coupon.domain.UserCoupon;
+import com.nineteen.omp.coupon.exception.CouponException;
+import com.nineteen.omp.coupon.exception.CouponExceptionCode;
 import com.nineteen.omp.coupon.exception.UserCouponException;
 import com.nineteen.omp.coupon.exception.UserCouponExceptionCode;
+import com.nineteen.omp.coupon.repository.CouponRepository;
 import com.nineteen.omp.coupon.repository.UserCouponRepository;
 import com.nineteen.omp.coupon.repository.dto.UserCouponData;
 import com.nineteen.omp.coupon.service.dto.UserCouponCommand;
@@ -22,22 +28,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserCouponServiceImpl implements UserCouponService {
 
   private final UserCouponRepository userCouponRepository;
+  private final CouponRepository couponRepository;
 
   @Override
   @Transactional
   public UserCouponResponseDto createUserCoupon(UserCouponCommand userCouponCommand) {
+    Coupon coupon = couponRepository.findById(userCouponCommand.userCouponRequestDto().couponId())
+        .orElseThrow(() -> new CouponException(CouponExceptionCode.COUPON_NOT_FOUND));
+
     boolean isExist = userCouponRepository.existsByUserIdAndCouponId(userCouponCommand.userId(),
-        userCouponCommand.coupon().getId());
+        coupon.getId());
     if (isExist) {
       throw new UserCouponException(UserCouponExceptionCode.USER_COUPON_IS_DUPLICATED);
     }
 
     UserCouponData userCouponData = new UserCouponData(
         userCouponCommand.userId(),
-        userCouponCommand.coupon(),
+        coupon,
         userCouponCommand.userCouponRequestDto().status());
 
     UserCoupon savedUserCoupon = userCouponRepository.save(userCouponData.toEntity());
@@ -46,17 +57,11 @@ public class UserCouponServiceImpl implements UserCouponService {
   }
 
   @Override
-  @Transactional(readOnly = true)
   public Page<UserCouponResponseDto> searchUserCoupon(Pageable pageable) {
-    System.out.println("페이지 정보 : " + pageable.getPageNumber());
     Page<UserCoupon> userCouponPage = userCouponRepository.findAll(pageable);
-    System.out.println("userCouponPage = " + userCouponPage);
-    System.out.println("Total elements: " + userCouponPage.getTotalElements()); // 추가된 로그
-    System.out.println("UserCoupons: " + userCouponPage.getContent()); // 추가된 로그
     List<UserCouponResponseDto> content = userCouponPage.stream()
         .map(userCoupon -> new UserCouponResponseDto(
             userCoupon.getId(),
-            userCoupon.getUserId(),
             userCoupon.getCoupon().getId(),
             userCoupon.isStatus()
         ))
@@ -93,12 +98,4 @@ public class UserCouponServiceImpl implements UserCouponService {
         .orElseThrow(() -> new UserCouponException(UserCouponExceptionCode.USER_COUPON_NOT_FOUND));
   }
 
-  private UserCouponResponseDto toResponseDto(UserCoupon savedUserCoupon) {
-    return new UserCouponResponseDto(
-        savedUserCoupon.getId(),
-        savedUserCoupon.getUserId(),
-        savedUserCoupon.getCoupon().getId(),
-        savedUserCoupon.isStatus()
-    );
-  }
 }
