@@ -8,9 +8,9 @@ public record UserCouponData(
     Coupon coupon,
     boolean status
 ) {
+
   public UserCoupon toEntity() {
     return UserCoupon.builder()
-        .userId(userId)
         .coupon(coupon)
         .status(status)
         .build();

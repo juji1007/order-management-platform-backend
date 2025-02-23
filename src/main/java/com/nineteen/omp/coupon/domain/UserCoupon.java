@@ -1,6 +1,7 @@
 package com.nineteen.omp.coupon.domain;
 
 import com.nineteen.omp.global.entity.BaseEntity;
+import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,11 +34,9 @@ public class UserCoupon extends BaseEntity {
   @Column(name = "user_coupon_id", updatable = false, nullable = false)
   private UUID id;
 
-  //  @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinColumn(name = "user_id", nullable = false)
-//  private User user;
-  @Column(name = "user_id", nullable = false)
-  private Long userId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "coupon_id", nullable = false)
