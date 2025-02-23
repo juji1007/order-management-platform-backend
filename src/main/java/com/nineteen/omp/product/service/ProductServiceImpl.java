@@ -93,9 +93,11 @@ public class ProductServiceImpl implements ProductService {
   @Override
   @Transactional
   public void deleteProduct(UUID productId) {
-    StoreProduct storeProduct = findProductById(productId)
-        .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
-    productRepository.delete(storeProduct);
+    if (productRepository.existsById(productId)) {
+      productRepository.deleteById(productId);
+    } else {
+      throw new ProductException(ProductExceptionCode.PRODUCT_ALREADY_DELETED);
+    }
   }
 
   @Override
