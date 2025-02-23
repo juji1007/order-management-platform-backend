@@ -54,24 +54,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     // 응답
     response.setStatus(HttpServletResponse.SC_OK);
     log.info("인증 성공 처리 완료 - userId: {}", userDetails.getUserId());
-
-    // 역할별 접근권한
-    String role = authentication.getAuthorities().stream()
-        .map(grantedAuthority -> grantedAuthority.getAuthority())
-        .findFirst()
-        .orElse("");
-
-    if (role.equals("MASTER")) {
-      log.info("/masters 접근 권한 - userRole: {}", userDetails.getRole());
-    }
-    if (role.equals("OWNER") || role.equals("MASTER")) {
-      log.info("/owners 접근 권한 - userRole: {}", userDetails.getRole());
-    }
-    if (role.equals("USER") || role.equals("OWNER") || role.equals("MASTER")) {
-      log.info("/users 접근 권한 - userRole: {}", userDetails.getRole());
-    }
-
-
+    
   }
 
   private record TokenPair(String accessToken, String refreshToken) {
