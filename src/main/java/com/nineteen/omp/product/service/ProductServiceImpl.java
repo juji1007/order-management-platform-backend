@@ -89,6 +89,11 @@ public class ProductServiceImpl implements ProductService {
         .orElseThrow(() -> new ProductException(ProductExceptionCode.STORE_NOT_FOUND));
   }
 
+  @Override
+  public Page<ProductResponseDto> getAllProducts(Pageable pageable) {
+    return productRepository.findAll(pageable)
+        .map(ProductResponseDto::new);
+  }
 
   @Override
   @Transactional

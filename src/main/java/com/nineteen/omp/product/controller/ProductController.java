@@ -46,6 +46,21 @@ public class ProductController {
     return ResponseEntity.ok().body(ResponseDto.success(productResponseDto));
   }
 
+  @GetMapping()
+  public ResponseEntity<ResponseDto<?>> getAllProducts(
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable) {
+
+    pageable = PageableUtils.validatePageable(pageable);  // 유효성 검사
+    Page<ProductResponseDto> productPage = productService.getAllProducts(pageable);
+
+    return ResponseEntity.ok().body(ResponseDto.success(productPage.getContent()));
+  }
+
   // TODO : @AuthenticationPrinciapal 로 UserDetails 에서 productId를 가져와야 함.
   @PatchMapping("/{productId}")
   public ResponseEntity<ResponseDto<?>> updateProduct(

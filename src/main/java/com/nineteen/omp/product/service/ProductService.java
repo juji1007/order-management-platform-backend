@@ -13,6 +13,8 @@ public interface ProductService {
 
   ProductResponseDto getProduct(UUID productId);
 
+  Page<ProductResponseDto> getAllProducts(Pageable pageable);
+
   ProductResponseDto updateProduct(ProductCommand command, UUID productId);
 
   Page<ProductResponseDto> searchProducts(String keyword, String category, Pageable pageable);
