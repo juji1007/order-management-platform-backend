@@ -1,5 +1,7 @@
 package com.nineteen.omp.store.service;
 
+import static com.nineteen.omp.store.controller.dto.StoreResponseDto.toResponseDto;
+
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.domain.StoreCategory;
@@ -99,21 +101,6 @@ public class StoreServiceImpl implements StoreService {
   private Store findByIdOrElseThrow(UUID storeId) {
     return storeRepository.findById(storeId)
         .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
-  }
-
-  //toResponse
-  private StoreResponseDto toResponseDto(Store store) {
-    return new StoreResponseDto(
-        store.getId(),
-        store.getUserId(),
-        store.getStoreCategory().getCategoryName(),
-        store.getName(),
-        store.getAddress(),
-        store.getPhone(),
-        store.getOpenHours(),
-        store.getCloseHours(),
-        store.getClosedDays()
-    );
   }
 
 }
