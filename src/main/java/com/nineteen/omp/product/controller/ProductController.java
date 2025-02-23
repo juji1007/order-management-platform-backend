@@ -80,8 +80,8 @@ public class ProductController {
 
   @GetMapping("/search")
   public ResponseEntity<ResponseDto<?>> searchProducts(
-      @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
-      @RequestParam(value = "category", required = false, defaultValue = "") String category,
+      @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword,
+      @RequestParam(name = "category", required = false, defaultValue = "") String category,
       @PageableDefault(
           size = 10,
           page = 1,
