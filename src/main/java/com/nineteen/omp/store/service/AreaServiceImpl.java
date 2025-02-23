@@ -66,10 +66,8 @@ public class AreaServiceImpl implements AreaService {
     return toResponseDto(savedArea);
   }
 
-  //softDelete
   @Transactional
   public void deleteArea(UUID areaId) {
-    //@PreRemove
     areaRepository.deleteById(findByIdOrElseThrow(areaId).getId());
   }
 
