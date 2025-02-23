@@ -1,9 +1,10 @@
 package com.nineteen.omp.store.domain;
 
 
-import com.nineteen.omp.category.domain.StoreCategory;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,9 +33,17 @@ public class Store {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @OneToOne
-  @JoinColumn(name = "category_id")
-  private StoreCategory storeCategory;
+  @Enumerated(EnumType.STRING)
+  public Category category;
 
-  private String storename; // TEMP: 임시로 추가된 필드
+  // TODO : 실행을 위한 임시 컬럼
+  public enum Category {
+    KOREAN_FOOD,  // 한식
+    KIMCHI,        // 김치
+    BBQ,           // 바비큐
+    SOJU_BAR,      // 소주바
+    NOODLES,       // 면류
+    DESSERT,       // 디저트
+    // 추가적인 카테고리들을 여기에 정의
+  }
 }

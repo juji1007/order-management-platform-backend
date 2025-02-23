@@ -1,13 +1,20 @@
 package com.nineteen.omp.product.controller;
 
 import com.nineteen.omp.global.dto.ResponseDto;
+import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.product.controller.dto.ProductRequestDto;
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
-import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.product.service.ProductService;
+import com.nineteen.omp.product.service.dto.ProductCommand;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,9 +35,11 @@ public class ProductController {
   private final ProductService productService;
 
   @PostMapping()
-  public ResponseEntity<ResponseDto<?>> addProduct(@RequestBody ProductRequestDto requestDto) {
-    StoreProduct storeProduct = productService.addProduct(requestDto);
-    return ResponseEntity.ok().body(ResponseDto.success(storeProduct));
+  public ResponseEntity<ResponseDto<?>> addProduct(
+      @RequestBody @Valid ProductRequestDto requestDto) {
+    ProductCommand productCommand = ProductCommand.fromProductRequestDto(requestDto);
+    ProductResponseDto productResponseDto = productService.addProduct(productCommand);
+    return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDto.success(productResponseDto));
   }
 
   @GetMapping("/{productId}")
@@ -38,14 +48,30 @@ public class ProductController {
     return ResponseEntity.ok().body(ResponseDto.success(productResponseDto));
   }
 
+
+  @GetMapping()
+  public ResponseEntity<ResponseDto<?>> getAllProducts(
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable) {
+
+    pageable = PageableUtils.validatePageable(pageable);  // 유효성 검사
+    Page<ProductResponseDto> productPage = productService.getAllProducts(pageable);
+
+    return ResponseEntity.ok().body(ResponseDto.success(productPage.getContent()));
+  }
+
   // TODO : @AuthenticationPrinciapal 로 UserDetails 에서 productId를 가져와야 함.
   @PatchMapping("/{productId}")
   public ResponseEntity<ResponseDto<?>> updateProduct(
-      @RequestBody ProductRequestDto requestDto,
+      @RequestBody @Valid ProductRequestDto requestDto,
       @PathVariable UUID productId
   ) {
-
-    ProductResponseDto updateProduct = productService.updateProduct(requestDto, productId);
+    ProductCommand command = ProductCommand.fromProductRequestDto(requestDto);
+    ProductResponseDto updateProduct = productService.updateProduct(command, productId);
     return ResponseEntity.ok().body(ResponseDto.success(updateProduct));
   }
 
@@ -55,10 +81,22 @@ public class ProductController {
     return ResponseEntity.ok().body(ResponseDto.success());
   }
 
-  // TODO : softDelete -> public 일 때 사용 가능.
-  @DeleteMapping("/soft/{productId}")
-  public ResponseEntity<ResponseDto<?>> softDeleteProduct(@PathVariable UUID productId) {
-    ProductResponseDto product = productService.softDeleteProduct(productId);
-    return ResponseEntity.ok().body(ResponseDto.success(product));
+  @GetMapping("/search")
+  public ResponseEntity<ResponseDto<?>> searchProducts(
+      @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword,
+      @RequestParam(name = "category", required = false, defaultValue = "") String category,
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable) {
+
+    pageable = PageableUtils.validatePageable(pageable);
+    Page<ProductResponseDto> productPage = productService.searchProducts(keyword, category,
+        pageable);
+
+    return ResponseEntity.ok().body(ResponseDto.success(productPage.getContent()));
   }
+
 }

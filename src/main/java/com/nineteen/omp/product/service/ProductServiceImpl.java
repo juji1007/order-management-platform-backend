@@ -1,22 +1,26 @@
 package com.nineteen.omp.product.service;
 
-import com.nineteen.omp.global.exception.CommonExceptionCode;
-import com.nineteen.omp.global.exception.CustomException;
-import com.nineteen.omp.product.controller.dto.ProductRequestDto;
+
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.StoreProduct;
+import com.nineteen.omp.product.exception.ProductException;
 import com.nineteen.omp.product.exception.ProductExceptionCode;
 import com.nineteen.omp.product.repository.ProductRepository;
+import com.nineteen.omp.product.service.dto.ProductCommand;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.repository.StoreRepository;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
@@ -24,90 +28,87 @@ public class ProductServiceImpl implements ProductService {
   private final StoreRepository storeRepository;
 
   @Override
-  public StoreProduct addProduct(ProductRequestDto requestDto) {
-    // TODO: 실제 store의 UUID 정보를 동적으로 조회하도록 변경 필요
-    Store store = getStoreById(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+  @Transactional
+  public ProductResponseDto addProduct(ProductCommand command) {
 
-    StoreProduct storeProduct = createProduct(requestDto, store);
-    return saveProduct(storeProduct);
+    Store store = findStoreById(command.storeId());
+    StoreProduct storeProduct = createProduct(command, store);
+
+    storeProduct = saveProduct(storeProduct);
+    return new ProductResponseDto(storeProduct);
   }
 
-  private StoreProduct createProduct(ProductRequestDto requestDto, Store store) {
+  private StoreProduct createProduct(ProductCommand command, Store store) {
     return StoreProduct.builder()
         .store(store)
-        .name(requestDto.name())
-        .price(requestDto.price())
-        .image(requestDto.image())
-        .description(requestDto.description())
+        .name(command.name())
+        .price(command.price())
+        .image(command.image())
+        .description(command.description())
         .build();
   }
 
   private StoreProduct saveProduct(StoreProduct storeProduct) {
     try {
       return productRepository.save(storeProduct);
-    } catch (DataIntegrityViolationException e) {
-      throw new CustomException(ProductExceptionCode.PRODUCT_SAVE_FAILED);
     } catch (Exception e) {
-      throw new CustomException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
+      throw new ProductException(ProductExceptionCode.PRODUCT_SAVE_FAILED);
     }
   }
 
   @Override
   public ProductResponseDto getProduct(UUID productId) {
-    StoreProduct storeProduct = getProductById(productId);
+    StoreProduct storeProduct = findProductById(productId)
+        .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
     return new ProductResponseDto(storeProduct);
   }
 
   @Override
-  public ProductResponseDto updateProduct(ProductRequestDto requestDto, UUID productId) {
+  @Transactional
+  public ProductResponseDto updateProduct(ProductCommand command, UUID productId) {
 
-    StoreProduct storeProduct = getProductById(productId);
-    UUID storeId = storeProduct.getStore().getId();
-    Store store = getStoreById(storeId);
+    StoreProduct storeProduct = findProductById(productId)
+        .orElseThrow(() -> new ProductException(ProductExceptionCode.PRODUCT_NOT_FOUND));
 
-    // 필드값 수정
-    StoreProduct updatedStoreProduct = updateProductFromDto(requestDto, storeProduct, store);
+    StoreProduct updatedStoreProduct = storeProduct.toBuilder()
+        .name(command.name())
+        .price(command.price())
+        .image(command.image())
+        .description(command.description())
+        .build();
 
-    // DB 저장
-    productRepository.save(updatedStoreProduct);
-
-    // 수정된 데이터를 ResponseDto로 반환
     return new ProductResponseDto(updatedStoreProduct);
   }
 
-  private StoreProduct getProductById(UUID productId) {
-    return productRepository.findById(productId)
-        .orElseThrow(() -> new CustomException(ProductExceptionCode.PRODUCT_NOT_FOUND));
+  public Optional<StoreProduct> findProductById(UUID productId) {
+    return productRepository.findById(productId);
   }
 
-  private Store getStoreById(UUID storeId) {
+  private Store findStoreById(UUID storeId) {
     return storeRepository.findById(storeId)
-        .orElseThrow(() -> new CustomException(ProductExceptionCode.STORE_NOT_FOUND));
-  }
-
-  private StoreProduct updateProductFromDto(ProductRequestDto requestDto, StoreProduct storeProduct,
-      Store store) {
-    return storeProduct.toBuilder()
-        .store(store)
-        .name(requestDto.name())
-        .price(requestDto.price())
-        .image(requestDto.image())
-        .description(requestDto.description())
-        .build();
+        .orElseThrow(() -> new ProductException(ProductExceptionCode.STORE_NOT_FOUND));
   }
 
   @Override
+  public Page<ProductResponseDto> getAllProducts(Pageable pageable) {
+    return productRepository.findAll(pageable)
+        .map(ProductResponseDto::new);
+  }
+
+  @Override
+  @Transactional
   public void deleteProduct(UUID productId) {
-    StoreProduct storeProduct = getProductById(productId);
-    productRepository.delete(storeProduct);
+    if (productRepository.existsById(productId)) {
+      productRepository.deleteById(productId);
+    } else {
+      throw new ProductException(ProductExceptionCode.PRODUCT_ALREADY_DELETED);
+    }
   }
 
   @Override
-  public ProductResponseDto softDeleteProduct(UUID productId) {
-    StoreProduct storeProduct = getProductById(productId);
-    storeProduct.softDelete();
-    productRepository.save(storeProduct);
-    return new ProductResponseDto(storeProduct);
+  public Page<ProductResponseDto> searchProducts(String keyword, String category,
+      Pageable pageable) {
+    return productRepository.searchProducts(keyword, category, pageable);
   }
 
 }

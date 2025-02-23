@@ -13,17 +13,22 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "p_store_product")
 @Getter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@SQLRestriction("is_deleted = false")
+@SQLDelete(sql = "UPDATE p_store_product SET is_deleted = true WHERE id = ?")
 public class StoreProduct extends BaseEntity {
 
   @Id
@@ -34,12 +39,13 @@ public class StoreProduct extends BaseEntity {
   @JoinColumn(name = "store_id", nullable = false)
   private Store store;
 
-  @Column(nullable = false, length = 100)
+  @Column(nullable = false, length = 20)
   private String name;
 
   @Column(nullable = false)
   private Integer price;
 
+  @Column(length = 100)
   private String image;
 
   @Column(length = 500)
