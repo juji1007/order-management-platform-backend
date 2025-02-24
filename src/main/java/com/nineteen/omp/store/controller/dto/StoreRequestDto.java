@@ -32,4 +32,8 @@ public record StoreRequestDto(
     String closedDays
 ) {
 
+  public StoreRequestDto {
+    // status 기본값 설정
+    status = StoreStatus.PENDING;
+  }
 }
