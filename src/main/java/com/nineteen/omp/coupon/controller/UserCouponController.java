@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,6 +34,7 @@ public class UserCouponController {
 
   private final UserCouponService userCouponService;
 
+  @PreAuthorize("hasRole('MASTER')")
   @PostMapping
   public ResponseEntity<ResponseDto<UserCouponResponseDto>> createUserCoupon(
       @Valid @RequestBody UserCouponRequestDto userCouponRequestDto,
@@ -48,6 +50,7 @@ public class UserCouponController {
   }
 
   //검색
+  @PreAuthorize("hasRole('MASTER')")
   @GetMapping
   public ResponseEntity<ResponseDto<Page<UserCouponResponseDto>>> searchUserCoupon(
       @PageableDefault(
@@ -73,6 +76,7 @@ public class UserCouponController {
   }
 
   //쿠폰 사용/사용불가 업데이트 / 상태불가는 -> is_deleted = true 로 처리
+  @PreAuthorize("hasRole('MASTER')")
   @PatchMapping("/{userCouponId}")
   public ResponseEntity<ResponseDto<UserCouponResponseDto>> updateUserCoupon(
       @PathVariable UUID userCouponId,
@@ -83,7 +87,8 @@ public class UserCouponController {
         userCouponRequestDto);
     return ResponseEntity.ok(ResponseDto.success(userCouponResponseDto));
   }
-
+  
+  @PreAuthorize("hasRole('MASTER')")
   @DeleteMapping("/{userCouponId}")
   public ResponseEntity<ResponseDto<?>> deleteUserCoupon(@PathVariable UUID userCouponId) {
     userCouponService.deleteUserCoupon(userCouponId);

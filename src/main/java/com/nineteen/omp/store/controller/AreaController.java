@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,6 +31,7 @@ public class AreaController {
 
   private final AreaService areaService;
 
+  @PreAuthorize("hasRole('MASTER')")
   @PostMapping //admin만 가능하게 -> security에서 처리
   public ResponseEntity<ResponseDto<AreaResponseDto>> createArea(
       @Valid @RequestBody AreaRequestDto areaRequestDto) {
@@ -60,14 +62,14 @@ public class AreaController {
     return ResponseEntity.ok(ResponseDto.success(searchedAreas));
   }
 
-  //관리자만
+  @PreAuthorize("hasRole('MASTER')")
   @GetMapping("{areaId}")
   public ResponseEntity<ResponseDto<AreaResponseDto>> getArea(@PathVariable UUID areaId) {
     AreaResponseDto areaResponseDto = areaService.getArea(areaId);
     return ResponseEntity.ok(ResponseDto.success(areaResponseDto));
   }
 
-  //관리자만
+  @PreAuthorize("hasRole('MASTER')")
   @PatchMapping("{areaId}")
   public ResponseEntity<ResponseDto<AreaResponseDto>> updateArea(
       @PathVariable UUID areaId,
@@ -76,7 +78,7 @@ public class AreaController {
     return ResponseEntity.ok(ResponseDto.success(areaResponseDto));
   }
 
-  //관리자만
+  @PreAuthorize("hasRole('MASTER')")
   @DeleteMapping("{areaId}")
   public ResponseEntity<?> deleteArea(@PathVariable UUID areaId) {
     areaService.deleteArea(areaId);
