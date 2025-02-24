@@ -97,4 +97,12 @@ public class UserServiceImpl implements UserService {
     return new GetUserInfoPageResponseCommand(pageResponseCommand);
   }
 
+  @Transactional
+  public void updateUserRole(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(UserExceptionCode.USER_NOT_FOUND));
+
+    user.updateRoleToOwner();
+  }
+
 }

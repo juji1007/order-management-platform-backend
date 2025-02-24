@@ -15,7 +15,8 @@ public record StoreResponseDto(
     LocalTime openHours,
     LocalTime closeHours,
     String closedDays,
-    StoreStatus storeStatus
+    StoreStatus storeStatus,
+    Long userId
 ) {
 
   //toResponse
@@ -29,7 +30,8 @@ public record StoreResponseDto(
         store.getOpenHours(),
         store.getCloseHours(),
         store.getClosedDays(),
-        store.getStatus()
+        store.getStatus(),
+        store.getUserId()
     );
   }
 
