@@ -58,6 +58,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     SecurityContextHolder.getContext().setAuthentication(authResult);
 
     successHandler.onAuthenticationSuccess(request, response, authResult);
+
+    response.getWriter().write("{\"message\": \"login Success!\"}");
+
   }
 
   // 로그인 실패 시 호출(작동 안함)
