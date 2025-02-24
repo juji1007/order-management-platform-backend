@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public record GetPaymentResponseCommand(
     UUID paymentId,
-    UUID orderId,
     PaymentStatus status,
     PaymentMethod paymentMethod,
     PgProvider pgProvider,
@@ -23,7 +22,6 @@ public record GetPaymentResponseCommand(
   ) {
     this(
         payment.getId(),
-        payment.getOrderId(),
         payment.getStatus(),
         payment.getMethod(),
         payment.getPgProvider(),
