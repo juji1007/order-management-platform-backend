@@ -12,9 +12,21 @@ public interface PaymentService {
 
   void cancelPayment(UUID paymentId);
 
-  GetPaymentResponseCommand getPaymentByOrderId(UUID orderId);
+  GetPaymentResponseCommand getPaymentById(UUID orderId);
 
-  GetPaymentListResponseCommand getPaymentListByUserId(Long userId, Pageable pageable);
+  GetPaymentListResponseCommand getUsersPaymentList(Long userId, Pageable pageable);
 
-  GetPaymentListResponseCommand getPaymentList(Pageable pageable);
+  GetPaymentListResponseCommand getStoresPaymentList(UUID storeId, Pageable pageable);
+
+  void isOwnersPayment(Long ownerId, UUID paymentId);
+
+  void cancelPaymentRequest(Long userId, UUID paymentId);
+
+  void cancelPaymentRequestDenied(UUID paymentId);
+
+  void isUsersPayment(Long userId, UUID paymentId);
+
+  GetPaymentListResponseCommand searchPaymentListByUserNickname(String nickname, Pageable pageable);
+
+  GetPaymentListResponseCommand searchPaymentListByStoreName(String storeName, Pageable pageable);
 }
