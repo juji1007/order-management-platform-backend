@@ -1,5 +1,6 @@
 package com.nineteen.omp.store.service;
 
+import com.nineteen.omp.store.controller.dto.SearchStoreResponseDto;
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
 import com.nineteen.omp.store.service.dto.StoreCommand;
 import java.util.UUID;
@@ -22,4 +23,7 @@ public interface StoreService {
   StoreResponseDto updateStore(UUID storeId, StoreCommand storeCommand);
 
   void deleteStore(UUID storeId);
+
+  Page<SearchStoreResponseDto> searchAdvacnedStore(String productName, String storeName,
+      String categoryName, int averageRating, Pageable pageable);
 }
