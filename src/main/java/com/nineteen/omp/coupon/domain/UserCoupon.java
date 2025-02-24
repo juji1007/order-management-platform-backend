@@ -47,13 +47,14 @@ public class UserCoupon extends BaseEntity {
 
   public void changeStatus(boolean status) {
     this.status = status;
+  }
 
   public int useCoupon(int totalAmount) {
     super.softDelete();
-    return totalAmount - coupon.getDiscountAmount();
+    return totalAmount - coupon.getDiscountPrice();
   }
 
   public Integer getDiscountAmount() {
-    return coupon.getDiscountAmount();
+    return coupon.getDiscountPrice();
   }
 }

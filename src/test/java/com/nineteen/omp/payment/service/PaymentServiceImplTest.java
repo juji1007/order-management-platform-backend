@@ -57,7 +57,7 @@ class PaymentServiceImplTest {
     final Integer totalAmount = 1000;
     final Integer discountAmount = 100;
 
-    when(order.getTotalAmount()).thenReturn(totalAmount);
+    when(order.getTotalPrice()).thenReturn(totalAmount);
     when(userCoupon.useCoupon(anyInt())).thenReturn(totalAmount - discountAmount);
 
     CreatePaymentRequestCommand req = CreatePaymentRequestCommand.builder()

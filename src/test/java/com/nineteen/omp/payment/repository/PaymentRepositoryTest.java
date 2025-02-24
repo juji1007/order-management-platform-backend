@@ -2,17 +2,22 @@ package com.nineteen.omp.payment.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.nineteen.omp.category.domain.StoreCategory;
+import com.nineteen.omp.auth.domain.Role;
 import com.nineteen.omp.global.config.JpaAuditingConfig;
 import com.nineteen.omp.global.config.QueryDslConfig;
 import com.nineteen.omp.order.domain.Order;
+import com.nineteen.omp.order.domain.emuns.OrderStatus;
+import com.nineteen.omp.order.domain.emuns.OrderType;
 import com.nineteen.omp.payment.domain.Payment;
 import com.nineteen.omp.payment.domain.PaymentMethod;
 import com.nineteen.omp.payment.domain.PaymentStatus;
 import com.nineteen.omp.payment.domain.PgProvider;
 import com.nineteen.omp.store.domain.Store;
+import com.nineteen.omp.store.domain.StoreCategory;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.EntityManager;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +42,31 @@ class PaymentRepositoryTest {
   void findByOrder_User_Id() {
     // given
     User user = User.builder()
+        .username("test")
+        .password("test")
+        .nickname("test")
+        .email("email")
+        .delivery_address("address")
+        .role(Role.USER)
         .build();
-    StoreCategory storeCategory = StoreCategory.builder().build();
-    Store store = Store.builder().storeCategory(storeCategory).build();
+    StoreCategory storeCategory = StoreCategory.KOREAN;
+    Store store = Store.builder()
+        .storeCategory(storeCategory)
+        .user(user)
+        .address("address")
+        .phone("phone")
+        .name("name")
+        .closedDays("--")
+        .closeHours(LocalTime.of(22, 0))
+        .openHours(LocalTime.of(10, 0))
+        .build();
     Order order = Order.builder()
         .user(user)
         .store(store)
+        .orderProducts(new ArrayList<>())
+        .totalPrice(1000)
+        .orderStatus(OrderStatus.CREATED)
+        .orderType(OrderType.DELIVERY)
         .build();
     Payment payment = Payment.builder()
         .order(order)
@@ -55,6 +79,10 @@ class PaymentRepositoryTest {
     Order order2 = Order.builder()
         .user(user)
         .store(store)
+        .orderProducts(new ArrayList<>())
+        .totalPrice(1000)
+        .orderStatus(OrderStatus.CREATED)
+        .orderType(OrderType.DELIVERY)
         .build();
     Payment payment2 = Payment.builder()
         .order(order2)
@@ -65,7 +93,6 @@ class PaymentRepositoryTest {
         .build();
 
     em.persist(user);
-    em.persist(storeCategory);
     em.persist(store);
     em.persist(order);
     em.persist(payment);

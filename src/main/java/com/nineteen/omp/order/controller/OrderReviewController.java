@@ -34,8 +34,8 @@ public class OrderReviewController {
   public ResponseEntity<ResponseDto<OrderReviewResponseDto>> createOrderReview(
       @Valid @RequestBody OrderReviewRequestDto orderReviewRequestDto) {
 
-    OrderReviewResponseDto orderReviewResponseDto = orderReviewService.createOrderReview(
-        orderReviewRequestDto);
+    OrderReviewResponseDto orderReviewResponseDto =
+        orderReviewService.createOrderReview(orderReviewRequestDto);
 
     return ResponseEntity.ok(ResponseDto.success(orderReviewResponseDto));
   }

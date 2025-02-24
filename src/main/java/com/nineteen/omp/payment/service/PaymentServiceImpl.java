@@ -64,7 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   private int calculateTotalAmount(Order order, UserCoupon userCoupon) {
-    int totalAmount = order.getTotalAmount();
+    int totalAmount = order.getTotalPrice();
 
     if (userCoupon != null) {
       totalAmount = userCoupon.useCoupon(totalAmount);

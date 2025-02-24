@@ -26,13 +26,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Slf4j
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
-  @Autowired
-  private OrderServiceImpl orderService;
+  private final OrderServiceImpl orderService;
 
   @PostMapping
   public ResponseEntity<ResponseDto<?>> createOrder(@RequestBody OrderRequestDto orderRequestDto) {
