@@ -5,6 +5,7 @@ import com.nineteen.omp.product.domain.QStoreProduct;
 import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.store.domain.QStore;
 import com.nineteen.omp.store.domain.Store;
+import com.nineteen.omp.store.domain.StoreCategory;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
@@ -34,7 +35,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository {
     BooleanExpression predicate = storeProduct.isDeleted.isFalse();
 
     if (StringUtils.hasText(category)) {
-      predicate = predicate.and(storeProduct.store.category.eq(Store.Category.valueOf(category)));
+      predicate = predicate.and(storeProduct.store.storeCategory.eq(StoreCategory.valueOf(category)));
     }
 
     if (StringUtils.hasText(keyword)) {

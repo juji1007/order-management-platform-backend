@@ -21,7 +21,7 @@ public record OrderResponseDto(
   public OrderResponseDto(Order order, List<OrderProduct> orderProducts) {
     this(
         order.getId(),
-        order.getStore() != null ? order.getStore().getStorename() : "No store",
+        order.getStore() != null ? order.getStore().getName() : "No store",
         order.getUser() != null ? order.getUser().getUsername() : "No username",
         order.getTotalPrice(),
         order.getOrderStatus().name(),

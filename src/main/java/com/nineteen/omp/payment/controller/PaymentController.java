@@ -85,7 +85,7 @@ public class PaymentController {
     return ResponseEntity.ok(ResponseDto.success(response));
   }
 
-  @GetMapping
+  @GetMapping("/users")
   public ResponseEntity<ResponseDto<?>> getPaymentListByUserId(
       @RequestParam(
           name = "userId",
@@ -125,7 +125,7 @@ public class PaymentController {
     return ResponseEntity.ok(ResponseDto.success(response));
   }
 
-  private static GetPaymentListResponseDto convertCommandToDto(
+  private GetPaymentListResponseDto convertCommandToDto(
       Pageable pageable,
       GetPaymentListResponseCommand responseCommand
   ) {

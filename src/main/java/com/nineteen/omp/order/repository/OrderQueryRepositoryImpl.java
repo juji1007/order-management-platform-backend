@@ -32,7 +32,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
     if (keyword != null && !keyword.isEmpty()) {
       builder.or(user.username.containsIgnoreCase(keyword));
-      builder.or(store.storename.containsIgnoreCase(keyword));
+      builder.or(store.name.containsIgnoreCase(keyword));
     }
 
     List<Order> orderList = queryFactory
