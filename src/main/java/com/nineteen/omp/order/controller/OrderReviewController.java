@@ -5,9 +5,7 @@ import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.order.controller.dto.OrderReviewRequestDto;
 import com.nineteen.omp.order.controller.dto.OrderReviewResponseDto;
 import com.nineteen.omp.order.controller.dto.UpdateOrderReviewRequestDto;
-import com.nineteen.omp.order.domain.Order;
 import com.nineteen.omp.order.service.OrderReviewService;
-import com.nineteen.omp.order.service.dto.OrderReviewCommand;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -31,19 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderReviewController {
 
   private final OrderReviewService orderReviewService;
-  private final OrderService orderService;
 
   @PostMapping
   public ResponseEntity<ResponseDto<OrderReviewResponseDto>> createOrderReview(
       @Valid @RequestBody OrderReviewRequestDto orderReviewRequestDto) {
 
-    //orderId 실제하는지 체크 필요 -> 합치고 나서 적용
-    //orderReviewCommand에 order객체 넘겨야함
-    //dto 벗기는 과정 추가 필요
-    Order order = orderService.getOrder(orderReviewRequestDto.orderId());
-
     OrderReviewResponseDto orderReviewResponseDto = orderReviewService.createOrderReview(
-        new OrderReviewCommand(orderReviewRequestDto, order));
+        orderReviewRequestDto);
 
     return ResponseEntity.ok(ResponseDto.success(orderReviewResponseDto));
   }

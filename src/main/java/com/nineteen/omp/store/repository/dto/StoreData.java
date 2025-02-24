@@ -3,16 +3,17 @@ package com.nineteen.omp.store.repository.dto;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.domain.StoreCategory;
 import com.nineteen.omp.store.service.dto.StoreCommand;
+import com.nineteen.omp.user.domain.User;
 
 public record StoreData(
     StoreCommand storeCommand,
-    StoreCategory storeCategory
+    StoreCategory storeCategory,
+    User user
 ) {
 
   public Store toEntity() {
     return Store.builder()
-//        .user
-        .userId(storeCommand.userId())
+        .user(user)
         .storeCategory(storeCategory)
         .name(storeCommand.storeRequestDto().name())
         .address(storeCommand.storeRequestDto().address())

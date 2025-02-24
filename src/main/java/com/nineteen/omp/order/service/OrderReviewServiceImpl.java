@@ -1,12 +1,17 @@
 package com.nineteen.omp.order.service;
 
+import static com.nineteen.omp.order.controller.dto.OrderReviewResponseDto.toResponseDto;
+
+import com.nineteen.omp.order.controller.dto.OrderReviewRequestDto;
 import com.nineteen.omp.order.controller.dto.OrderReviewResponseDto;
 import com.nineteen.omp.order.controller.dto.UpdateOrderReviewRequestDto;
+import com.nineteen.omp.order.domain.Order;
 import com.nineteen.omp.order.domain.OrderReview;
+import com.nineteen.omp.order.exception.OrderException;
 import com.nineteen.omp.order.exception.OrderReviewException;
 import com.nineteen.omp.order.exception.OrderReviewExceptionCode;
+import com.nineteen.omp.order.repository.OrderRepository;
 import com.nineteen.omp.order.repository.OrderReviewRepository;
-import com.nineteen.omp.order.service.dto.OrderReviewCommand;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,17 +28,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderReviewServiceImpl implements OrderReviewService {
 
   private final OrderReviewRepository orderReviewRepository;
+  private final OrderRepository orderRepository;
 
 
   @Override
   @Transactional
-  public OrderReviewResponseDto createOrderReview(OrderReviewCommand orderReviewCommand) {
+  public OrderReviewResponseDto createOrderReview(OrderReviewRequestDto orderReviewRequestDto) {
+
+    Order order = orderRepository.findById(orderReviewRequestDto.orderId())
+        .orElseThrow(() -> new OrderException(OrderReviewExceptionCode.ORDER_IS_NOT_FOUND));
 
     OrderReview savedOrderReview = orderReviewRepository.save(
         OrderReview.builder()
-            .order(orderReviewCommand.order())
-            .content(orderReviewCommand.orderReviewRequestDto().content())
-            .rating(orderReviewCommand.orderReviewRequestDto().rating())
+            .order(order)
+            .content(orderReviewRequestDto.content())
+            .rating(orderReviewRequestDto.rating())
             .build()
     );
 
@@ -85,12 +94,4 @@ public class OrderReviewServiceImpl implements OrderReviewService {
         .orElseThrow(() -> new OrderReviewException(OrderReviewExceptionCode.ORDER_IS_NOT_FOUND));
   }
 
-  private OrderReviewResponseDto toResponseDto(OrderReview orderReview) {
-    return new OrderReviewResponseDto(
-        orderReview.getId(),
-        orderReview.getOrder().getId(),
-        orderReview.getContent(),
-        orderReview.getRating()
-    );
-  }
 }

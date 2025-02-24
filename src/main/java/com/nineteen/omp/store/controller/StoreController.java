@@ -1,5 +1,6 @@
 package com.nineteen.omp.store.controller;
 
+import com.nineteen.omp.auth.dto.UserDetailsImpl;
 import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.store.controller.dto.StoreRequestDto;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,9 +36,11 @@ public class StoreController {
 
   @PostMapping
   public ResponseEntity<ResponseDto<StoreResponseDto>> createStore(
-      @Valid @RequestBody StoreRequestDto storeRequestDto) {
+      @Valid @RequestBody StoreRequestDto storeRequestDto,
+      @AuthenticationPrincipal UserDetails userDetails) {
 
-    Long userId = 123L;
+    UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
+    Long userId = userDetailsImpl.getUserId();
 
     StoreResponseDto storeResponseDto = storeService.createStore(
         new StoreCommand(userId, storeRequestDto));
@@ -43,7 +48,6 @@ public class StoreController {
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 
-  //검색 -> @ModelAttribute말고 전부 RequestParam 처리?, storeSearchDto(요청dto)예외처리 안함(null 일 때 전체검색)
   //검색 -> 이름, 카테고리, 주소 -> 정렬조건은 다만들기
   @GetMapping
   public ResponseEntity<ResponseDto<Page<StoreResponseDto>>> searchStore(
