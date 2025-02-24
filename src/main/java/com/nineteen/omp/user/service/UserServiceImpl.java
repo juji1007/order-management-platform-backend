@@ -35,6 +35,13 @@ public class UserServiceImpl implements UserService {
     if (checkUsername) {
       throw new CustomException(UserExceptionCode.DUPLICATE_USERNAME);
     }
+
+    // 이메일 중복 확인
+    boolean checkEmail = userRepository.existsByEmail(requestDto.email());
+    if (checkEmail) {
+      throw new CustomException(UserExceptionCode.DUPLICATE_EMAIL);
+    }
+
     // 사용자 등록
     User user = User.builder()
         .username(requestDto.username())
