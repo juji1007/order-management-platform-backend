@@ -104,12 +104,4 @@ public class UserCouponServiceImpl implements UserCouponService {
     return userCouponRepository.findById(userCouponId)
         .orElseThrow(() -> new UserCouponException(UserCouponExceptionCode.USER_COUPON_NOT_FOUND));
   }
-
-
-  // 결제에서 사용함!! 대체 필요!
-//   @Override
-//   public UserCoupon getUserCoupon(UUID userCouponId) {
-//     return userCouponRepository.findById(userCouponId)
-//         .orElseThrow(() -> new CustomException(UserCouponExceptionCode.USER_COUPON_NOT_FOUND));
-//   }
 }

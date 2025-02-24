@@ -1,11 +1,15 @@
 package com.nineteen.omp.payment.controller;
 
 import com.nineteen.omp.coupon.domain.UserCoupon;
-import com.nineteen.omp.coupon.service.UserCouponService;
+import com.nineteen.omp.coupon.exception.UserCouponException;
+import com.nineteen.omp.coupon.exception.UserCouponExceptionCode;
+import com.nineteen.omp.coupon.repository.UserCouponRepository;
 import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.order.domain.Order;
-import com.nineteen.omp.order.service.OrderService;
+import com.nineteen.omp.order.exception.OrderException;
+import com.nineteen.omp.order.exception.OrderExceptionCode;
+import com.nineteen.omp.order.repository.OrderRepository;
 import com.nineteen.omp.payment.controller.dto.CreatePaymentRequestDto;
 import com.nineteen.omp.payment.controller.dto.GetPaymentListResponseDto;
 import com.nineteen.omp.payment.controller.dto.GetPaymentResponseDto;
@@ -37,8 +41,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
 
   private final PaymentService paymentService;
-  private final OrderService orderService;
-  private final UserCouponService userCouponService;
+  private final OrderRepository orderRepository;
+  private final UserCouponRepository userCouponRepository;
 
   @PostMapping
   public ResponseEntity<ResponseDto<?>> createPayment(
@@ -46,9 +50,11 @@ public class PaymentController {
   ) {
 
     // 주문 조회
-    Order order = orderService.getOrder(request.orderId());
+    Order order = orderRepository.findById(request.orderId())
+        .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
     // 사용자 쿠폰 조회
-    UserCoupon userCoupon = userCouponService.getUserCoupon(request.userCouponId());
+    UserCoupon userCoupon = userCouponRepository.findById(request.userCouponId())
+        .orElseThrow(() -> new UserCouponException(UserCouponExceptionCode.USER_COUPON_NOT_FOUND));
 
     // 결제 생성
     var requestCommand = CreatePaymentRequestCommand.builder()

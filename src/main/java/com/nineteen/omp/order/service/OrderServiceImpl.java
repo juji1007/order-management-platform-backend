@@ -84,12 +84,4 @@ public class OrderServiceImpl implements OrderService {
     return orderRepository.findById(orderId)
         .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
   }
-
-
-  // 결제에서 사용함!!
-//   @Override
-//   public Order getOrder(UUID orderId) {
-//     return orderRepository.findById(orderId)
-//         .orElseThrow(() -> new CustomException(OrderExceptionCode.ORDER_NOT_FOUND));
-//   }
 }
