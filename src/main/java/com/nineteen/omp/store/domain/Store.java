@@ -59,6 +59,10 @@ public class Store extends BaseEntity {
   private LocalTime closeHours;
   @Column(name = "closed_days", updatable = true, nullable = true)
   private String closedDays;
+  
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "status", updatable = true, nullable = false)
+  private StoreStatus status;
 
   public void changeStoreCategory(String storeCategoryName) {
     if (storeCategoryName == null) {
