@@ -10,5 +10,5 @@ public interface UserCouponRepository extends JpaRepository<UserCoupon, UUID> {
 
   boolean existsByUserIdAndCouponId(Long userId, UUID couponId);
 
-  Page<UserCoupon> findAll(Pageable pageable);
+  Page<UserCoupon> findByUser_Id(Long userId, Pageable pageable);
 }

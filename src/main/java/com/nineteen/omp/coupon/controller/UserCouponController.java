@@ -17,14 +17,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,14 +33,12 @@ public class UserCouponController {
 
   private final UserCouponService userCouponService;
 
-  @PreAuthorize("hasRole('MASTER')")
   @PostMapping
   public ResponseEntity<ResponseDto<UserCouponResponseDto>> createUserCoupon(
       @Valid @RequestBody UserCouponRequestDto userCouponRequestDto,
-      @AuthenticationPrincipal UserDetails userDetails) {
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-    UserDetailsImpl userdetailsImpl = (UserDetailsImpl) userDetails;
-    Long userId = userdetailsImpl.getUserId();
+    Long userId = userDetails.getUserId();
 
     UserCouponResponseDto userCouponResponseDto = userCouponService.createUserCoupon(
         new UserCouponCommand(userCouponRequestDto, userId));
@@ -50,23 +47,25 @@ public class UserCouponController {
   }
 
   //검색
-  @PreAuthorize("hasRole('MASTER')")
   @GetMapping
-  public ResponseEntity<ResponseDto<Page<UserCouponResponseDto>>> searchUserCoupon(
+  public ResponseEntity<ResponseDto<Page<UserCouponResponseDto>>> getMyCoupons(
       @PageableDefault(
           size = 10,
           page = 1,
           sort = {"createdAt", "updatedAt"},
           direction = Direction.ASC
-      ) Pageable pageable) {
+      ) Pageable pageable,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
     Pageable validatedPageable = PageableUtils.validatePageable(pageable);
-    System.out.println("페이지 정보 !!!!!! " + validatedPageable);
-    Page<UserCouponResponseDto> searchedCoupons = userCouponService.searchUserCoupon(
-        validatedPageable);
+
+    Page<UserCouponResponseDto> searchedCoupons =
+        userCouponService.getUserCoupons(userDetails.getUserId(), validatedPageable);
 
     return ResponseEntity.ok(ResponseDto.success(searchedCoupons));
   }
 
+  // 의미가 있나?
   @GetMapping("/{userCouponId}")
   public ResponseEntity<ResponseDto<UserCouponResponseDto>> getUserCoupon(
       @PathVariable UUID userCouponId
@@ -80,18 +79,40 @@ public class UserCouponController {
   @PatchMapping("/{userCouponId}")
   public ResponseEntity<ResponseDto<UserCouponResponseDto>> updateUserCoupon(
       @PathVariable UUID userCouponId,
-      @Valid @RequestBody UserCouponRequestDto userCouponRequestDto
+      @Valid @RequestBody UserCouponRequestDto userCouponRequestDto,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
   ) {
-    Long userId = 123L;
+    Long userId = userDetails.getUserId();
     UserCouponResponseDto userCouponResponseDto = userCouponService.updateUserCoupon(userCouponId,
         userCouponRequestDto);
     return ResponseEntity.ok(ResponseDto.success(userCouponResponseDto));
   }
-  
-  @PreAuthorize("hasRole('MASTER')")
-  @DeleteMapping("/{userCouponId}")
+
+  @PatchMapping("/{userCouponId}")
   public ResponseEntity<ResponseDto<?>> deleteUserCoupon(@PathVariable UUID userCouponId) {
     userCouponService.deleteUserCoupon(userCouponId);
     return ResponseEntity.ok(ResponseDto.success());
+  }
+
+  @GetMapping("/search")
+  public ResponseEntity<ResponseDto<?>> searchUserCoupon(
+      @RequestParam(
+          name = "userId",
+          required = false,
+          defaultValue = "0L"
+      ) Long userId,
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable
+  ) {
+    Pageable validatedPageable = PageableUtils.validatePageable(pageable);
+
+    Page<UserCouponResponseDto> searchedCoupons =
+        userCouponService.searchUserCoupons(userId, validatedPageable);
+
+    return ResponseEntity.ok(ResponseDto.success(searchedCoupons));
   }
 }
