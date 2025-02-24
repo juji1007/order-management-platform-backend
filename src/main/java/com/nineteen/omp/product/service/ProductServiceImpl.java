@@ -1,6 +1,7 @@
 package com.nineteen.omp.product.service;
 
 
+import com.nineteen.omp.ai.service.AiService;
 import com.nineteen.omp.product.controller.dto.ProductResponseDto;
 import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.product.exception.ProductException;
@@ -26,25 +27,36 @@ public class ProductServiceImpl implements ProductService {
 
   private final ProductRepository productRepository;
   private final StoreRepository storeRepository;
+  private final AiService aiService;
 
   @Override
   @Transactional
   public ProductResponseDto addProduct(ProductCommand command) {
 
     Store store = findStoreById(command.storeId());
-    StoreProduct storeProduct = createProduct(command, store);
+    String description = getProductDescription(command);
+
+    StoreProduct storeProduct = createProduct(command, store, description);
 
     storeProduct = saveProduct(storeProduct);
     return new ProductResponseDto(storeProduct);
   }
 
-  private StoreProduct createProduct(ProductCommand command, Store store) {
+  private String getProductDescription(ProductCommand command) {
+    String description = command.description();
+    if (description == null || description.isEmpty()) {
+      description = aiService.getAiResponse(command.name());
+    }
+    return description;
+  }
+
+  private StoreProduct createProduct(ProductCommand command, Store store, String description) {
     return StoreProduct.builder()
         .store(store)
         .name(command.name())
         .price(command.price())
         .image(command.image())
-        .description(command.description())
+        .description(description)
         .build();
   }
 
