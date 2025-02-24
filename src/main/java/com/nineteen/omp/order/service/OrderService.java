@@ -18,4 +18,8 @@ public interface OrderService {
   void cancelOrder(UUID orderId);
 
   Page<OrderResponseDto> getOrderByKeyword(String keyword, Pageable pageable);
+
+  // 결제에서 사용함!!
+//   Order getOrder(UUID orderId);
+
 }

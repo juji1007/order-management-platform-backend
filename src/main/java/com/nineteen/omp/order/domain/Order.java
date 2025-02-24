@@ -8,6 +8,7 @@ import com.nineteen.omp.order.exception.OrderException;
 import com.nineteen.omp.order.exception.OrderExceptionCode;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.user.domain.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

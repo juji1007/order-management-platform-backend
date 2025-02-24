@@ -19,4 +19,7 @@ public interface UserCouponService {
       UserCouponRequestDto userCouponRequestDto);
 
   void deleteUserCoupon(UUID userCouponId);
+
+  // 결제에서 사용함 수정필요!
+//  UserCoupon getUserCoupon(UUID userCouponId);
 }
