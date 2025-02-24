@@ -21,6 +21,7 @@ public record StoreData(
         .openHours(storeCommand.storeRequestDto().openHours())
         .closeHours(storeCommand.storeRequestDto().closeHours())
         .closedDays(storeCommand.storeRequestDto().closedDays())
+        .status(storeCommand.storeRequestDto().status())
         .build();
   }
 }

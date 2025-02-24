@@ -1,6 +1,7 @@
 package com.nineteen.omp.store.controller.dto;
 
 import com.nineteen.omp.store.domain.Store;
+import com.nineteen.omp.store.domain.StoreStatus;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -13,7 +14,8 @@ public record StoreResponseDto(
     String phone,
     LocalTime openHours,
     LocalTime closeHours,
-    String closedDays
+    String closedDays,
+    StoreStatus storeStatus
 ) {
 
   //toResponse
@@ -26,7 +28,8 @@ public record StoreResponseDto(
         store.getPhone(),
         store.getOpenHours(),
         store.getCloseHours(),
-        store.getClosedDays()
+        store.getClosedDays(),
+        store.getStatus()
     );
   }
 
