@@ -83,7 +83,8 @@ public class Payment extends BaseEntity {
     return order.getId();
   }
 
-  public void success() {
+  public void success(String pgTid) {
+    this.pgTid = pgTid;
     this.status = PaymentStatus.SUCCESS;
     this.paymentSuccessTime = LocalTime.now();
   }

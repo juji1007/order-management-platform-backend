@@ -8,6 +8,8 @@ import com.nineteen.omp.payment.domain.PaymentStatus;
 import com.nineteen.omp.payment.exception.PaymentExceptionCode;
 import com.nineteen.omp.payment.repository.PaymentRepository;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
+import com.nineteen.omp.payment.service.dto.ExecutePaymentRequestCommand;
+import com.nineteen.omp.payment.service.dto.ExecutePaymentResponseCommand;
 import com.nineteen.omp.payment.service.dto.GetPaymentListResponseCommand;
 import com.nineteen.omp.payment.service.dto.GetPaymentResponseCommand;
 import java.util.List;
@@ -43,11 +45,22 @@ public class PaymentServiceImpl implements PaymentService {
         .method(createPaymentRequestCommand.paymentMethod())
         .build();
 
-    // PG 사에 결제 요청 (추가 구현 필요)
+    ExecutePaymentResponseCommand responseCommand = executePaymentGateway(newPayment);
 
-    newPayment.success();
+    newPayment.success(responseCommand.pgTid());
 
     paymentRepository.save(newPayment);
+  }
+
+  private ExecutePaymentResponseCommand executePaymentGateway(Payment newPayment) {
+    PaymentGatewayService paymentGatewayService = null;
+//    if (newPayment.getPgProvider().equals(PgProvider.MOCK_PAY)) {
+//      paymentGatewayService = new MockPaymentGatewayService();
+//    }
+    paymentGatewayService = new DummyPaymentGatewayService();
+    ExecutePaymentRequestCommand executePaymentRequestCommand =
+        new ExecutePaymentRequestCommand(newPayment);
+    return paymentGatewayService.executePayment(executePaymentRequestCommand);
   }
 
   @Override
