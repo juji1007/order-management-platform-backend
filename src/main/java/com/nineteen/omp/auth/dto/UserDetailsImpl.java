@@ -46,4 +46,11 @@ public class UserDetailsImpl implements UserDetails {
     return user.getRole();
   }
 
+  public boolean isOwner() {
+    return user.getRole().equals(Role.OWNER);
+  }
+
+  public boolean isUser() {
+    return user.getRole().equals(Role.USER);
+  }
 }
