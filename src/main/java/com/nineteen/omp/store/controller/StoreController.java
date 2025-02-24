@@ -110,6 +110,7 @@ public class StoreController {
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 
+  @PreAuthorize("hasAnyRole('MASTER','OWNER')")
   @PatchMapping("/{storeId}")
   public ResponseEntity<ResponseDto<StoreResponseDto>> updateStore(
       @PathVariable UUID storeId,
@@ -118,11 +119,14 @@ public class StoreController {
 
     Long userId = 123L;
 
+    System.out.println("heloo");
+
     StoreResponseDto storeResponseDto = storeService.updateStore(storeId,
         new StoreCommand(userId, storeRequestDto));
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
-
+  
+  @PreAuthorize("hasAnyRole('MASTER','OWNER')")
   @DeleteMapping("/{storeId}")
   public ResponseEntity<?> deleteStore(@PathVariable UUID storeId) {
     storeService.deleteStore(storeId);
