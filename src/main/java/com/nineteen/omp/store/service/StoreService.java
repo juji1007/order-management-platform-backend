@@ -22,4 +22,6 @@ public interface StoreService {
   StoreResponseDto updateStore(UUID storeId, StoreCommand storeCommand);
 
   void deleteStore(UUID storeId);
+
+  StoreResponseDto approveStore(UUID storeId);
 }

@@ -64,4 +64,8 @@ public class User extends BaseEntity {
       this.delivery_address = requestCommand.delivery_address();
     }
   }
+
+  public void updateRoleToOwner() {
+    this.role = Role.OWNER; // 역할 업데이트
+  }
 }

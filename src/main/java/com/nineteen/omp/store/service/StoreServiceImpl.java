@@ -112,4 +112,14 @@ public class StoreServiceImpl implements StoreService {
         .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
   }
 
+  @Transactional
+  public StoreResponseDto approveStore(UUID storeId) {
+    Store store = findByIdOrElseThrow(storeId); // 가게 찾기
+    store.approveStoreStatus();  // 승인 상태로 변경
+
+    Store savedStore = storeRepository.save(store);
+    return toResponseDto(savedStore);  // 변경된 가게 상태 저장
+  }
+
+
 }
