@@ -1,33 +1,3 @@
-
-# <음식 주문 관리 플랫폼>
-## 프로젝트 목적 / 상세 
-- 이 플랫폼은 온라인과 오프라인 모두에서 고객이 움식을 주문하고 결제할 수 있도록 지원합니다.
-- 서비스는 음식점 주인, 고객, 관리자 등 세 가지 주요 사용자에 초점을 맞춰 각 사용자에게 맞는 권한과 기능을 제공합니다.
-- ai 기능을 통해 음식 설명을 자동으로 생성을 통해 고객과 주인 모두의 편의를 도모함.
-- 다각적인 상품 검색 기능을 통한 고객 만족도 향상을 도모함(?)
-## 기술 스택 
-| **Category**        | **Technology**    | **Version** |
-|---------------------|-------------------|-------------|
-| **Framework, Library** | Spring Boot       | 3.4.2     |
-|                     | Spring Security   | 6.x         |
-| **Database**        | PostgreSQL        | 15.x        |
-|                     | Spring Data JPA   | 3.x         |
-| **Build, Dependency** | Gradle           | 8.x         |
-|                     | QueryDSL          | 5.0.0       |
-| **Authentication**  | JWT               | 0.12.3      |
-| **Test**            | JUnit             | 5.x         |
-|                     | Mockito           | 5.x         |
-
-
-
-
-## 서비스 구성 및 실행 방법 
-
-
-
-## ERD
-
-
 # 음식 주문 관리 플랫폼
 
 ## 프로젝트 개요
@@ -37,10 +7,12 @@
 ## 주요 기능
 
 - AI 기반 음식 설명 자동 생성
-- 다양한 상품 검색 기능 제공
+- 다양한 가게,상품 검색 기능 제공
 - 보안 강화를 위한 JWT 기반 인증 및 인가
 - Redis를 활용한 성능 최적화
 - 무중단 배포(블루/그린 배포) 지원
+- 글로벌 에러 처리
+- 
 
 ## 기술 스택
 
@@ -58,7 +30,11 @@
 | **캐싱**            | Redis                  | 7.2.0  |
 | **유효성 검사**        | Spring Boot Validation | 3.4.2  |
 
-## 서비스 구성 및 실행 방법
+## 서비스 구성
+- 컨벤션
+- 베이스엔티티
+- 글로벌 에러 처리
+- 
 
 ### 환경 변수 설정
 
@@ -89,6 +65,29 @@ openai:
     key: "<OPENAI_API_KEY>"
 ```
 
+## 실행 방법
+이 프로젝트를 실행하려면 다음 단계를 따라주세요.
+
+### 1. Git 클론
+
+먼저 GitHub에서 프로젝트를 클론합니다:
+
+```bash
+git clone https://github.com/2025-order-management-platform/order-management-platform-backend.git
+cd order-management-platform-backend
+
+### 2. Docker 실행
+프로젝트는 Docker Compose를 사용하여 실행됩니다. Docker를 사용하여 애플리케이션을 실행하려면 아래 명령어로 관련 컨테이너를 시작하세요.
+
+```bash
+docker-compose up --build
+
+### 3. 애플리케이션 실행 확인
+애플리케이션이 정상적으로 실행되면, 아래 URL을 통해 확인할 수 있습니다.
+
+Backend: http://localhost:8080
+위 주소에 접속하여 애플리케이션이 정상적으로 동작하는지 확인합니다.
+
 ## CI/CD
 
 ### 블루/그린 무중단 배포 아키텍처
@@ -100,13 +99,17 @@ openai:
   - Redis
 - **RDS (PostgreSQL)**
 
+## 인프라 설계도
+
 ## ERD
 
-(추가 필요)
+
 
 ## API 문서
 
 (추가 필요)
+
+## 프로젝트 개선점
 
 ## 팀원 역할
 
