@@ -88,8 +88,10 @@ public class UserCouponController {
     return ResponseEntity.ok(ResponseDto.success(userCouponResponseDto));
   }
 
-  @PatchMapping("/{userCouponId}")
-  public ResponseEntity<ResponseDto<?>> deleteUserCoupon(@PathVariable UUID userCouponId) {
+  @PatchMapping("/{userCouponId}/delete")
+  public ResponseEntity<ResponseDto<?>> deleteUserCoupon(
+      @PathVariable UUID userCouponId
+  ) {
     userCouponService.deleteUserCoupon(userCouponId);
     return ResponseEntity.ok(ResponseDto.success());
   }
