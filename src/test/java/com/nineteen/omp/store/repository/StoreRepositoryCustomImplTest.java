@@ -1,5 +1,8 @@
 package com.nineteen.omp.store.repository;
 
+import static com.nineteen.omp.fixture.FixtureFactory.getStore;
+import static com.nineteen.omp.fixture.FixtureFactory.getStoreProduct;
+import static com.nineteen.omp.fixture.FixtureFactory.getUser;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.nineteen.omp.auth.domain.Role;
@@ -17,6 +20,7 @@ import com.nineteen.omp.store.domain.StoreStatus;
 import com.nineteen.omp.user.domain.User;
 import jakarta.persistence.EntityManager;
 import java.util.Random;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +41,9 @@ public class StoreRepositoryCustomImplTest {
 
   @Autowired
   private StoreRepositoryCustomImpl storeRepositoryCustom;
+
+  @Autowired
+  private StoreRepository storeRepository;
 
   @Autowired
   private EntityManager em;
@@ -192,5 +199,31 @@ public class StoreRepositoryCustomImplTest {
         .description("맛있는 " + productName)
         .build();
     em.persist(product);
+  }
+
+
+  @Test
+  @DisplayName("findById를 @EntityGraph로 join해서 조회 테스트")
+  public void findByIdWithFetchJoin() {
+    // given
+    User user = getUser();
+    Store store = getStore(user);
+    StoreProduct storeProduct1 = getStoreProduct(store);
+    StoreProduct storeProduct2 = getStoreProduct(store);
+    StoreProduct storeProduct3 = getStoreProduct(store);
+    em.persist(user);
+    em.persist(store);
+    em.persist(storeProduct1);
+    em.persist(storeProduct2);
+    em.persist(storeProduct3);
+    em.flush();
+    em.clear();
+
+    // when
+    Store findStore = storeRepository.findById(store.getId()).get();
+
+    // then
+    assertThat(findStore.getStoreProducts()).isNotEmpty();
+
   }
 }

@@ -25,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -76,7 +75,6 @@ public class Store extends BaseEntity {
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
   private List<Order> orders;
-
 
   public void changeStoreCategory(String storeCategoryName) {
     if (storeCategoryName == null) {
