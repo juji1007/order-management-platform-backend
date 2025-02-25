@@ -3,6 +3,7 @@ package com.nineteen.omp.store.controller;
 import com.nineteen.omp.auth.dto.UserDetailsImpl;
 import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.global.utils.PageableUtils;
+import com.nineteen.omp.store.controller.dto.SearchStoreResponseDto;
 import com.nineteen.omp.store.controller.dto.StoreRequestDto;
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
 import com.nineteen.omp.store.service.StoreService;
@@ -55,6 +56,50 @@ public class StoreController {
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 
+
+  //심화 검색
+  @GetMapping("/search")
+  public ResponseEntity<ResponseDto<Page<SearchStoreResponseDto>>> searchAdvancedStore(
+      @RequestParam(
+          name = "productName",
+          defaultValue = "",
+          required = false
+      ) String productName,
+      @RequestParam(
+          name = "storeName",
+          defaultValue = "",
+          required = false
+      ) String storeName,
+      @RequestParam(
+          name = "categoryName",
+          defaultValue = "",
+          required = false
+      ) String categoryName,
+      @RequestParam(
+          name = "averageRating",
+          defaultValue = "0",
+          required = false
+      ) int averageRating,
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable) {
+    Pageable validatedPageable = PageableUtils.validatePageable(pageable);
+
+    Page<SearchStoreResponseDto> searchedAdvanced = storeService.searchAdvacnedStore(
+        productName,
+        storeName,
+        categoryName,
+        averageRating,
+        validatedPageable
+    );
+
+    return ResponseEntity.ok(ResponseDto.success(searchedAdvanced));
+  }
+
+
   @PreAuthorize("hasAnyRole('MASTER')")
   @PostMapping("/approve/{storeId}")
   public ResponseEntity<ResponseDto<StoreResponseDto>> approveStore(
@@ -69,7 +114,7 @@ public class StoreController {
     return ResponseEntity.ok(ResponseDto.success());
   }
 
-  //검색 -> 이름, 카테고리, 주소 -> 정렬조건은 다만들기
+  //검색 -> 이름, 카테고리, 주소 -> 정렬조건은 다만들
   @GetMapping
   public ResponseEntity<ResponseDto<Page<StoreResponseDto>>> searchStore(
       @RequestParam(

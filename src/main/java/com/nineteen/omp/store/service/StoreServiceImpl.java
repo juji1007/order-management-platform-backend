@@ -3,6 +3,7 @@ package com.nineteen.omp.store.service;
 import static com.nineteen.omp.store.controller.dto.StoreResponseDto.toResponseDto;
 
 import com.nineteen.omp.global.exception.CustomException;
+import com.nineteen.omp.store.controller.dto.SearchStoreResponseDto;
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
 import com.nineteen.omp.store.domain.Store;
 import com.nineteen.omp.store.domain.StoreCategory;
@@ -30,6 +31,7 @@ public class StoreServiceImpl implements StoreService {
   private final UserRepository userRepository;
 
   //Create, 가게 중복 체크
+  @Override
   @Transactional
   public StoreResponseDto createStore(StoreCommand storeCommand) {
 
@@ -52,7 +54,22 @@ public class StoreServiceImpl implements StoreService {
     return toResponseDto(savedStore);
   }
 
+  //심화 검색
+  @Override
+  public Page<SearchStoreResponseDto> searchAdvacnedStore(String productName, String storeName,
+      String categoryName, int averageRating, Pageable pageable) {
+
+    //검증
+    if (categoryName != null && !categoryName.isEmpty()) {
+      StoreCategory.fromName(categoryName);
+    }
+
+    return storeRepository.searchAdvancedStore(productName, storeName, categoryName, averageRating,
+        pageable);
+  }
+
   //Search
+  @Override
   public Page<StoreResponseDto> searchStores(
       String name,
       String categoryName,
@@ -68,12 +85,13 @@ public class StoreServiceImpl implements StoreService {
   }
 
   //Read
-  @Transactional(readOnly = true)
+  @Override
   public StoreResponseDto getStore(UUID storeId) {
     return toResponseDto(findByIdOrElseThrow(storeId));
   }
 
   //update
+  @Override
   @Transactional
   public StoreResponseDto updateStore(UUID storeId, StoreCommand storeCommand) {
     //아이디 존재 확인
@@ -102,10 +120,12 @@ public class StoreServiceImpl implements StoreService {
     return toResponseDto(savedStore);
   }
 
+  @Override
   @Transactional
   public void deleteStore(UUID storeId) {
     storeRepository.deleteById(findByIdOrElseThrow(storeId).getId());
   }
+
 
   private Store findByIdOrElseThrow(UUID storeId) {
     return storeRepository.findById(storeId)

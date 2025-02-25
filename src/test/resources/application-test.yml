@@ -1,0 +1,59 @@
+spring:
+  #  datasource:
+  #    url: jdbc:postgresql://localhost:5432/test
+  #    username: root
+  #    password: root
+  #    driver-class-name: org.postgresql.Driver
+  #  jpa:
+  #    hibernate:
+  #      ddl-auto: update
+  #    show-sql: true
+  #    properties:
+  #      hibernate:
+  #        dialect: org.hibernate.dialect.PostgreSQLDialect
+  #        format_sql: true  # SQL 쿼리를 보기 좋게 정렬
+  datasource:
+    url: jdbc:h2:mem:testdb  # H2 메모리 모드
+#    url: jdbc:h2:file:./data/testdb  # H2 파일 모드 (파일 경로)
+    username: sa
+    password: password
+    hikari:
+      maximum-pool-size: 10  # HikariCP 커넥션 풀 크기
+
+  h2:
+    console:
+      enabled: true  # H2 웹 콘솔 활성화
+      path: /h2-console  # 접근 경로: http://localhost:8080/h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # 테이블 자동 업데이트
+    show-sql: true  # 실행되는 SQL 쿼리 로그 출력
+    properties:
+      hibernate:
+        format_sql: true  # SQL 쿼리를 보기 좋게 정렬
+        generate_statistics: true
+        default_batch_fetch_size: 100        #원래는 551 -> 351, 51, 300 으로 줄임
+        jdbc:
+          batch_size: 100
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG  # Hibernate SQL 로그 출력
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # SQL 바인딩 값 로깅
+
+jwt:
+  secret: "asdfasdfasdf325425lkjhsdfgfgalkh2354235623lkjh2356lkhjh325lkjh325lkjh325klhj"
+  refresh-token-validity: 86400000  # 24시간 (밀리초)
+  access-token-validity: 3600000  # 1시간 (밀리초)
+  prefix: "Bearer "
+  header: "Authorization"
+
+encryptor:
+  aes:
+    key: "0123456789abcdef"  # AES 암호화 16바이트 키
