@@ -35,7 +35,7 @@ jobs:
 
       - name: Create application.properties
         run: |
-          echo "$APPLICATION_YAML > src/main/resources/application.yaml"
+          echo "${{ secrets.APPLICATION_YAML }} > src/main/resources/application.yaml"
 
       - name: Java setup
         uses: actions/setup-java@v2
@@ -91,23 +91,30 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest .
-          docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
 
   deploy:
     needs: integration
     runs-on: [ ubuntu-latest ]
     steps:
       - name: deploy
-        continue-on-error: true  # 실패해도 GitHub Actions가 바로 종료되지 않도록 설정
+        # continue-on-error: true  # 실패해도 GitHub Actions가 바로 종료되지 않도록 설정
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.BLUE_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
-            sudo docker run -d -p 80:8080 --name $DOCKER_IMAGE_NAME $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
+            sudo docker stop ${{ env.DOCKER_IMAGE_NAME }} || true
+            sudo docker rm ${{ env.DOCKER_IMAGE_NAME }} || true
+            sudo docker stop omp-redis || true
+            sudo docker rm omp-redis || true
+
+            sudo docker pull redis
+            docker run -p 6379:6379 --name omp-redis -d redis:latest --requirepass "1234"
+            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+            sudo docker run -d -p 80:8080 --name ${{ env.DOCKER_IMAGE_NAME }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
 
 
 #            # 실행 중인 포트 확인
