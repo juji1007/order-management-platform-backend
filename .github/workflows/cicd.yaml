@@ -99,11 +99,11 @@ jobs:
             if [ "$CURRENT_PROFILE" == "${{ secrets.GREEN_PROFILE }}" ]; then
               IDLE_PROFILE=${{ secrets.BLUE_PROFILE }}
               IDLE_HOST=${{ secrets.BLUE_HOST }}
-              IDLE_HOST_KEY=${{ secrets.BLUE_HOST_KEY }}
+              IDLE_HOST_KEY=${{ secrets.SSH_PRIVATE_KEY }}
             else
               IDLE_PROFILE=${{ secrets.GREEN_PROFILE }}
               IDLE_HOST=${{ secrets.GREEN_HOST }}
-              IDLE_HOST_KEY=${{ secrets.GREEN_HOST_KEY }}
+              IDLE_HOST_KEY=${{ secrets.SSH_PRIVATE_KEY }}
             fi
             echo "IDLE_PROFILE: $IDLE_PROFILE"
 
