@@ -174,10 +174,12 @@ Backend: http://localhost:8080
 
 
 ## 인프라 설계도
-![image](https://github.com/user-attachments/assets/9b91fa5e-3e04-4deb-ac25-b3136e294452)
+![image](![nineteen-omp-infra drawio](https://github.com/user-attachments/assets/8ebe4eeb-f1c9-4b1f-bae5-74db37164089))
 - 링크 
 
 ## ERD
+- ![ERD - 19조](https://github.com/user-attachments/assets/8a2f11f2-4761-4c76-9373-601cc8c3b4a)
+
 - [ERD 및 테이블 설계](https://www.notion.so/teamsparta/ERD-1982dc3ef51480e3a46bded8c16217a9)
 
 ## 프로젝트 개선점
