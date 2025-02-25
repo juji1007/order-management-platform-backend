@@ -1,10 +1,15 @@
 package com.nineteen.omp.order.controller;
 
+import com.nineteen.omp.auth.dto.UserDetailsImpl;
 import com.nineteen.omp.global.dto.ResponseDto;
 import com.nineteen.omp.global.utils.PageableUtils;
-import com.nineteen.omp.order.controller.dto.OrderRequestDto;
+import com.nineteen.omp.order.controller.dto.CompleteOrderRequestDto;
+import com.nineteen.omp.order.service.dto.CreateOrderRequestCommand;
+import com.nineteen.omp.order.controller.dto.CreateOrderRequestDto;
 import com.nineteen.omp.order.controller.dto.OrderResponseDto;
-import com.nineteen.omp.order.service.OrderServiceImpl;
+import com.nineteen.omp.order.service.OrderService;
+import com.nineteen.omp.order.service.dto.CompleteOrderRequestCommand;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +20,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,13 +35,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OrderController {
 
-  private final OrderServiceImpl orderService;
+  private final OrderService orderService;
 
   @PostMapping
-  public ResponseEntity<ResponseDto<?>> createOrder(@RequestBody OrderRequestDto orderRequestDto) {
-    orderService.createOrder(orderRequestDto);
+  public ResponseEntity<ResponseDto<?>> createOrder(
+      @RequestBody @Valid CreateOrderRequestDto createOrderRequestDto,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
+    CreateOrderRequestCommand requestCommand =
+        new CreateOrderRequestCommand(createOrderRequestDto, userDetails.getUserId());
+    orderService.createOrder(requestCommand);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ResponseDto.success());
+  }
+
+  @PatchMapping("/{orderId}/complete")
+  public ResponseEntity<ResponseDto<?>> completeOrder(
+      @PathVariable UUID orderId,
+      @RequestBody @Valid CompleteOrderRequestDto requestDto,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
+    CompleteOrderRequestCommand requestCommand = new CompleteOrderRequestCommand(
+        requestDto,
+        userDetails.getUserId(),
+        orderId
+    );
+    orderService.completeOrder(requestCommand);
+    return ResponseEntity.ok().body(ResponseDto.success());
   }
 
   @GetMapping

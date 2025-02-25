@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -56,6 +55,8 @@ public class Order extends BaseEntity {
 
   private int totalPrice;
 
+  private String orderRequestMsg;
+
   @Enumerated(EnumType.STRING)
   private OrderStatus orderStatus;
 
@@ -66,7 +67,6 @@ public class Order extends BaseEntity {
   private List<OrderProduct> orderProducts;
 
   @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
-//  @BatchSize(size = 10)
   private List<OrderReview> orderReviews;
 
   @Builder
@@ -85,5 +85,14 @@ public class Order extends BaseEntity {
     }
     this.orderStatus = OrderStatus.CANCELLED;
     return this;
+  }
+
+  public void completeOrder(OrderType orderType, String orderRequestMsg) {
+    if (this.orderStatus == OrderStatus.COMPLETED) {
+      throw new OrderException(OrderExceptionCode.ORDER_ALREADY_COMPLETED);
+    }
+    this.orderStatus = OrderStatus.COMPLETED;
+    this.orderType = orderType;
+    this.orderRequestMsg = orderRequestMsg;
   }
 }

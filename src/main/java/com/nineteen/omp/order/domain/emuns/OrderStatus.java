@@ -6,5 +6,6 @@ public enum OrderStatus {
   PREPARING,      // 배송 준비 중
   SHIPPING,       // 배송 중
   DELIVERED,      // 배송 완료
+  COMPLETED,      // 주문 완료
   CANCELLED       // 주문 취소
 }

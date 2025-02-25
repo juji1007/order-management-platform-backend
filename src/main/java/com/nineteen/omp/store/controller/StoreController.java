@@ -6,6 +6,8 @@ import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.store.controller.dto.SearchStoreResponseDto;
 import com.nineteen.omp.store.controller.dto.StoreRequestDto;
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
+import com.nineteen.omp.store.domain.Store;
+import com.nineteen.omp.store.repository.StoreRepository;
 import com.nineteen.omp.store.service.StoreService;
 import com.nineteen.omp.store.service.dto.StoreCommand;
 import com.nineteen.omp.user.service.UserService;
@@ -21,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +40,7 @@ public class StoreController {
 
   private final StoreService storeService;
   private final UserService userService;
+  private final StoreRepository storeRepository;
 
   @PreAuthorize("hasAnyRole('USER','MASTER','OWNER')")
   @PostMapping
@@ -102,15 +104,18 @@ public class StoreController {
 
   @PreAuthorize("hasAnyRole('MASTER')")
   @PostMapping("/approve/{storeId}")
-  public ResponseEntity<ResponseDto<StoreResponseDto>> approveStore(
-      @PathVariable UUID storeId) {
+  public ResponseEntity<ResponseDto<?>> approveStore(
+      @PathVariable UUID storeId
+  ) {
     log.info("approveStore StoreId : {}", storeId);
-    StoreResponseDto storeResponseDto = storeService.getStore(storeId);
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게입니다."));
 
     // 가게 status -> open으로 변경
     storeService.approveStore(storeId);
     // 유저 role -> 변경
-    userService.updateUserRole(storeResponseDto.userId());
+    userService.updateUserRole(store.getUser().getId());
+
     return ResponseEntity.ok(ResponseDto.success());
   }
 
@@ -159,20 +164,19 @@ public class StoreController {
   @PatchMapping("/{storeId}")
   public ResponseEntity<ResponseDto<StoreResponseDto>> updateStore(
       @PathVariable UUID storeId,
-      @Valid @RequestBody StoreRequestDto storeRequestDto
-  ) {
+      @Valid @RequestBody StoreRequestDto storeRequestDto,
+      @AuthenticationPrincipal UserDetails userDetails) {
 
-    Long userId = 123L;
-
-    System.out.println("heloo");
+    UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
+    Long userId = userDetailsImpl.getUserId();
 
     StoreResponseDto storeResponseDto = storeService.updateStore(storeId,
         new StoreCommand(userId, storeRequestDto));
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
-  
+
   @PreAuthorize("hasAnyRole('MASTER','OWNER')")
-  @DeleteMapping("/{storeId}")
+  @PatchMapping("/{storeId}/delete")
   public ResponseEntity<?> deleteStore(@PathVariable UUID storeId) {
     storeService.deleteStore(storeId);
     return ResponseEntity.ok(ResponseDto.success());
