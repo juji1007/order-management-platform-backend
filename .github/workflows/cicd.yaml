@@ -103,10 +103,12 @@ jobs:
             if [ "$CURRENT_PROFILE" == "${{ secrets.GREEN_PROFILE }}" ]; then
               IDLE_PROFILE=${{ secrets.BLUE_PROFILE }}
               IDLE_HOST=${{ secrets.BLUE_HOST }}
+              CURRENT_HOST=${{ secrets.GREEN_HOST }}}
               echo "is Green"
             else
               IDLE_PROFILE=${{ secrets.GREEN_PROFILE }}
               IDLE_HOST=${{ secrets.GREEN_HOST }}
+              CURRENT_HOST=${{ secrets.BLUE_HOST }}
               echo "is Blue"
             fi
             echo "IDLE_PROFILE: $IDLE_PROFILE"
