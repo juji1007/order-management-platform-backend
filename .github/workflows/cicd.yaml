@@ -10,7 +10,7 @@ on:
 
 env:
   APPLICATION_YAML: ${{ secrets.APPLICATION_YAML }}
-  PROJECT_JAR_NAME: omp-0.0.1-SNAPSHOT.jar
+  PROJECT_JAR_NAME: omp-0.0.1-SNAPSHOT
 
   DOCKER_IMAGE_NAME: nineteen-omp
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: my-jar
-          path: /build/libs/$PROJECT_JAR_NAME
+          path: /build/libs/$PROJECT_JAR_NAME.jar
 
       - name: Upload Docker file
         uses: actions/upload-artifact@v4
