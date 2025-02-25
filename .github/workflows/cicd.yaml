@@ -101,7 +101,6 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
             sudo docker run -d -p 80:8080 --name ${{ env.DOCKER_IMAGE_NAME }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
 
-
 #            # 실행 중인 포트 확인
 #            CURRENT_PROFILE=$(curl http://localhost/profile)
 #            echo "CURRENT_PROFILE: $CURRENT_PROFILE"
