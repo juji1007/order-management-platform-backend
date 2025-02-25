@@ -106,8 +106,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo docker stop ${{ DOCKER_IMAGE_NAME }} || true
-            sudo docker rm ${{ DOCKER_IMAGE_NAME }} || true
+            sudo docker stop ${{ secrets.DOCKER_IMAGE_NAME }} || true
+            sudo docker rm ${{ secrets.DOCKER_IMAGE_NAME }} || true
             sudo docker stop omp-redis || true
             sudo docker rm omp-redis || true
 
