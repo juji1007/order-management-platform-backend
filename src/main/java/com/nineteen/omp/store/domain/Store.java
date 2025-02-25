@@ -1,6 +1,8 @@
 package com.nineteen.omp.store.domain;
 
 import com.nineteen.omp.global.entity.BaseEntity;
+import com.nineteen.omp.order.domain.Order;
+import com.nineteen.omp.product.domain.StoreProduct;
 import com.nineteen.omp.store.exception.StoreException;
 import com.nineteen.omp.store.exception.StoreExceptionCode;
 import com.nineteen.omp.user.domain.User;
@@ -8,18 +10,22 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -59,10 +65,18 @@ public class Store extends BaseEntity {
   private LocalTime closeHours;
   @Column(name = "closed_days", updatable = true, nullable = true)
   private String closedDays;
-  
+
   @Enumerated(value = EnumType.STRING)
   @Column(name = "status", updatable = true, nullable = false)
   private StoreStatus status;
+
+  @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+//  @BatchSize(size = 10)
+  private List<StoreProduct> storeProducts;
+
+  @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+//  @BatchSize(size = 10)
+  private List<Order> orders;
 
   public void changeStoreCategory(String storeCategoryName) {
     if (storeCategoryName == null) {

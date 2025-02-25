@@ -1,27 +1,20 @@
 package com.nineteen.omp.store.repository;
 
-import static com.nineteen.omp.store.domain.QStore.store;
 import static com.nineteen.omp.order.domain.QOrder.order;
 import static com.nineteen.omp.order.domain.QOrderReview.orderReview;
-import static com.nineteen.omp.order.domain.QOrderProduct.orderProduct;
-import static com.nineteen.omp.store.domain.QServiceArea.serviceArea;
-import static com.nineteen.omp.store.domain.QArea.area;
 import static com.nineteen.omp.product.domain.QStoreProduct.storeProduct;
+import static com.nineteen.omp.store.domain.QStore.store;
 
 import com.nineteen.omp.store.controller.dto.QSearchStoreResponseDto;
 import com.nineteen.omp.store.controller.dto.SearchStoreResponseDto;
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
-import com.nineteen.omp.store.domain.Store;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -51,29 +44,28 @@ public class StoreRepositoryCustomImpl implements StoreRepositoryCustom {
         .select(new QSearchStoreResponseDto(
             store.name,
             store.storeCategory.stringValue(),
-            null,
-            orderReview.rating.avg().intValue(),
+            //            null, //area.si, area.gu, area.dong
+            orderReview.rating.avg().doubleValue(),
             store.status.stringValue()
-            ))
+        ))
         .from(store)
-        .join(storeProduct.store, store)
-        .join(orderReview.order, order)
-        .join(order.store, store)
+        .join(store.storeProducts, storeProduct)
+        .leftJoin(store.orders, order)
+        .leftJoin(order.orderReviews, orderReview)
         .where(
-            storeProduct.name.containsIgnoreCase(productName),
+            storeProductNameContains(productName),
+            nameContains(storeName),
             categoryNameContains(categoryName)
         )
+        .groupBy(store.id)
+        .having(ratingContains(averageRating))
         .orderBy(orders.toArray(new OrderSpecifier[0]))
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .fetchResults();
 
-    List<StoreResponseDto> content = results.getResults().stream()
-        .map(StoreResponseDto::toResponseDto)
-        .collect(Collectors.toList());
-    long total = results.getTotal();
-    return new PageImpl<>(content, pageable, total);
-    return null;
+    Long total = results.getTotal();
+    return new PageImpl<>(results.getResults(), pageable, total);
   }
 
   @Override
@@ -82,26 +74,34 @@ public class StoreRepositoryCustomImpl implements StoreRepositoryCustom {
       String categoryName,
       String address,
       Pageable pageable) {
-    List<OrderSpecifier<?>> orders = getAllOrderSpecifiers(pageable);
+//    List<OrderSpecifier<?>> orders = getAllOrderSpecifiers(pageable);
+//
+//    QueryResults<Store> results = queryFactory
+//        .select(store)
+//        .from(store)
+//        .where(
+//            nameContains(name),
+//            categoryNameContains(categoryName),
+//            addressContains(address)
+//        )
+//        .orderBy(orders.toArray(new OrderSpecifier[0]))
+//        .offset(pageable.getOffset())
+//        .limit(pageable.getPageSize())
+//        .fetchResults();
+//
+//    List<StoreResponseDto> content = results.getResults().stream()
+//        .map(StoreResponseDto::toResponseDto)
+//        .collect(Collectors.toList());
+//    long total = results.getTotal();
+//    return new PageImpl<>(content, pageable, total);
+    return null;
+  }
 
-    QueryResults<Store> results = queryFactory
-        .select(store)
-        .from(store)
-        .where(
-            nameContains(name),
-            categoryNameContains(categoryName),
-            addressContains(address)
-        )
-        .orderBy(orders.toArray(new OrderSpecifier[0]))
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .fetchResults();
-
-    List<StoreResponseDto> content = results.getResults().stream()
-        .map(StoreResponseDto::toResponseDto)
-        .collect(Collectors.toList());
-    long total = results.getTotal();
-    return new PageImpl<>(content, pageable, total);
+  private BooleanExpression storeProductNameContains(String productName) {
+    if (productName == null || productName.isEmpty()) {
+      return null;
+    }
+    return storeProduct.name.containsIgnoreCase(productName);
   }
 
   private BooleanExpression nameContains(String name) {
@@ -118,11 +118,14 @@ public class StoreRepositoryCustomImpl implements StoreRepositoryCustom {
     return store.storeCategory.stringValue().eq(categoryName);
   }
 
-  private BooleanExpression addressContains(String address) {
-    if (address == null || address.isEmpty()) {
+  private BooleanExpression ratingContains(int averageRating) {
+    if (averageRating <= 0) {
       return null;
+    } else if (averageRating == 5) {
+      return orderReview.rating.avg().between(averageRating, averageRating);
     }
-    return store.address.containsIgnoreCase(address);
+    return orderReview.rating.avg().goe(averageRating)
+        .and(orderReview.rating.avg().lt(averageRating + 1));
   }
 
   private List<OrderSpecifier<?>> getAllOrderSpecifiers(Pageable pageable) {
