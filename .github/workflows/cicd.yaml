@@ -95,17 +95,20 @@ jobs:
             # 실행 중인 포트 확인
             CURRENT_PROFILE=$(curl http://${{ secrets.EC2_HOST }}/api/v1/profile)
             echo "CURRENT_PROFILE: $CURRENT_PROFILE"
+            IDLE_PROFILE=""
+            IDLE_HOST=""
+            IDLE_HOST_KEY=""
 
             if [ "$CURRENT_PROFILE" == "${{ secrets.GREEN_PROFILE }}" ]; then
               IDLE_PROFILE=${{ secrets.BLUE_PROFILE }}
               IDLE_HOST=${{ secrets.BLUE_HOST }}
               IDLE_HOST_KEY=${{ secrets.SSH_PRIVATE_KEY }}
-              echo "is green"
+              echo "is Green"
             else
               IDLE_PROFILE=${{ secrets.GREEN_PROFILE }}
               IDLE_HOST=${{ secrets.GREEN_HOST }}
               IDLE_HOST_KEY=${{ secrets.SSH_PRIVATE_KEY }}
-              echo "is blue"
+              echo "is Blue"
             fi
             echo "IDLE_PROFILE: $IDLE_PROFILE"
 
