@@ -6,6 +6,8 @@ import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.store.controller.dto.SearchStoreResponseDto;
 import com.nineteen.omp.store.controller.dto.StoreRequestDto;
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
+import com.nineteen.omp.store.domain.Store;
+import com.nineteen.omp.store.repository.StoreRepository;
 import com.nineteen.omp.store.service.StoreService;
 import com.nineteen.omp.store.service.dto.StoreCommand;
 import com.nineteen.omp.user.service.UserService;
@@ -39,6 +41,7 @@ public class StoreController {
 
   private final StoreService storeService;
   private final UserService userService;
+  private final StoreRepository storeRepository;
 
   @PreAuthorize("hasAnyRole('USER','MASTER','OWNER')")
   @PostMapping
@@ -103,18 +106,18 @@ public class StoreController {
   @PreAuthorize("hasAnyRole('MASTER')")
   @PostMapping("/approve/{storeId}")
   public ResponseEntity<ResponseDto<?>> approveStore(
-      @PathVariable UUID storeId) {
+      @PathVariable UUID storeId
+  ) {
     log.info("approveStore StoreId : {}", storeId);
-    StoreResponseDto storeResponseDto = storeService.getStore(storeId);
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게입니다."));
 
     // 가게 status -> open으로 변경
     storeService.approveStore(storeId);
     // 유저 role -> 변경
-    userService.updateUserRole(storeResponseDto.userId());
+    userService.updateUserRole(store.getUser().getId());
 
-    StoreResponseDto updatedStoreResponseDto = storeService.getStore(storeId);
-
-    return ResponseEntity.ok(ResponseDto.success(updatedStoreResponseDto));
+    return ResponseEntity.ok(ResponseDto.success());
   }
 
   //검색 -> 이름, 카테고리, 주소 -> 정렬조건은 다만들
@@ -172,7 +175,7 @@ public class StoreController {
         new StoreCommand(userId, storeRequestDto));
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
-  
+
   @PreAuthorize("hasAnyRole('MASTER','OWNER')")
   @DeleteMapping("/{storeId}")
   public ResponseEntity<?> deleteStore(@PathVariable UUID storeId) {
