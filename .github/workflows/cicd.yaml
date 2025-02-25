@@ -9,22 +9,7 @@ on:
       - develop
 
 env:
-  APPLICATION_YAML: ${{ secrets.APPLICATION_YAML }}
-  
   DOCKER_IMAGE_NAME: nineteen-omp
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-  NGINX_HOST: ${{ secrets.EC2_HOST }}
-  NGINX_HOST_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
-  GREEN_PROFILE: ${{ secrets.GREEN_PROFILE }}
-  GREEN_HOST: ${{ secrets.GREEN_HOST }}
-  GREEN_HOST_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
-  BLUE_PROFILE: ${{ secrets.BLUE_PROFILE }}
-  BLUE_HOST: ${{ secrets.BLUE_HOST }}
-  BLUE_HOST_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
   build:
@@ -33,9 +18,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create application.properties
+      - name: Create application.yaml
         run: |
-          echo "${{ secrets.APPLICATION_YAML }} > src/main/resources/application.yaml"
+          echo "${{ secrets.APPLICATION_YAML }}" > src/main/resources/application.yaml
 
       - name: Java setup
         uses: actions/setup-java@v2
