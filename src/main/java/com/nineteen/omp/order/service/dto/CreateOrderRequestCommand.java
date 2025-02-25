@@ -1,5 +1,7 @@
-package com.nineteen.omp.order.controller.dto;
+package com.nineteen.omp.order.service.dto;
 
+import com.nineteen.omp.order.controller.dto.CreateOrderRequestDto;
+import com.nineteen.omp.order.controller.dto.OrderProductRequestDto;
 import java.util.List;
 import java.util.UUID;
 
