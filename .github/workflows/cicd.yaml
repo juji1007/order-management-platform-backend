@@ -50,11 +50,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
+      - name: check directory
+        run : ls -R build/
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: my-jar
-          path: /build/libs/$PROJECT_JAR_NAME.jar
+          path: build/libs/$PROJECT_JAR_NAME.jar
 
       - name: Upload Docker file
         uses: actions/upload-artifact@v4
