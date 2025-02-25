@@ -63,8 +63,7 @@ public class CouponServiceImpl implements CouponService {
     coupon.changeDiscountPrice(couponRequestDto.discountPrice());
     coupon.changeExpiration(couponRequestDto.expiration());
 
-    Coupon updatedCoupon = couponRepository.save(coupon);
-    return toResponse(updatedCoupon);
+    return toResponse(coupon);
   }
 
   @Transactional
