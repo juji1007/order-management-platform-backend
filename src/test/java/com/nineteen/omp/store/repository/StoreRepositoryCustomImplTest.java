@@ -59,7 +59,9 @@ public class StoreRepositoryCustomImplTest {
 
     log.info("Total Elements: " + results.getTotalElements());
     log.info("Total Pages: " + results.getTotalPages());
+    log.info("Total contents: " + results.getContent());
     results.getContent().forEach(result -> {
+      log.info("Store id: " + result.storeId());
       log.info("Store Name: " + result.storeName());
       log.info("Store Category: " + result.categoryName());
       log.info("Store Status: " + result.statusName());

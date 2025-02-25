@@ -1,8 +1,10 @@
 package com.nineteen.omp.store.controller.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import java.util.UUID;
 
 public record SearchStoreResponseDto(
+    UUID storeId,
     String storeName,
     String categoryName,
 //    List<String> serviceAreaName,

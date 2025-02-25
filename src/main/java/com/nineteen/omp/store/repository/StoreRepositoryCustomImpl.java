@@ -37,14 +37,11 @@ public class StoreRepositoryCustomImpl implements StoreRepositoryCustom {
     List<OrderSpecifier<?>> orders = getAllOrderSpecifiers(pageable);
 
     //검색 조건 : 상품이름, 가게이름, 카테고리 이름, 별점
-//    //상품이름은 상품이랑 가게 조인 가능함, 별점은 오더랑 오더리뷰랑 조인
-//    //상품이름, 가게이름, 카테고리이름은 booleanExpression 이용
-//    //별점은 fetchjoin 써야함
     QueryResults<SearchStoreResponseDto> results = queryFactory
         .select(new QSearchStoreResponseDto(
+            store.id,
             store.name,
             store.storeCategory.stringValue(),
-            //            null, //area.si, area.gu, area.dong
             orderReview.rating.avg().doubleValue(),
             store.status.stringValue()
         ))
@@ -119,7 +116,7 @@ public class StoreRepositoryCustomImpl implements StoreRepositoryCustom {
   }
 
   private BooleanExpression ratingContains(int averageRating) {
-    if (averageRating <= 0) {
+    if (averageRating == 0) {
       return null;
     } else if (averageRating == 5) {
       return orderReview.rating.avg().between(averageRating, averageRating);
