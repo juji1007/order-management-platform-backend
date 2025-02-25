@@ -1,19 +1,28 @@
 package com.nineteen.omp.order.service;
 
-import com.nineteen.omp.order.controller.dto.OrderRequestDto;
+import com.nineteen.omp.global.exception.CustomException;
+import com.nineteen.omp.order.controller.dto.OrderProductRequestDto;
 import com.nineteen.omp.order.controller.dto.OrderResponseDto;
+import com.nineteen.omp.order.domain.Delivery;
 import com.nineteen.omp.order.domain.Order;
 import com.nineteen.omp.order.domain.OrderProduct;
+import com.nineteen.omp.order.domain.emuns.OrderStatus;
+import com.nineteen.omp.order.domain.emuns.OrderType;
 import com.nineteen.omp.order.exception.OrderException;
 import com.nineteen.omp.order.exception.OrderExceptionCode;
+import com.nineteen.omp.order.repository.DeliveryRepository;
 import com.nineteen.omp.order.repository.OrderProductRepository;
 import com.nineteen.omp.order.repository.OrderRepository;
-import com.nineteen.omp.order.service.dto.OrderCommand;
+import com.nineteen.omp.order.service.dto.CompleteOrderRequestCommand;
+import com.nineteen.omp.order.service.dto.CreateOrderRequestCommand;
 import com.nineteen.omp.product.domain.StoreProduct;
+import com.nineteen.omp.product.exception.ProductExceptionCode;
 import com.nineteen.omp.product.repository.ProductRepository;
 import com.nineteen.omp.store.domain.Store;
+import com.nineteen.omp.store.exception.StoreExceptionCode;
 import com.nineteen.omp.store.repository.StoreRepository;
 import com.nineteen.omp.user.domain.User;
+import com.nineteen.omp.user.repository.UserRepository;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,46 +42,49 @@ public class OrderServiceImpl implements OrderService {
   private final OrderRepository orderRepository;
   private final OrderProductRepository orderProductRepository;
   private final ProductRepository productRepository;
+  private final DeliveryRepository deliveryRepository;
+  private final UserRepository userRepository;
 
   @Override
   @Transactional
-  public void createOrder(OrderRequestDto orderRequestDto) {
-    OrderCommand orderCommand = OrderCommand.fromOrderRequestDto(orderRequestDto);
-    // TODO : 병합 후 storeException 예외 적용
-    Store store = storeRepository.findById(orderCommand.storeId())
-        .orElseThrow(() -> new RuntimeException("Store not found"));
-
-    // TODO: Authentication 객체로 가져오도록 수정 필요.
-    User user = User.builder()
-        .id(1L)
-        .username("exampleUser")
-        .build();
+  public void createOrder(CreateOrderRequestCommand requestCommand) {
+    Store store = storeRepository.findById(requestCommand.storeId())
+        .orElseThrow(() -> new CustomException(StoreExceptionCode.STORE_NOT_FOUND));
+    User user = userRepository.findById(requestCommand.userId())
+        .orElseThrow(() -> new CustomException(StoreExceptionCode.STORE_NOT_FOUND));
 
     Order order = Order.builder()
         .store(store)
         .user(user)
-        .totalPrice(orderCommand.totalPrice())
-        .orderStatus(orderCommand.orderStatus())
-        .orderType(orderCommand.orderType())
+        .totalPrice(calculateTotalPrice(requestCommand.orderProducts()))
+        .orderStatus(OrderStatus.CREATED)
         .build();
 
     orderRepository.save(order);
 
-    for (OrderRequestDto.OrderProductRequestDto productDto : orderRequestDto.orderProducts()) {
-      // Now you can call findById on the injected productRepository
-      StoreProduct storeProduct = productRepository.findById(productDto.storeProductId())
-          .orElseThrow(() -> new RuntimeException("Product not found"));
+    List<OrderProduct> products = requestCommand.orderProducts().stream()
+        .map(orderProductRequestDto -> {
+          StoreProduct findProduct =
+              productRepository.findById(orderProductRequestDto.storeProductId())
+                  .orElseThrow(() -> new CustomException(ProductExceptionCode.PRODUCT_NOT_FOUND));
+          return OrderProduct.builder()
+              .order(order)
+              .storeProduct(findProduct)
+              .quantity(orderProductRequestDto.quantity())
+              .price(orderProductRequestDto.pricePerItem())
+              .build();
+        })
+        .toList();
 
-      OrderProduct orderProduct = OrderProduct.builder()
-          .order(order)
-          .store(store)
-          .storeProduct(storeProduct)
-          .quantity(productDto.quantity())
-          .price(productDto.pricePerItem())
-          .build();
+    orderProductRepository.saveAll(products);
+  }
 
-      orderProductRepository.save(orderProduct);
+  private int calculateTotalPrice(List<OrderProductRequestDto> orderProductRequestDtos) {
+    int totalPrice = 0;
+    for (OrderProductRequestDto orderProductRequestDto : orderProductRequestDtos) {
+      totalPrice += orderProductRequestDto.pricePerItem() * orderProductRequestDto.quantity();
     }
+    return totalPrice;
   }
 
   @Override
@@ -100,6 +112,22 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public Page<OrderResponseDto> getOrderByKeyword(String keyword, Pageable pageable) {
     return orderRepository.searchOrdersByKeyword(keyword, pageable);
+  }
+
+  @Override
+  @Transactional
+  public void completeOrder(CompleteOrderRequestCommand requestCommand) {
+    Order order = findById(requestCommand.orderId());
+    order.completeOrder(requestCommand.orderType(), requestCommand.orderRequestMsg());
+
+    if (requestCommand.orderType().equals(OrderType.DELIVERY)) {
+      Delivery delivery = Delivery.builder()
+          .order(order)
+          .reqstMsg(requestCommand.deliveryRequestMsg())
+          .adress(requestCommand.deliveryAddress())
+          .build();
+      deliveryRepository.save(delivery);
+    }
   }
 
   private Order findById(UUID orderId) {

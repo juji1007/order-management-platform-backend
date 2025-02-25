@@ -3,7 +3,6 @@ package com.nineteen.omp.order.domain;
 
 import com.nineteen.omp.global.entity.BaseEntity;
 import com.nineteen.omp.product.domain.StoreProduct;
-import com.nineteen.omp.store.domain.Store;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -41,10 +40,6 @@ public class OrderProduct extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id")
   private Order order;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "store_id")
-  private Store store;
 
   private int quantity;
 
