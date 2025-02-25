@@ -9,6 +9,7 @@ on:
       - develop
 
 env:
+  APPLICATION_YAML: ${{ secrets.APPLICATION_YAML }}
   PROJECT_JAR_NAME: omp-0.0.1-SNAPSHOT.jar
 
   DOCKER_IMAGE_NAME: nineteen-omp
@@ -35,7 +36,7 @@ jobs:
 
       - name: Create application.properties
         run: |
-          echo "${{ secrets.APPLICATION_YAML }}" > src/main/resources/application.yaml
+          echo "$APPLICATION_YAML > src/main/resources/application.yaml"
 
       - name: Java setup
         uses: actions/setup-java@v2
