@@ -106,6 +106,13 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            sudo docker stop ${{ DOCKER_IMAGE_NAME }} || true
+            sudo docker rm ${{ DOCKER_IMAGE_NAME }} || true
+            sudo docker stop omp-redis || true
+            sudo docker rm omp-redis || true
+
+            sudo docker pull redis
+            docker run -p 6379:6379 --name omp-redis -d redis:latest --requirepass "1234"
             sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
             sudo docker run -d -p 80:8080 --name ${{ env.DOCKER_IMAGE_NAME }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
 
