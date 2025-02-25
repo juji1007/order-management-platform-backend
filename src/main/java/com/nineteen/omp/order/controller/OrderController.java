@@ -5,6 +5,7 @@ import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.order.controller.dto.OrderRequestDto;
 import com.nineteen.omp.order.controller.dto.OrderResponseDto;
 import com.nineteen.omp.order.service.OrderServiceImpl;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,8 @@ public class OrderController {
   private final OrderServiceImpl orderService;
 
   @PostMapping
-  public ResponseEntity<ResponseDto<?>> createOrder(@RequestBody OrderRequestDto orderRequestDto) {
+  public ResponseEntity<ResponseDto<?>> createOrder(
+      @RequestBody @Valid OrderRequestDto orderRequestDto) {
     orderService.createOrder(orderRequestDto);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ResponseDto.success());
