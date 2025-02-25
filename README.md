@@ -173,9 +173,10 @@ Backend: http://localhost:8080
 - **RDS (PostgreSQL)**
 
 
-## 인프라 설계도
+### 인프라 설계도
 ![image](![nineteen-omp-infra drawio](https://github.com/user-attachments/assets/8ebe4eeb-f1c9-4b1f-bae5-74db37164089))
 - 링크 
+
 
 ## ERD
 - ![ERD - 19조](![image](https://github.com/user-attachments/assets/bc00f7d5-2a10-4d79-8248-9bf241156a3a))
