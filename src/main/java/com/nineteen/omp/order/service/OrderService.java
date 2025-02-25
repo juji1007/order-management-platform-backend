@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
 
-  void createOrder(CreateOrderRequestCommand requestCommand);
+  UUID createOrder(CreateOrderRequestCommand requestCommand);
 
   List<OrderResponseDto> getAllOrders();
 

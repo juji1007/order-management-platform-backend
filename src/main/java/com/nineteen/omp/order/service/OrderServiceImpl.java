@@ -47,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   @Transactional
-  public void createOrder(CreateOrderRequestCommand requestCommand) {
+  public UUID createOrder(CreateOrderRequestCommand requestCommand) {
     Store store = storeRepository.findById(requestCommand.storeId())
         .orElseThrow(() -> new CustomException(StoreExceptionCode.STORE_NOT_FOUND));
     User user = userRepository.findById(requestCommand.userId())
@@ -77,6 +77,8 @@ public class OrderServiceImpl implements OrderService {
         .toList();
 
     orderProductRepository.saveAll(products);
+
+    return order.getId();
   }
 
   private int calculateTotalPrice(List<OrderProductRequestDto> orderProductRequestDtos) {
