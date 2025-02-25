@@ -11,7 +11,7 @@ public interface UserCouponService {
 
   UserCouponResponseDto createUserCoupon(UserCouponCommand userCouponCommand);
 
-  Page<UserCouponResponseDto> searchUserCoupon(Pageable pageable);
+  Page<UserCouponResponseDto> getUserCoupons(Long userId, Pageable pageable);
 
   UserCouponResponseDto getUserCoupon(UUID userCouponId);
 
@@ -19,4 +19,6 @@ public interface UserCouponService {
       UserCouponRequestDto userCouponRequestDto);
 
   void deleteUserCoupon(UUID userCouponId);
+
+  Page<UserCouponResponseDto> searchUserCoupons(Long userId, Pageable validatedPageable);
 }
