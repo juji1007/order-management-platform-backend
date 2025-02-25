@@ -179,8 +179,6 @@ Backend: http://localhost:8080
 
 
 ## ERD
-- ![ERD - 19조](![image](https://github.com/user-attachments/assets/bc00f7d5-2a10-4d79-8248-9bf241156a3a))
-
 - [ERD 및 테이블 설계](https://www.notion.so/teamsparta/ERD-1982dc3ef51480e3a46bded8c16217a9)
 
 ## 프로젝트 개선점
@@ -196,7 +194,7 @@ Backend: http://localhost:8080
 ## 팀원 역할 
 |                           [전주호](https://wbsf.tistory.com/manage)                            |                           [오혜민](https://github.com/oh-min)                           |                           [주재일](https://github.com/juji1007)                            |                          [최호진](https://gentle-tiger.tistory.com/)                         |
 | :----------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
-| ![전주호](https://github.com/user-attachments/assets/dummy-image-1.jpg) | ![오혜민](https://github.com/user-attachments/assets/dummy-image-2.jpg) | ![주재일](https://github.com/user-attachments/assets/dummy-image-3.jpg) | ![최호진](https://github.com/user-attachments/assets/05a62117-2d66-499e-b9e2-9108549fb6e3) |
+| ![전주호](https://github.com/user-attachments/assets/dummy-image-1.jpg) | ![오혜민]([[https://github.com/user-attachments/assets/dummy-image-2.jpg](https://avatars.githubusercontent.com/u/106955616?v=4)](https://github.com/oh-min)) | ![주재일](https://github.com/user-attachments/assets/dummy-image-3.jpg) | ![최호진](https://github.com/user-attachments/assets/05a62117-2d66-499e-b9e2-9108549fb6e3) |
 | **주호** | **혜민** | **재일** | **호진** |
 | BE/ Payment, Infrastructure | BE/ Category | BE/ Store, Review, Coupon | BE/ Order, Product |
 
