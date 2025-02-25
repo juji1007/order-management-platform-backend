@@ -24,6 +24,10 @@ public interface StoreService {
 
   void deleteStore(UUID storeId);
 
+
   Page<SearchStoreResponseDto> searchAdvacnedStore(String productName, String storeName,
       String categoryName, int averageRating, Pageable pageable);
+
+  StoreResponseDto approveStore(UUID storeId);
+
 }

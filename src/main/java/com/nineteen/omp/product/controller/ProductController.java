@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,6 +35,7 @@ public class ProductController {
 
   private final ProductService productService;
 
+  @PreAuthorize("hasRole('OWNER')")
   @PostMapping()
   public ResponseEntity<ResponseDto<?>> addProduct(
       @RequestBody @Valid ProductRequestDto requestDto) {
@@ -65,6 +67,7 @@ public class ProductController {
   }
 
   // TODO : @AuthenticationPrinciapal 로 UserDetails 에서 productId를 가져와야 함.
+  @PreAuthorize("hasAnyRole('MASTER','OWNER')")
   @PatchMapping("/{productId}")
   public ResponseEntity<ResponseDto<?>> updateProduct(
       @RequestBody @Valid ProductRequestDto requestDto,
@@ -75,6 +78,7 @@ public class ProductController {
     return ResponseEntity.ok().body(ResponseDto.success(updateProduct));
   }
 
+  @PreAuthorize("hasAnyRole('MASTER','OWNER')")
   @DeleteMapping("/{productId}")
   public ResponseEntity<ResponseDto<?>> deleteProduct(@PathVariable UUID productId) {
     productService.deleteProduct(productId);
