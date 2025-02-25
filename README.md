@@ -178,7 +178,7 @@ Backend: http://localhost:8080
 - 링크 
 
 ## ERD
-- 링크
+- [ERD 및 테이블 설계](https://www.notion.so/teamsparta/ERD-1982dc3ef51480e3a46bded8c16217a9)
 
 ## 프로젝트 개선점
 - 쿼리dsl로 통합검색 시 N + 1 문제 해결
@@ -188,6 +188,7 @@ Backend: http://localhost:8080
   
 
 ## API docs 
+- 
 
 ## 팀원 역할 
 
