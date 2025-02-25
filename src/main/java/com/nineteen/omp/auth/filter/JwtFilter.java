@@ -27,7 +27,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
   private static List<String> PASS_URI_PATTERN = List.of(
       "/api/v1/users/login",
-      "/api/v1/users/signup"
+      "/api/v1/users/signup",
+      "/api/v1/profile",
+      "/favicon.ico"
   );
 
   private final JwtProvider jwtProvider;
