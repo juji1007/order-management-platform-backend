@@ -134,10 +134,11 @@ public class StoreController {
   @PatchMapping("/{storeId}")
   public ResponseEntity<ResponseDto<StoreResponseDto>> updateStore(
       @PathVariable UUID storeId,
-      @Valid @RequestBody StoreRequestDto storeRequestDto
-  ) {
+      @Valid @RequestBody StoreRequestDto storeRequestDto,
+      @AuthenticationPrincipal UserDetails userDetails) {
 
-    Long userId = 123L;
+    UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
+    Long userId = userDetailsImpl.getUserId();
 
     StoreResponseDto storeResponseDto = storeService.updateStore(storeId,
         new StoreCommand(userId, storeRequestDto));
