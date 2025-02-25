@@ -165,8 +165,6 @@ public class StoreController {
     UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
     Long userId = userDetailsImpl.getUserId();
 
-    System.out.println("heloo");
-
     StoreResponseDto storeResponseDto = storeService.updateStore(storeId,
         new StoreCommand(userId, storeRequestDto));
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
