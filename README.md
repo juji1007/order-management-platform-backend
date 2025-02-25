@@ -118,11 +118,15 @@ openai:
     key: "<OPENAI_API_KEY>"
 ```
 
-### 프로젝트 기술 구현
-- 시큐리티 기반 사용자 Role 
+### 프로젝트 주요 기술 구현
+
+- 시큐리티 기반 사용자 Role 관리 및 API 권한 부여
+- 사용자 주문 결제 시 쿠폰 적용
 - AI 기반 음식 설명 자동 생성
-- 다양한 상점,상품 검색 기능 제공
+- 쿼리dsl을 이용 상점, 상품, 평점 통합 검색
 - 보안 강화를 위한 JWT 기반 인증 및 인가
+- 공통 유틸 및 설정 기반 모든 디비 Auditing 관리 및 응답,에러 컨벤션 적용
+- 모든 DB softDelete 적용 및 조회 시 필터링 기능
 
 
 
@@ -168,11 +172,20 @@ Backend: http://localhost:8080
   - Redis
 - **RDS (PostgreSQL)**
 
-### 인프라 설계도
+
+## 인프라 설계도
+![image](https://github.com/user-attachments/assets/9b91fa5e-3e04-4deb-ac25-b3136e294452)
+- 링크 
 
 ## ERD
+- 링크
 
 ## 프로젝트 개선점
+- 쿼리dsl로 통합검색 시 N + 1 문제 해결
+- 상점 조회 시 서비스 지역 리스트 표시
+
+- MSA 로의 확장
+  
 
 ## API docs 
 
