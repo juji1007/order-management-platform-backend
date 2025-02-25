@@ -191,7 +191,14 @@ Backend: http://localhost:8080
   
 
 ## API docs 
+- [API 명세서](https://www.notion.so/teamsparta/API-1982dc3ef51480aaa507eb7192babbb3)
 - 
-
 ## 팀원 역할 
+|                           [전주호](https://wbsf.tistory.com/manage)                            |                           [오혜민](https://github.com/oh-min)                           |                           [주재일](https://github.com/juji1007)                            |                          [최호진](https://gentle-tiger.tistory.com/)                         |
+| :----------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
+| ![전주호](https://github.com/user-attachments/assets/dummy-image-1.jpg) | ![오혜민](https://github.com/user-attachments/assets/dummy-image-2.jpg) | ![주재일](https://github.com/user-attachments/assets/dummy-image-3.jpg) | ![최호진](https://github.com/user-attachments/assets/05a62117-2d66-499e-b9e2-9108549fb6e3) |
+| **주호** | **혜민** | **재일** | **호진** |
+| BE/ Payment, Infrastructure | BE/ Category | BE/ Store, Review, Coupon | BE/ Order, Product |
+
+
 
