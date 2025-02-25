@@ -1,7 +1,6 @@
 package com.nineteen.omp.auth.jwt.repository;
 
 import com.nineteen.omp.auth.jwt.entity.RefreshToken;
-import com.nineteen.omp.global.config.EmbeddedRedisConfig;
 import com.nineteen.omp.global.config.RedisConfig;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -12,7 +11,7 @@ import org.springframework.boot.test.autoconfigure.data.redis.DataRedisTest;
 import org.springframework.context.annotation.Import;
 
 @DataRedisTest
-@Import({RedisConfig.class, EmbeddedRedisConfig.class})
+@Import({RedisConfig.class})
 class RefreshRepositoryTest {
 
   @Autowired
