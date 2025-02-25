@@ -126,6 +126,16 @@ public class FixtureFactory {
         .build();
   }
 
+  public static StoreProduct getStoreProduct(Store store) {
+    return StoreProduct.builder()
+        .store(store)
+        .name("product" + seq++)
+        .description("description")
+        .image("image")
+        .price(1000)
+        .build();
+  }
+
   public static Store getStore() {
     return Store.builder()
         .user(getUser())
