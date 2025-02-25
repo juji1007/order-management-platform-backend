@@ -99,7 +99,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: deploy
-        continue-on-error: true  # 실패해도 GitHub Actions가 바로 종료되지 않도록 설정
+        # continue-on-error: true  # 실패해도 GitHub Actions가 바로 종료되지 않도록 설정
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.BLUE_HOST }}
