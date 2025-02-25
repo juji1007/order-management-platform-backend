@@ -75,12 +75,14 @@ openai:
 ```bash
 git clone https://github.com/2025-order-management-platform/order-management-platform-backend.git
 cd order-management-platform-backend
+```
 
 ### 2. Docker 실행
 프로젝트는 Docker Compose를 사용하여 실행됩니다. Docker를 사용하여 애플리케이션을 실행하려면 아래 명령어로 관련 컨테이너를 시작하세요.
 
 ```bash
 docker-compose up --build
+```
 
 ### 3. 애플리케이션 실행 확인
 애플리케이션이 정상적으로 실행되면, 아래 URL을 통해 확인할 수 있습니다.
