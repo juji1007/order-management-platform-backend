@@ -50,7 +50,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
   }
 
-  // 로그인 성공 시 호출
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain, Authentication authResult) throws IOException, ServletException {
@@ -58,16 +57,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     SecurityContextHolder.getContext().setAuthentication(authResult);
 
     successHandler.onAuthenticationSuccess(request, response, authResult);
+    response.getWriter().write("{\"message\": \"login Success!\"}");
+
   }
 
-  // 로그인 실패 시 호출(작동 안함)
-  @Override
-  protected void unsuccessfulAuthentication(HttpServletRequest request,
-      HttpServletResponse response, AuthenticationException failed)
-      throws IOException, ServletException {
-    response.setContentType("application/json");
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    response.getWriter().write("{\"message\": \"login failed!\"}");
-  }
 
 }

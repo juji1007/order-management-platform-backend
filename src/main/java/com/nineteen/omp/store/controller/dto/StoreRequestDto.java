@@ -1,5 +1,6 @@
 package com.nineteen.omp.store.controller.dto;
 
+import com.nineteen.omp.store.domain.StoreStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -23,10 +24,16 @@ public record StoreRequestDto(
     @Size(max = 15, message = "스토어 전화번호는 최대 15자까지 입력 가능합니다. (하이픈 포함)")
     String phone,
 
+    StoreStatus status,
+
     LocalTime openHours,
     LocalTime closeHours,
 
     String closedDays
 ) {
 
+  public StoreRequestDto {
+    // status 기본값 설정
+    status = StoreStatus.PENDING;
+  }
 }

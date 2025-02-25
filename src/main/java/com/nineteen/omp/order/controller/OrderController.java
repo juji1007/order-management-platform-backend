@@ -8,14 +8,13 @@ import com.nineteen.omp.order.service.OrderServiceImpl;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +56,7 @@ public class OrderController {
     return ResponseEntity.ok().body(ResponseDto.success());
   }
 
+  @PreAuthorize("hasRole('MASTER')")
   @GetMapping("/search")
   public ResponseEntity<ResponseDto<?>> search(
       @RequestParam(name = "keyword", defaultValue = "", required = false) String keyword,

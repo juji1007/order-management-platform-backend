@@ -65,16 +65,16 @@ public class UserCouponServiceImpl implements UserCouponService {
   }
 
   @Override
-  public Page<UserCouponResponseDto> searchUserCoupon(Pageable pageable) {
-    Page<UserCoupon> userCouponPage = userCouponRepository.findAll(pageable);
+  public Page<UserCouponResponseDto> getUserCoupons(Long userId, Pageable pageable) {
+    Page<UserCoupon> userCouponPage = userCouponRepository.findByUser_Id(userId, pageable);
     List<UserCouponResponseDto> content = userCouponPage.stream()
-        .map(userCoupon -> new UserCouponResponseDto(
-            userCoupon.getId(),
-            userCoupon.getCoupon().getId(),
-            userCoupon.isStatus()
-        ))
-        .collect(Collectors.toList());
-    return new PageImpl<>(content, pageable, userCouponPage.getTotalElements());
+        .map(UserCouponResponseDto::toResponseDto)
+        .toList();
+    return new PageImpl<>(
+        content,
+        userCouponPage.getPageable(),
+        userCouponPage.getTotalElements()
+    );
   }
 
   @Override
@@ -84,8 +84,10 @@ public class UserCouponServiceImpl implements UserCouponService {
 
   @Override
   @Transactional
-  public UserCouponResponseDto updateUserCoupon(UUID userCouponId,
-      UserCouponRequestDto userCouponRequestDto) {
+  public UserCouponResponseDto updateUserCoupon(
+      UUID userCouponId,
+      UserCouponRequestDto userCouponRequestDto
+  ) {
     UserCoupon userCoupon = findUserCouponOrThrow(userCouponId);
 
     userCoupon.changeStatus(userCouponRequestDto.status());
@@ -98,6 +100,18 @@ public class UserCouponServiceImpl implements UserCouponService {
   @Transactional
   public void deleteUserCoupon(UUID userCouponId) {
     userCouponRepository.delete(findUserCouponOrThrow(userCouponId));
+  }
+
+  @Override
+  public Page<UserCouponResponseDto> searchUserCoupons(Long userId, Pageable validatedPageable) {
+    if (userId != 0L) {
+      return getUserCoupons(userId, validatedPageable);
+    }
+    Page<UserCoupon> all = userCouponRepository.findAll(validatedPageable);
+    List<UserCouponResponseDto> content = all.stream()
+        .map(UserCouponResponseDto::toResponseDto)
+        .toList();
+    return new PageImpl<>(content, all.getPageable(), all.getTotalElements());
   }
 
   private UserCoupon findUserCouponOrThrow(UUID userCouponId) {

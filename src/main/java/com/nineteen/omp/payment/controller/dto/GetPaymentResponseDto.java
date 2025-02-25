@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public record GetPaymentResponseDto(
     UUID paymentId,
-    UUID orderId,
     PaymentStatus status,
     PaymentMethod paymentMethod,
     PgProvider pgProvider,
@@ -23,7 +22,6 @@ public record GetPaymentResponseDto(
   ) {
     this(
         command.paymentId(),
-        command.orderId(),
         command.status(),
         command.paymentMethod(),
         command.pgProvider(),

@@ -8,14 +8,17 @@ import com.nineteen.omp.store.controller.dto.StoreRequestDto;
 import com.nineteen.omp.store.controller.dto.StoreResponseDto;
 import com.nineteen.omp.store.service.StoreService;
 import com.nineteen.omp.store.service.dto.StoreCommand;
+import com.nineteen.omp.user.service.UserService;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,17 +31,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/stores")
 @RequiredArgsConstructor
 public class StoreController {
 
   private final StoreService storeService;
+  private final UserService userService;
 
+  @PreAuthorize("hasAnyRole('USER','MASTER','OWNER')")
   @PostMapping
   public ResponseEntity<ResponseDto<StoreResponseDto>> createStore(
       @Valid @RequestBody StoreRequestDto storeRequestDto,
-      @AuthenticationPrincipal UserDetails userDetails) {
+      @AuthenticationPrincipal UserDetails userDetails
+  ) {
 
     UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
     Long userId = userDetailsImpl.getUserId();
@@ -48,6 +55,7 @@ public class StoreController {
 
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
+
 
   //심화 검색
   @GetMapping("/search")
@@ -91,6 +99,22 @@ public class StoreController {
     return ResponseEntity.ok(ResponseDto.success(searchedAdvanced));
   }
 
+
+  @PreAuthorize("hasAnyRole('MASTER')")
+  @PostMapping("/approve/{storeId}")
+  public ResponseEntity<ResponseDto<StoreResponseDto>> approveStore(
+      @PathVariable UUID storeId) {
+    log.info("approveStore StoreId : {}", storeId);
+    StoreResponseDto storeResponseDto = storeService.getStore(storeId);
+
+    // 가게 status -> open으로 변경
+    storeService.approveStore(storeId);
+    // 유저 role -> 변경
+    userService.updateUserRole(storeResponseDto.userId());
+    return ResponseEntity.ok(ResponseDto.success());
+  }
+
+  //검색 -> 이름, 카테고리, 주소 -> 정렬조건은 다만들
   @GetMapping
   public ResponseEntity<ResponseDto<Page<StoreResponseDto>>> searchStore(
       @RequestParam(
@@ -131,6 +155,7 @@ public class StoreController {
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
 
+  @PreAuthorize("hasAnyRole('MASTER','OWNER')")
   @PatchMapping("/{storeId}")
   public ResponseEntity<ResponseDto<StoreResponseDto>> updateStore(
       @PathVariable UUID storeId,
@@ -140,11 +165,14 @@ public class StoreController {
     UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
     Long userId = userDetailsImpl.getUserId();
 
+    System.out.println("heloo");
+
     StoreResponseDto storeResponseDto = storeService.updateStore(storeId,
         new StoreCommand(userId, storeRequestDto));
     return ResponseEntity.ok(ResponseDto.success(storeResponseDto));
   }
-
+  
+  @PreAuthorize("hasAnyRole('MASTER','OWNER')")
   @DeleteMapping("/{storeId}")
   public ResponseEntity<?> deleteStore(@PathVariable UUID storeId) {
     storeService.deleteStore(storeId);

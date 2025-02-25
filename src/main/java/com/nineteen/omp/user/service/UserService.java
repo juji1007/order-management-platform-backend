@@ -19,4 +19,6 @@ public interface UserService {
   void deleteUser(Long userId);
 
   GetUserInfoPageResponseCommand searchUser(String nickname, Pageable pageable);
+
+  void updateUserRole(Long userId);
 }

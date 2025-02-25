@@ -70,13 +70,13 @@ public class Store extends BaseEntity {
   @Column(name = "status", updatable = true, nullable = false)
   private StoreStatus status;
 
+
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-//  @BatchSize(size = 10)
   private List<StoreProduct> storeProducts;
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-//  @BatchSize(size = 10)
   private List<Order> orders;
+
 
   public void changeStoreCategory(String storeCategoryName) {
     if (storeCategoryName == null) {
@@ -110,5 +110,9 @@ public class Store extends BaseEntity {
 
   public void changeStoreClosedDays(String closedDays) {
     this.closedDays = closedDays;
+  }
+
+  public void approveStoreStatus() {
+    this.status = status.OPEN;
   }
 }
