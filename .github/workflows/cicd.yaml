@@ -1,3 +1,4 @@
+
 name: CICD
 
 on:
@@ -87,102 +88,108 @@ jobs:
         # continue-on-error: true  # 실패해도 GitHub Actions가 바로 종료되지 않도록 설정
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.BLUE_HOST }}
+          host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo docker stop ${{ env.DOCKER_IMAGE_NAME }} || true
-            sudo docker rm ${{ env.DOCKER_IMAGE_NAME }} || true
-            sudo docker stop omp-redis || true
-            sudo docker rm omp-redis || true
+            # 실행 중인 포트 확인
+            CURRENT_PROFILE=$(curl http://${{ secrets.EC2_HOST }}/api/v1/profile)
+            echo "CURRENT_PROFILE: $CURRENT_PROFILE"
 
-            sudo docker pull redis
-            sudo docker run -p 6379:6379 --name omp-redis -d redis:latest
-            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-            sudo docker run -d -p 80:8080 --name ${{ env.DOCKER_IMAGE_NAME }} -e REDIS_HOST=${{ secrets.BLUE_HOST }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+            if [ "$CURRENT_PROFILE" == "${{ secrets.GREEN_PROFILE }}" ]; then
+              IDLE_PROFILE=${{ secrets.BLUE_PROFILE }}
+              IDLE_HOST=${{ secrets.BLUE_HOST }}
+              IDLE_HOST_KEY=${{ secrets.BLUE_HOST_KEY }}
+            else
+              IDLE_PROFILE=${{ secrets.GREEN_PROFILE }}
+              IDLE_HOST=${{ secrets.GREEN_HOST }}
+              IDLE_HOST_KEY=${{ secrets.GREEN_HOST_KEY }}
+            fi
+            echo "IDLE_PROFILE: $IDLE_PROFILE"
 
-#            # 실행 중인 포트 확인
-#            CURRENT_PROFILE=$(curl http://localhost/profile)
-#            echo "CURRENT_PROFILE: $CURRENT_PROFILE"
-#
-#            if [ "$CURRENT_PROFILE" == "$GREEN_PROFILE" ]; then
-#              IDLE_PROFILE=$BLUE_PROFILE
-#              IDLE_HOST=$BLUE_HOST
-#              IDLE_HOST_KEY=$BLUE_HOST_KEY
-#            else
-#              IDLE_PROFILE=$GREEN_PROFILE
-#              IDLE_HOST=$GREEN_HOST
-#              IDLE_HOST_KEY=$GREEN_HOST_KEY
-#            fi
-#            echo "IDLE_PROFILE: $IDLE_PROFILE"
-#
-#            # IDLE_PROFILE로 배포
-#            echo "Deploying to $IDLE_PROFILE"
-#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "mkdir -p /home/ubuntu/app"
-#
-#            # 혹시 모를 이전 이미지 삭제
-#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker stop $DOCKER_IMAGE_NAME || true"
-#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker rm $DOCKER_IMAGE_NAME || true"
-#
-#            # 새 이미지 다운로드 및 실행
-#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest"
-#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker run -d -p 80:8080 --name $DOCKER_IMAGE_NAME $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest"
-#
-#            # 배포 성공 확인
-#            echo "Checking health status..."
-#
-#            MAX_RETRIES=10  # 최대 재시도 횟수
-#            RETRY_DELAY=5  # 재시도 간격 (초)
-#
-#            SUCCESS=false   # 배포 성공 여부 플래그
-#
-#            for ((i=1; i<=MAX_RETRIES; i++)); do
-#              echo "Attempt $i: Checking health status..."
-#
-#              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$IDLE_HOST)
-#
-#              if [[ $RESPONSE_CODE -ge 200 && $RESPONSE_CODE -lt 400 ]]; then
-#                echo "Deploy successful! (HTTP $RESPONSE_CODE)"
-#                SUCCESS=true
-#                break
-#              else
-#                echo "Deploy not ready yet... (HTTP $RESPONSE_CODE)"
-#                sleep $RETRY_DELAY
-#              fi
-#            done
-#
-#            # 최종 실패 처리
-#            if [ "$SUCCESS" = false ]; then
-#              echo "Deploy failed after $MAX_RETRIES attempts."
-#              exit 1
-#            fi
-#
-#
-#            # Nginx 설정 변경
-#            echo "switching to $IDLE_PROFILE"
-#            echo "set \$service_url http://$IDLE_HOST;" | sudo tee /etc/nginx/conf.d/service-url.inc
-#            sudo service nginx reload
-#
-#
-#            # 이전 버전 종료
-#            echo "Stopping $CURRENT_PROFILE"
-#
-#            # Application server graceful shutdown
-#            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker exec $DOCKER_IMAGE_NAME /bin/sh -c 'kill -15 1'"
-#
-#            for ((i=1; i<=MAX_RETRIES; i++)); do
-#              echo "Attempt $i: Checking health status..."
-#              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$CURRENT_HOST)
-#
-#              if [ "$RESPONSE_CODE" -ge 500 ]; then
-#                echo "서비스가 정상적으로 종료됨 (응답 코드: $RESPONSE_CODE)"
-#                break
-#              else
-#                echo "서비스가 종료되지 않음... (응답 코드: $RESPONSE_CODE)"
-#                sleep $RETRY_DELAY
-#              fi
-#            done
-#
-#            # 이전 버전 삭제
-#            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker stop $DOCKER_IMAGE_NAME || true"
-#            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker rm $DOCKER_IMAGE_NAME || true"
+            # IDLE_PROFILE로 배포
+            echo "Deploying to $IDLE_PROFILE"
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "mkdir -p /home/ubuntu/app"
+
+            # 혹시 모를 이전 이미지 삭제
+            ## redis            
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker stop omp-redis || true"
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker rm omp-redis || true"
+
+            ## server
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker stop ${{ env.DOCKER_IMAGE_NAME }} || true"
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker rm ${{ env.DOCKER_IMAGE_NAME }} || true"
+            
+            # 새 이미지 다운로드 및 실행
+            ## reids
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker pull redis"
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker run -p 6379:6379 --name omp-redis -d redis:latest"
+
+            ## server
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest"
+            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker run -d -p 80:8080 -e PROFILE_NAME=$IDLE_PROFILE -e REDIS_HOST=$IDLE_HOST --name ${{ env.DOCKER_IMAGE_NAME }} ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest"
+
+
+            # 배포 성공 확인
+            echo "Checking health status..."
+
+            MAX_RETRIES=10  # 최대 재시도 횟수
+            RETRY_DELAY=5  # 재시도 간격 (초)
+
+            SUCCESS=false   # 배포 성공 여부 플래그
+
+            for ((i=1; i<=MAX_RETRIES; i++)); do
+              echo "Attempt $i: Checking health status..."
+
+              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$IDLE_HOST)
+
+              if [[ $RESPONSE_CODE -ge 200 && $RESPONSE_CODE -lt 400 ]]; then
+                echo "Deploy successful! (HTTP $RESPONSE_CODE)"
+                SUCCESS=true
+                break
+              else
+                echo "Deploy not ready yet... (HTTP $RESPONSE_CODE)"
+                sleep $RETRY_DELAY
+              fi
+            done
+
+            # 최종 실패 처리
+            if [ "$SUCCESS" = false ]; then
+              echo "Deploy failed after $MAX_RETRIES attempts."
+              exit 1
+            fi
+
+
+            # Nginx 설정 변경
+            echo "switching to $IDLE_PROFILE"
+            echo "set \$service_url http://$IDLE_HOST;" | sudo tee /etc/nginx/conf.d/service-url.inc
+            sudo service nginx reload
+
+
+            # 이전 버전 종료
+            echo "Stopping $CURRENT_PROFILE"
+
+            # Application server graceful shutdown
+            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker exec ${{ env.DOCKER_IMAGE_NAME }} /bin/sh -c 'kill -15 1'"
+
+            for ((i=1; i<=MAX_RETRIES; i++)); do
+              echo "Attempt $i: Checking health status..."
+              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$CURRENT_HOST)
+
+              if [ "$RESPONSE_CODE" -ge 500 ]; then
+                echo "서비스가 정상적으로 종료됨 (응답 코드: $RESPONSE_CODE)"
+                break
+              else
+                echo "서비스가 종료되지 않음... (응답 코드: $RESPONSE_CODE)"
+                sleep $RETRY_DELAY
+              fi
+            done
+
+            # 이전 버전 삭제
+            ## redis
+            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker stop omp-redis || true"
+            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker rm omp-redis || true"
+
+            ## server
+            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker stop ${{ env.DOCKER_IMAGE_NAME }} || true"
+            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker rm ${{ env.DOCKER_IMAGE_NAME }} || true"
