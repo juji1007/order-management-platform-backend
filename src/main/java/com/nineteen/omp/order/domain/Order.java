@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -64,10 +65,10 @@ public class Order extends BaseEntity {
   private OrderType orderType;
 
   @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
-  private List<OrderProduct> orderProducts;
+  private List<OrderProduct> orderProducts = new ArrayList<>();
 
   @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
-  private List<OrderReview> orderReviews;
+  private List<OrderReview> orderReviews = new ArrayList<>();
 
   @Builder
   public Order(Store store, User user, int totalPrice, OrderStatus orderStatus,

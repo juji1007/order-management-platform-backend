@@ -19,6 +19,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -71,10 +72,10 @@ public class Store extends BaseEntity {
 
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-  private List<StoreProduct> storeProducts;
+  private List<StoreProduct> storeProducts = new ArrayList<>();
 
   @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-  private List<Order> orders;
+  private List<Order> orders = new ArrayList<>();
 
   public void changeStoreCategory(String storeCategoryName) {
     if (storeCategoryName == null) {
