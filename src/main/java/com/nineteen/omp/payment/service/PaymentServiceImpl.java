@@ -8,6 +8,8 @@ import com.nineteen.omp.payment.domain.PaymentStatus;
 import com.nineteen.omp.payment.exception.PaymentExceptionCode;
 import com.nineteen.omp.payment.repository.PaymentRepository;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
+import com.nineteen.omp.payment.service.dto.ExecutePaymentRequestCommand;
+import com.nineteen.omp.payment.service.dto.ExecutePaymentResponseCommand;
 import com.nineteen.omp.payment.service.dto.GetPaymentListResponseCommand;
 import com.nineteen.omp.payment.service.dto.GetPaymentResponseCommand;
 import java.util.List;
@@ -43,9 +45,22 @@ public class PaymentServiceImpl implements PaymentService {
         .method(createPaymentRequestCommand.paymentMethod())
         .build();
 
-    paymentRepository.save(newPayment);
+    ExecutePaymentResponseCommand responseCommand = executePaymentGateway(newPayment);
 
-    // PG 사에 결제 요청 (추가 구현 필요)
+    newPayment.success(responseCommand.pgTid());
+
+    paymentRepository.save(newPayment);
+  }
+
+  private ExecutePaymentResponseCommand executePaymentGateway(Payment newPayment) {
+    PaymentGatewayService paymentGatewayService = null;
+//    if (newPayment.getPgProvider().equals(PgProvider.MOCK_PAY)) {
+//      paymentGatewayService = new MockPaymentGatewayService();
+//    }
+    paymentGatewayService = new DummyPaymentGatewayService();
+    ExecutePaymentRequestCommand executePaymentRequestCommand =
+        new ExecutePaymentRequestCommand(newPayment);
+    return paymentGatewayService.executePayment(executePaymentRequestCommand);
   }
 
   @Override
@@ -53,12 +68,12 @@ public class PaymentServiceImpl implements PaymentService {
   public void cancelPayment(UUID paymentId) {
     Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
-    payment.cancel();
+    payment.cancelForce();
   }
 
   @Override
-  public GetPaymentResponseCommand getPaymentByOrderId(UUID orderId) {
-    Payment payment = paymentRepository.findByOrder_Id(orderId)
+  public GetPaymentResponseCommand getPaymentById(UUID paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
     return new GetPaymentResponseCommand(payment);
   }
@@ -73,24 +88,83 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   @Override
-  public GetPaymentListResponseCommand getPaymentListByUserId(Long userId, Pageable pageable) {
+  public GetPaymentListResponseCommand getUsersPaymentList(Long userId, Pageable pageable) {
     Page<Payment> payments = paymentRepository.findByOrder_User_Id(userId, pageable);
-    List<GetPaymentResponseCommand> contents = payments.stream()
-        .map(GetPaymentResponseCommand::new)
-        .toList();
-    PageImpl<GetPaymentResponseCommand> responseCommands =
-        new PageImpl<>(contents, pageable, payments.getTotalElements());
-    return new GetPaymentListResponseCommand(responseCommands);
+    return convertGetPaymentListResponseCommand(payments);
   }
 
   @Override
-  public GetPaymentListResponseCommand getPaymentList(Pageable pageable) {
-    Page<Payment> payments = paymentRepository.findAll(pageable);
+  public GetPaymentListResponseCommand getStoresPaymentList(UUID storeId, Pageable pageable) {
+    Page<Payment> payments = paymentRepository.findByOrder_Store_Id(storeId, pageable);
+    return convertGetPaymentListResponseCommand(payments);
+  }
+
+  @Override
+  public void isOwnersPayment(Long ownerId, UUID paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
+    if (!payment.getOrder().getStore().getUser().getId().equals(ownerId)) {
+      throw new CustomException(PaymentExceptionCode.NOT_OWNER_PAYMENT);
+    }
+  }
+
+  @Override
+  @Transactional
+  public void cancelPaymentRequest(Long userId, UUID paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
+    if (!payment.getOrder().getUser().getId().equals(userId)) {
+      throw new CustomException(PaymentExceptionCode.NOT_USER_PAYMENT);
+    }
+    payment.cancelRequest();
+  }
+
+  @Override
+  @Transactional
+  public void cancelPaymentRequestDenied(UUID paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
+    if (!payment.isCancelRequest()) {
+      throw new CustomException(PaymentExceptionCode.NOT_VALID_CANCEL_REQUEST);
+    }
+    payment.cancelRequestDenied();
+  }
+
+  @Override
+  public void isUsersPayment(Long userId, UUID paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT));
+    if (!payment.getOrder().getUser().getId().equals(userId)) {
+      throw new CustomException(PaymentExceptionCode.NOT_USER_PAYMENT);
+    }
+  }
+
+  @Override
+  public GetPaymentListResponseCommand searchPaymentListByUserNickname(
+      String nickname,
+      Pageable pageable
+  ) {
+    Page<Payment> payments = paymentRepository.findByOrder_User_Nickname(nickname, pageable);
+    return convertGetPaymentListResponseCommand(payments);
+  }
+
+  @Override
+  public GetPaymentListResponseCommand searchPaymentListByStoreName(
+      String storeName,
+      Pageable pageable
+  ) {
+    Page<Payment> payments = paymentRepository.findByOrder_Store_Name(storeName, pageable);
+    return convertGetPaymentListResponseCommand(payments);
+  }
+
+  private static GetPaymentListResponseCommand convertGetPaymentListResponseCommand(
+      Page<Payment> payments
+  ) {
     List<GetPaymentResponseCommand> contents = payments.stream()
         .map(GetPaymentResponseCommand::new)
         .toList();
     PageImpl<GetPaymentResponseCommand> responseCommands =
-        new PageImpl<>(contents, pageable, payments.getTotalElements());
+        new PageImpl<>(contents, payments.getPageable(), payments.getTotalElements());
     return new GetPaymentListResponseCommand(responseCommands);
   }
 

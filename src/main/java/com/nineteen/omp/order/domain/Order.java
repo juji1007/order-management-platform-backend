@@ -41,6 +41,7 @@ public class Order extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "order_id", updatable = false, nullable = false)
   private UUID id;
 
   @ManyToOne(fetch = FetchType.EAGER)

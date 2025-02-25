@@ -1,10 +1,12 @@
 package com.nineteen.omp.payment.controller;
 
+import com.nineteen.omp.auth.dto.UserDetailsImpl;
 import com.nineteen.omp.coupon.domain.UserCoupon;
 import com.nineteen.omp.coupon.exception.UserCouponException;
 import com.nineteen.omp.coupon.exception.UserCouponExceptionCode;
 import com.nineteen.omp.coupon.repository.UserCouponRepository;
 import com.nineteen.omp.global.dto.ResponseDto;
+import com.nineteen.omp.global.exception.CustomException;
 import com.nineteen.omp.global.utils.PageableUtils;
 import com.nineteen.omp.order.domain.Order;
 import com.nineteen.omp.order.exception.OrderException;
@@ -18,6 +20,9 @@ import com.nineteen.omp.payment.domain.PgProvider;
 import com.nineteen.omp.payment.service.PaymentService;
 import com.nineteen.omp.payment.service.dto.CreatePaymentRequestCommand;
 import com.nineteen.omp.payment.service.dto.GetPaymentListResponseCommand;
+import com.nineteen.omp.store.domain.Store;
+import com.nineteen.omp.store.exception.StoreExceptionCode;
+import com.nineteen.omp.store.repository.StoreRepository;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +31,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,7 +51,9 @@ public class PaymentController {
   private final PaymentService paymentService;
   private final OrderRepository orderRepository;
   private final UserCouponRepository userCouponRepository;
+  private final StoreRepository storeRepository;
 
+  @PreAuthorize("permitAll()")
   @PostMapping
   public ResponseEntity<ResponseDto<?>> createPayment(
       @RequestBody @Valid CreatePaymentRequestDto request
@@ -68,25 +78,61 @@ public class PaymentController {
     return ResponseEntity.ok(ResponseDto.success());
   }
 
-  @PatchMapping("/{paymentId}")
+  @PreAuthorize("hasAnyRole('MASTER', 'OWNER')")
+  @PatchMapping("/{paymentId}/cancel")
   public ResponseEntity<ResponseDto<?>> cancelPayment(
-      @PathVariable("paymentId") UUID paymentId
+      @PathVariable("paymentId") UUID paymentId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
   ) {
+    if (userDetails.isOwner()) {
+      paymentService.isOwnersPayment(userDetails.getUserId(), paymentId);
+    }
     paymentService.cancelPayment(paymentId);
     return ResponseEntity.ok(ResponseDto.success());
   }
 
-  @GetMapping
-  public ResponseEntity<ResponseDto<?>> getPaymentByOrderId(
-      @RequestParam("orderId") UUID orderId
+  @PreAuthorize("hasAnyRole('MASTER', 'OWNER')")
+  @PatchMapping("/{paymentId}/cancel/denied")
+  public ResponseEntity<ResponseDto<?>> cancelPaymentRequestDenied(
+      @PathVariable("paymentId") UUID paymentId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
   ) {
-    var responseCommand = paymentService.getPaymentByOrderId(orderId);
+    if (userDetails.isOwner()) {
+      paymentService.isOwnersPayment(userDetails.getUserId(), paymentId);
+    }
+    paymentService.cancelPaymentRequestDenied(paymentId);
+    return ResponseEntity.ok(ResponseDto.success());
+  }
+
+  @Secured("USER")
+  @PatchMapping("/{paymentId}/cancel/request")
+  public ResponseEntity<ResponseDto<?>> cancelPaymentRequest(
+      @PathVariable("paymentId") UUID paymentId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
+    paymentService.cancelPaymentRequest(userDetails.getUserId(), paymentId);
+    return ResponseEntity.ok(ResponseDto.success());
+  }
+
+  @PreAuthorize("permitAll()")
+  @GetMapping("/{paymentId}")
+  public ResponseEntity<ResponseDto<?>> getPaymentDetail(
+      @PathVariable("paymentId") UUID paymentId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
+    if (userDetails.isUser()) {
+      paymentService.isUsersPayment(userDetails.getUserId(), paymentId);
+    } else if (userDetails.isOwner()) {
+      paymentService.isOwnersPayment(userDetails.getUserId(), paymentId);
+    }
+    var responseCommand = paymentService.getPaymentById(paymentId);
     var response = new GetPaymentResponseDto(responseCommand);
     return ResponseEntity.ok(ResponseDto.success(response));
   }
 
-  @GetMapping("/users")
-  public ResponseEntity<ResponseDto<?>> getPaymentListByUserId(
+  @Secured("MASTER")
+  @GetMapping("/search/by/user")
+  public ResponseEntity<ResponseDto<?>> searchPaymentListByUserId(
       @RequestParam(
           name = "userId",
           required = false,
@@ -99,18 +145,21 @@ public class PaymentController {
           direction = Direction.ASC
       ) Pageable pageable
   ) {
-    /*
-     * Master 가 아니면 본인 결제 내역만 조회 가능
-     * Master 라면 UserId를 파라미터로 받아 해당 유저의 결제 내역 조회
-     */
     PageableUtils.validatePageable(pageable);
-    var responseCommand = paymentService.getPaymentListByUserId(userId, pageable);
+
+    var responseCommand = paymentService.getUsersPaymentList(userId, pageable);
     var response = convertCommandToDto(pageable, responseCommand);
     return ResponseEntity.ok(ResponseDto.success(response));
   }
 
-  @GetMapping("/all")
-  public ResponseEntity<ResponseDto<?>> getPaymentListByUserId(
+  @Secured("MASTER")
+  @GetMapping("/search/by/store")
+  public ResponseEntity<ResponseDto<?>> searchPaymentListByStoreId(
+      @RequestParam(
+          name = "storeId",
+          required = false,
+          defaultValue = ""
+      ) UUID storeId,
       @PageableDefault(
           size = 10,
           page = 1,
@@ -118,9 +167,92 @@ public class PaymentController {
           direction = Direction.ASC
       ) Pageable pageable
   ) {
-    // Master만 전체 결제 내역 조회 가능
     PageableUtils.validatePageable(pageable);
-    var responseCommand = paymentService.getPaymentList(pageable);
+
+    var responseCommand = paymentService.getStoresPaymentList(storeId, pageable);
+    var response = convertCommandToDto(pageable, responseCommand);
+    return ResponseEntity.ok(ResponseDto.success(response));
+  }
+
+  @Secured("MASTER")
+  @GetMapping("/search/by/user-nickname")
+  public ResponseEntity<ResponseDto<?>> searchPaymentListByUserNickname(
+      @RequestParam(
+          name = "nickname",
+          required = false,
+          defaultValue = ""
+      ) String nickname,
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable
+  ) {
+    PageableUtils.validatePageable(pageable);
+
+    var responseCommand = paymentService.searchPaymentListByUserNickname(nickname, pageable);
+    var response = convertCommandToDto(pageable, responseCommand);
+    return ResponseEntity.ok(ResponseDto.success(response));
+  }
+
+  @Secured("MASTER")
+  @GetMapping("/search/by/store-name")
+  public ResponseEntity<ResponseDto<?>> searchPaymentListByStoreName(
+      @RequestParam(
+          name = "storeName",
+          required = false,
+          defaultValue = ""
+      ) String storeName,
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable
+  ) {
+    PageableUtils.validatePageable(pageable);
+
+    var responseCommand = paymentService.searchPaymentListByStoreName(storeName, pageable);
+    var response = convertCommandToDto(pageable, responseCommand);
+    return ResponseEntity.ok(ResponseDto.success(response));
+  }
+
+  @Secured("USER")
+  @GetMapping("/search/my/users")
+  public ResponseEntity<ResponseDto<?>> getUsersPaymentList(
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
+    PageableUtils.validatePageable(pageable);
+
+    var responseCommand = paymentService.getUsersPaymentList(userDetails.getUserId(), pageable);
+    var response = convertCommandToDto(pageable, responseCommand);
+    return ResponseEntity.ok(ResponseDto.success(response));
+  }
+
+  @Secured("OWNER")
+  @GetMapping("/search/my/stores")
+  public ResponseEntity<ResponseDto<?>> getStoresPaymentList(
+      @PageableDefault(
+          size = 10,
+          page = 1,
+          sort = {"createdAt", "updatedAt"},
+          direction = Direction.ASC
+      ) Pageable pageable,
+      @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
+    PageableUtils.validatePageable(pageable);
+
+    Store store = storeRepository.findByUser_Id(userDetails.getUserId())
+        .orElseThrow(() -> new CustomException(StoreExceptionCode.STORE_NOT_FOUND));
+
+    var responseCommand = paymentService.getStoresPaymentList(store.getId(), pageable);
     var response = convertCommandToDto(pageable, responseCommand);
     return ResponseEntity.ok(ResponseDto.success(response));
   }
