@@ -102,7 +102,7 @@ public class StoreController {
 
   @PreAuthorize("hasAnyRole('MASTER')")
   @PostMapping("/approve/{storeId}")
-  public ResponseEntity<ResponseDto<StoreResponseDto>> approveStore(
+  public ResponseEntity<ResponseDto<?>> approveStore(
       @PathVariable UUID storeId) {
     log.info("approveStore StoreId : {}", storeId);
     StoreResponseDto storeResponseDto = storeService.getStore(storeId);
@@ -111,7 +111,10 @@ public class StoreController {
     storeService.approveStore(storeId);
     // 유저 role -> 변경
     userService.updateUserRole(storeResponseDto.userId());
-    return ResponseEntity.ok(ResponseDto.success());
+
+    StoreResponseDto updatedStoreResponseDto = storeService.getStore(storeId);
+
+    return ResponseEntity.ok(ResponseDto.success(updatedStoreResponseDto));
   }
 
   //검색 -> 이름, 카테고리, 주소 -> 정렬조건은 다만들
