@@ -145,7 +145,7 @@ jobs:
             for ((i=1; i<=MAX_RETRIES; i++)); do
               echo "Attempt $i: Checking health status..."
 
-              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$IDLE_HOST)
+              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$IDLE_HOST/api/v1/profile)
 
               if [[ $RESPONSE_CODE -ge 200 && $RESPONSE_CODE -lt 400 ]]; then
                 echo "Deploy successful! (HTTP $RESPONSE_CODE)"
@@ -178,7 +178,7 @@ jobs:
 
             for ((i=1; i<=MAX_RETRIES; i++)); do
               echo "Attempt $i: Checking health status..."
-              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$CURRENT_HOST)
+              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$CURRENT_HOST/api/v1/profile)
 
               if [ "$RESPONSE_CODE" -ge 500 ]; then
                 echo "서비스가 정상적으로 종료됨 (응답 코드: $RESPONSE_CODE)"
