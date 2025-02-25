@@ -86,8 +86,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: $DOCKER_HUB_USERNAME
-          password: $DOCKER_HUB_ACCESS_TOKEN
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Build and push Docker image
         run: |
@@ -102,9 +102,9 @@ jobs:
         continue-on-error: true  # 실패해도 GitHub Actions가 바로 종료되지 않도록 설정
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: $BLUE_HOST
+          host: ${{ secrets.BLUE_HOST }}
           username: ubuntu
-          key: $BLUE_HOST_KEY
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             sudo docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
             sudo docker run -d -p 80:8080 --name $DOCKER_IMAGE_NAME $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
