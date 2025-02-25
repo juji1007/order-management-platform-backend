@@ -178,7 +178,7 @@ Backend: http://localhost:8080
 - 링크 
 
 ## ERD
-- ![ERD - 19조](https://github.com/user-attachments/assets/8a2f11f2-4761-4c76-9373-601cc8c3b4a)
+- ![ERD - 19조](![image](https://github.com/user-attachments/assets/bc00f7d5-2a10-4d79-8248-9bf241156a3a))
 
 - [ERD 및 테이블 설계](https://www.notion.so/teamsparta/ERD-1982dc3ef51480e3a46bded8c16217a9)
 
