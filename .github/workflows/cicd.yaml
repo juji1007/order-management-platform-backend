@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: my-jar
-          path: build/libs/$PROJECT_JAR_NAME.jar
+          path: /build/libs/$PROJECT_JAR_NAME
 
       - name: Upload Docker file
         uses: actions/upload-artifact@v4
