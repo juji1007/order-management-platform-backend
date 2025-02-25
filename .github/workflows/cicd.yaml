@@ -1,0 +1,194 @@
+name: CICD
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+env:
+  PROJECT_JAR_NAME: omp-0.0.1-SNAPSHOT.jar
+
+  DOCKER_IMAGE_NAME: nineteen-omp
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+  NGINX_HOST: ${{ secrets.EC2_HOST }}
+  NGINX_HOST_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+  GREEN_PROFILE: ${{ secrets.GREEN_PROFILE }}
+  GREEN_HOST: ${{ secrets.GREEN_HOST }}
+  GREEN_HOST_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+  BLUE_PROFILE: ${{ secrets.BLUE_PROFILE }}
+  BLUE_HOST: ${{ secrets.BLUE_HOST }}
+  BLUE_HOST_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create application.properties
+        run: |
+          echo "${{ secrets.APPLICATION_YAML }}" > src/main/resources/application.yaml
+
+      - name: Java setup
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-jar
+          path: build/libs/$PROJECT_JAR_NAME.jar
+
+      - name: Upload Docker file
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-dockerfile
+          path: Dockerfile
+
+  integration:
+    needs: build
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-jar
+          path: build/libs/
+
+      - name: Download Dockerfile artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-dockerfile
+          path: .
+
+      - name: Set up Docker buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: $DOCKER_HUB_USERNAME
+          password: $DOCKER_HUB_ACCESS_TOKEN
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest .
+          docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
+
+  deploy:
+    needs: integration
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - name: deploy
+        continue-on-error: true  # 실패해도 GitHub Actions가 바로 종료되지 않도록 설정
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: $BLUE_HOST
+          username: ubuntu
+          key: $BLUE_HOST_KEY
+          script: |
+            sudo docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
+            sudo docker run -d -p 80:8080 --name $DOCKER_IMAGE_NAME $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
+
+
+#            # 실행 중인 포트 확인
+#            CURRENT_PROFILE=$(curl http://localhost/profile)
+#            echo "CURRENT_PROFILE: $CURRENT_PROFILE"
+#
+#            if [ "$CURRENT_PROFILE" == "$GREEN_PROFILE" ]; then
+#              IDLE_PROFILE=$BLUE_PROFILE
+#              IDLE_HOST=$BLUE_HOST
+#              IDLE_HOST_KEY=$BLUE_HOST_KEY
+#            else
+#              IDLE_PROFILE=$GREEN_PROFILE
+#              IDLE_HOST=$GREEN_HOST
+#              IDLE_HOST_KEY=$GREEN_HOST_KEY
+#            fi
+#            echo "IDLE_PROFILE: $IDLE_PROFILE"
+#
+#            # IDLE_PROFILE로 배포
+#            echo "Deploying to $IDLE_PROFILE"
+#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "mkdir -p /home/ubuntu/app"
+#
+#            # 혹시 모를 이전 이미지 삭제
+#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker stop $DOCKER_IMAGE_NAME || true"
+#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker rm $DOCKER_IMAGE_NAME || true"
+#
+#            # 새 이미지 다운로드 및 실행
+#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker pull $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest"
+#            ssh -o StrictHostKeyChecking=no -i $IDLE_HOST_KEY ubuntu@$IDLE_HOST "sudo docker run -d -p 80:8080 --name $DOCKER_IMAGE_NAME $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest"
+#
+#            # 배포 성공 확인
+#            echo "Checking health status..."
+#
+#            MAX_RETRIES=10  # 최대 재시도 횟수
+#            RETRY_DELAY=5  # 재시도 간격 (초)
+#
+#            SUCCESS=false   # 배포 성공 여부 플래그
+#
+#            for ((i=1; i<=MAX_RETRIES; i++)); do
+#              echo "Attempt $i: Checking health status..."
+#
+#              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$IDLE_HOST)
+#
+#              if [[ $RESPONSE_CODE -ge 200 && $RESPONSE_CODE -lt 400 ]]; then
+#                echo "Deploy successful! (HTTP $RESPONSE_CODE)"
+#                SUCCESS=true
+#                break
+#              else
+#                echo "Deploy not ready yet... (HTTP $RESPONSE_CODE)"
+#                sleep $RETRY_DELAY
+#              fi
+#            done
+#
+#            # 최종 실패 처리
+#            if [ "$SUCCESS" = false ]; then
+#              echo "Deploy failed after $MAX_RETRIES attempts."
+#              exit 1
+#            fi
+#
+#
+#            # Nginx 설정 변경
+#            echo "switching to $IDLE_PROFILE"
+#            echo "set \$service_url http://$IDLE_HOST;" | sudo tee /etc/nginx/conf.d/service-url.inc
+#            sudo service nginx reload
+#
+#
+#            # 이전 버전 종료
+#            echo "Stopping $CURRENT_PROFILE"
+#
+#            # Application server graceful shutdown
+#            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker exec $DOCKER_IMAGE_NAME /bin/sh -c 'kill -15 1'"
+#
+#            for ((i=1; i<=MAX_RETRIES; i++)); do
+#              echo "Attempt $i: Checking health status..."
+#              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$CURRENT_HOST)
+#
+#              if [ "$RESPONSE_CODE" -ge 500 ]; then
+#                echo "서비스가 정상적으로 종료됨 (응답 코드: $RESPONSE_CODE)"
+#                break
+#              else
+#                echo "서비스가 종료되지 않음... (응답 코드: $RESPONSE_CODE)"
+#                sleep $RETRY_DELAY
+#              fi
+#            done
+#
+#            # 이전 버전 삭제
+#            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker stop $DOCKER_IMAGE_NAME || true"
+#            ssh -o StrictHostKeyChecking=no -i $CURRENT_HOST_KEY ubuntu@$CURRENT_HOST "sudo docker rm $DOCKER_IMAGE_NAME || true"
