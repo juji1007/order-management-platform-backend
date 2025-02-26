@@ -44,9 +44,9 @@ public class OrderController {
   ) {
     CreateOrderRequestCommand requestCommand =
         new CreateOrderRequestCommand(createOrderRequestDto, userDetails.getUserId());
-    orderService.createOrder(requestCommand);
+    UUID orderId = orderService.createOrder(requestCommand);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(ResponseDto.success());
+        .body(ResponseDto.success(orderId));
   }
 
   @PatchMapping("/{orderId}/complete")
